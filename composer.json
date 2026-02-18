@@ -52,12 +52,16 @@
             "Composer\\Config::disableProcessTimeout",
             "./vendor/bin/sail up -d",
             "./vendor/bin/sail yarn",
-            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"./vendor/bin/sail artisan queue:listen --tries=1 --timeout=0\" \"./vendor/bin/sail artisan pail --timeout=0\" \"./vendor/bin/sail yarn run dev\" --names=server,queue,logs,vite --kill-others"
+            "./vendor/bin/sail artisan migrate -y",
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"./vendor/bin/sail artisan horizon:listen --poll --tries=1 --timeout=0\" \"./vendor/bin/sail artisan pail --timeout=0\" \"./vendor/bin/sail yarn run dev\" --names=server,horizon,logs,vite --kill-others"
         ],
         "dev:ssr": [
-            "npm run build:ssr",
             "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"php artisan inertia:start-ssr\" --names=server,queue,logs,ssr --kill-others"
+            "./vendor/bin/sail up -d",
+            "./vendor/bin/sail yarn",
+            "./vendor/bin/sail artisan migrate -y",
+            "./vendor/bin/sail yarn run build:ssr",
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"./vendor/bin/sail artisan horizon:listen --poll --tries=1\" \"./vendor/bin/sail artisan pail --timeout=0\" \"./vendor/bin/sail artisan inertia:start-ssr\" --names=server,horizon,logs,ssr --kill-others"
         ],
         "lint": [
             "pint --parallel"
