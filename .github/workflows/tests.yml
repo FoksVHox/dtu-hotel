@@ -21,6 +21,21 @@ jobs:
       matrix:
         php-version: ['8.4', '8.5']
 
+    services:
+      postgres:
+        image: public.ecr.aws/docker/library/postgres:17
+        env:
+          POSTGRES_DB: testing
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -33,9 +48,15 @@ jobs:
           coverage: xdebug
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: 'lts/*'
+
+      - name: Enable Yarn (Corepack) and node-modules linker
+        run: |
+          corepack enable
+          corepack prepare yarn@stable --activate
+          yarn config set nodeLinker node-modules
 
       - name: Install Node Dependencies
         run: npm i
@@ -54,3 +75,10 @@ jobs:
 
       - name: Tests
         run: ./vendor/bin/pest
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: ${{ job.services.postgres.ports['5432'] }}
+          DB_USERNAME: postgres
+          DB_DATABASE: testing
+          DB_PASSWORD: password
