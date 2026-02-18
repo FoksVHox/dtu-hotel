@@ -27,3 +27,17 @@ yarn-error.log
 /.vscode
 /.zed
 /.yarn/
+
+
+# macOS
+._*
+.AppleDouble
+.LSOverride
+Icon
+.Spotlight-V100
+.Trashes
+.fseventsd
+
+# Claude Code
+.claude/
+CLAUDE.md
