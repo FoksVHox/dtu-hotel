@@ -5,9 +5,9 @@ namespace Database\Seeders;
 use App\Models\Building;
 use App\Models\Floor;
 use App\Models\Hotel;
+use App\Models\Room;
 use App\Models\RoomAccessory;
 use App\Models\RoomCategory;
-use App\Models\Room;
 use Illuminate\Database\Seeder;
 
 class HotelStructureSeeder extends Seeder
