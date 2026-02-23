@@ -6,7 +6,7 @@ use App\Models\Guest;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
-class GuestsFactory extends Factory
+class GuestFactory extends Factory
 {
     protected $model = Guest::class;
 

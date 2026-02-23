@@ -7,7 +7,7 @@ use App\Models\Hotel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
-class BuildingsFactory extends Factory
+class BuildingFactory extends Factory
 {
     protected $model = Building::class;
 
@@ -21,7 +21,7 @@ class BuildingsFactory extends Factory
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
 
-            'hotels_id' => Hotel::factory(),
+            'hotel_id' => Hotel::factory(),
         ];
     }
 }

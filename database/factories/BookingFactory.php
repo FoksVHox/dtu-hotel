@@ -6,7 +6,7 @@ use App\Models\Booking;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
-class BookingsFactory extends Factory
+class BookingFactory extends Factory
 {
     protected $model = Booking::class;
 

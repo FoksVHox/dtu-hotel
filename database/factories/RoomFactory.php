@@ -5,13 +5,12 @@ namespace Database\Factories;
 use App\Models\Building;
 use App\Models\Floor;
 use App\Models\Hotel;
-use App\Models\RoomAccessory;
 use App\Models\RoomCategory;
 use App\Models\Room;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
-class RoomsFactory extends Factory
+class RoomFactory extends Factory
 {
     protected $model = Room::class;
 
@@ -21,9 +20,9 @@ class RoomsFactory extends Factory
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
 
-            'hotels_id' => Hotel::factory(),
-            'buildings_id' => Building::factory(),
-            'floors_id' => Floor::factory(),
+            'hotel_id' => Hotel::factory(),
+            'building_id' => Building::factory(),
+            'floor_id' => Floor::factory(),
             'room_category_id' => RoomCategory::factory(),
         ];
     }
