@@ -5,9 +5,8 @@ namespace Database\Factories;
 use App\Models\Building;
 use App\Models\Floor;
 use App\Models\Hotel;
-use App\Models\RoomAccessory;
-use App\Models\RoomCategory;
 use App\Models\Room;
+use App\Models\RoomCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 

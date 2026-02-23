@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Gate;
 use Laravel\Telescope\IncomingEntry;
 use Laravel\Telescope\Telescope;
 use Laravel\Telescope\TelescopeApplicationServiceProvider;
+
 use function str_ends_with;
 
 class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
