@@ -59,7 +59,7 @@ jobs:
           yarn config set nodeLinker node-modules
 
       - name: Install Node Dependencies
-        run: yarn install
+        run: yarn install --immutable
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
