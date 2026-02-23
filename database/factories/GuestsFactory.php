@@ -2,13 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\Guests;
+use App\Models\Guest;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
 class GuestsFactory extends Factory
 {
-    protected $model = Guests::class;
+    protected $model = Guest::class;
 
     public function definition(): array
     {

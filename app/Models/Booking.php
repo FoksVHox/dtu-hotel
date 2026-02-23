@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class Bookings extends Model
+class Booking extends Model
 {
     use HasFactory;
+
+    protected $table = 'bookings';
 
     protected $fillable = [
         'start',
@@ -18,12 +20,12 @@ class Bookings extends Model
 
     public function rooms(): BelongsToMany
     {
-        return $this->belongsToMany(Rooms::class, 'booking_room', 'bookings_id', 'rooms_id');
+        return $this->belongsToMany(Room::class, 'booking_room', 'bookings_id', 'rooms_id');
     }
 
     public function guests(): BelongsToMany
     {
-        return $this->belongsToMany(Guests::class, 'guest_booking', 'bookings_id', 'guests_id');
+        return $this->belongsToMany(Guest::class, 'guest_booking', 'bookings_id', 'guests_id');
     }
 
     protected function casts(): array

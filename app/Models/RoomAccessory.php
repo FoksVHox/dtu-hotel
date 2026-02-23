@@ -15,4 +15,9 @@ class RoomAccessory extends Model
         'name',
         'description',
     ];
+
+    public function rooms(): BelongsToMany
+    {
+        return $this->belongsToMany(Room::class, 'room_accessory_room', 'room_accessory_id', 'rooms_id');
+    }
 }

@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Bookings;
-use App\Models\Guests;
-use App\Models\Hotels;
-use App\Models\Rooms;
+use App\Models\Booking;
+use App\Models\Guest;
+use App\Models\Hotel;
+use App\Models\Room;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
@@ -13,15 +13,15 @@ class BookingSeeder extends Seeder
 {
     public function run(): void
     {
-        $guestIds = Guests::query()->pluck('id');
-        $hotels = Hotels::all();
+        $guestIds = Guest::query()->pluck('id');
+        $hotels = Hotel::all();
 
         if ($guestIds->isEmpty() || $hotels->isEmpty()) {
             throw new \RuntimeException('Guests eller Hotels mangler. Kør de tidligere seeders først.');
         }
 
         // Cache rooms pr. hotel (hurtigere end query hver gang)
-        $roomIdsByHotel = Rooms::query()
+        $roomIdsByHotel = Room::query()
             ->select('id', 'hotels_id')
             ->get()
             ->groupBy('hotels_id')
@@ -56,7 +56,7 @@ class BookingSeeder extends Seeder
                     ->setTime(11, 0);
 
                 // Find rum i det hotel der er optaget i perioden (overlap)
-                $occupiedRoomIds = Rooms::query()
+                $occupiedRoomIds = Room::query()
                     ->where('hotels_id', $hotel->id)
                     ->whereHas('bookings', function ($q) use ($start, $end) {
                         $q->where('start', '<', $end)
@@ -79,7 +79,7 @@ class BookingSeeder extends Seeder
                     ->values()
                     ->all();
 
-                $booking = Bookings::factory()->create([
+                $booking = Booking::factory()->create([
                     'start' => $start,
                     'end' => $end,
                     'status' => $statuses[array_rand($statuses)],

@@ -2,15 +2,15 @@
 
 namespace Database\Factories;
 
-use App\Models\Buildings;
-use App\Models\Floors;
-use App\Models\Hotels;
+use App\Models\Building;
+use App\Models\Floor;
+use App\Models\Hotel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
 class FloorsFactory extends Factory
 {
-    protected $model = Floors::class;
+    protected $model = Floor::class;
 
     public function definition(): array
     {
@@ -20,8 +20,8 @@ class FloorsFactory extends Factory
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
 
-            'buildings_id' => Buildings::factory(),
-            'hotels_id' => Hotels::factory(),
+            'buildings_id' => Building::factory(),
+            'hotels_id' => Hotel::factory(),
         ];
     }
 }

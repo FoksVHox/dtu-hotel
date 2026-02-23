@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\Buildings;
-use App\Models\Floors;
-use App\Models\Hotels;
+use App\Models\Building;
+use App\Models\Floor;
+use App\Models\Hotel;
 use App\Models\RoomAccessory;
 use App\Models\RoomCategory;
-use App\Models\Rooms;
+use App\Models\Room;
 use Illuminate\Database\Seeder;
 
 class HotelStructureSeeder extends Seeder
@@ -23,7 +23,7 @@ class HotelStructureSeeder extends Seeder
 
         // 2 fiktive hoteller (via factory)
         $hotels = collect([
-            Hotels::factory()->create([
+            Hotel::factory()->create([
                 'name' => 'North Harbor Hotel',
                 'cvr' => '12345678',
                 'phone' => '+45 20112233',
@@ -32,7 +32,7 @@ class HotelStructureSeeder extends Seeder
                 'address' => 'Harborvej 12, 2800 Kongens Lyngby',
                 'currency' => 'DKK',
             ]),
-            Hotels::factory()->create([
+            Hotel::factory()->create([
                 'name' => 'Aurora Stay Copenhagen',
                 'cvr' => '87654321',
                 'phone' => '+45 20998877',
@@ -47,7 +47,7 @@ class HotelStructureSeeder extends Seeder
             $buildingCount = rand(1, 3);
 
             for ($b = 1; $b <= $buildingCount; $b++) {
-                $building = Buildings::factory()->create([
+                $building = Building::factory()->create([
                     'hotels_id' => $hotel->id,
                     'name' => "Building {$b}",
                     'code' => 'H'.$hotel->id.'-B'.$b, // unik og læsbar
@@ -58,7 +58,7 @@ class HotelStructureSeeder extends Seeder
                 $floorCount = rand(2, 5);
 
                 for ($f = 1; $f <= $floorCount; $f++) {
-                    $floor = Floors::factory()->create([
+                    $floor = Floor::factory()->create([
                         'hotels_id' => $hotel->id,
                         'buildings_id' => $building->id,
                         'name' => "Floor {$f}",
@@ -71,7 +71,7 @@ class HotelStructureSeeder extends Seeder
                     for ($r = 1; $r <= $roomsOnFloor; $r++) {
                         $primaryAccessory = $accessories->random();
 
-                        $room = Rooms::factory()->create([
+                        $room = Room::factory()->create([
                             'hotels_id' => $hotel->id,
                             'buildings_id' => $building->id,
                             'floors_id' => $floor->id,

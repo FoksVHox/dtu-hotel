@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class Rooms extends Model
+class Room extends Model
 {
     use HasFactory;
+
+    protected $table = 'rooms';
 
     protected $fillable = [
         'hotels_id',
@@ -18,19 +20,19 @@ class Rooms extends Model
         'room_category_id',
     ];
 
-    public function hotels(): BelongsTo
+    public function hotel(): BelongsTo
     {
-        return $this->belongsTo(Hotels::class);
+        return $this->belongsTo(Hotel::class, 'hotels_id');
     }
 
-    public function buildings(): BelongsTo
+    public function building(): BelongsTo
     {
-        return $this->belongsTo(Buildings::class);
+        return $this->belongsTo(Building::class, 'buildings_id');
     }
 
-    public function floors(): BelongsTo
+    public function floor(): BelongsTo
     {
-        return $this->belongsTo(Floors::class);
+        return $this->belongsTo(Floor::class, 'floors_id');
     }
 
     public function roomCategory(): BelongsTo
@@ -45,6 +47,6 @@ class Rooms extends Model
 
     public function bookings(): BelongsToMany
     {
-        return $this->belongsToMany(Bookings::class, 'booking_room', 'rooms_id', 'bookings_id');
+        return $this->belongsToMany(Booking::class, 'booking_room', 'rooms_id', 'bookings_id');
     }
 }

@@ -2,13 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\Bookings;
+use App\Models\Booking;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
 class BookingsFactory extends Factory
 {
-    protected $model = Bookings::class;
+    protected $model = Booking::class;
 
     public function definition(): array
     {

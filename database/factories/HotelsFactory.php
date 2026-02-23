@@ -2,13 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\Hotels;
+use App\Models\Hotel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
 
 class HotelsFactory extends Factory
 {
-    protected $model = Hotels::class;
+    protected $model = Hotel::class;
 
     public function definition(): array
     {

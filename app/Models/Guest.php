@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class Guests extends Model
+class Guest extends Model
 {
     use HasFactory;
+
+    protected $table = 'guests';
 
     protected $fillable = [
         'first_name',
@@ -21,7 +23,7 @@ class Guests extends Model
 
     public function bookings(): BelongsToMany
     {
-        return $this->belongsToMany(Bookings::class, 'guest_booking', 'guests_id', 'bookings_id');
+        return $this->belongsToMany(Booking::class, 'guest_booking', 'guests_id', 'bookings_id');
     }
 
     protected function casts(): array
