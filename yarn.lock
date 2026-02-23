@@ -2938,7 +2938,15 @@ keyv@^4.5.4:
   dependencies:
     json-buffer "3.0.1"
 
-laravel-precognition@^1.0.1:
+laravel-precognition-react@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/laravel-precognition-react/-/laravel-precognition-react-1.0.2.tgz#90c7cbdc3dce83ae01b790e83db51ea701ea7745"
+  integrity sha512-22uiiKlsrvV/9439rFjb84HFxBE8buIg6tWnMCFFxBDXFFWc3K2CYoYd/PB/wLpDPHht4PqT32frd72rfbOg3A==
+  dependencies:
+    laravel-precognition "1.0.2"
+    lodash-es "^4.17.21"
+
+laravel-precognition@1.0.2, laravel-precognition@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/laravel-precognition/-/laravel-precognition-1.0.2.tgz#8955a66439088984b1e04fcd0a2a86d8fbc75564"
   integrity sha512-0H08JDdMWONrL/N314fvsO3FATJwGGlFKGkMF3nNmizVFJaWs17816iM+sX7Rp8d5hUjYCx6WLfsehSKfaTxjg==
