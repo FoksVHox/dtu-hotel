@@ -8,8 +8,8 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('guest_booking', function (Blueprint $table) {
-            $table->foreignId('guests_id');
-            $table->foreignId('bookings_id');
+            $table->foreignId('guest_id');
+            $table->foreignId('booking_id');
         });
     }
 

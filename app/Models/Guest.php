@@ -10,8 +10,6 @@ class Guest extends Model
 {
     use HasFactory;
 
-    protected $table = 'guests';
-
     protected $fillable = [
         'first_name',
         'last_name',
@@ -23,7 +21,7 @@ class Guest extends Model
 
     public function bookings(): BelongsToMany
     {
-        return $this->belongsToMany(Booking::class, 'guest_booking', 'guests_id', 'bookings_id');
+        return $this->belongsToMany(Booking::class);
     }
 
     protected function casts(): array

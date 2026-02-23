@@ -9,7 +9,7 @@ return new class extends Migration {
     {
         Schema::create('room_accessory_room', function (Blueprint $table) {
             $table->foreignId('room_accessory_id');
-            $table->foreignId('rooms_id');
+            $table->foreignId('room_id');
         });
     }
 

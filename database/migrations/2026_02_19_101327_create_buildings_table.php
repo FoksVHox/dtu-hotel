@@ -13,7 +13,7 @@ return new class extends Migration {
             $table->string('address');
             $table->string('phone');
             $table->string('code');
-            $table->foreignId('hotels_id');
+            $table->foreignId('hotel_id');
             $table->timestamps();
         });
     }

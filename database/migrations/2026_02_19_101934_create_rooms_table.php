@@ -9,9 +9,9 @@ return new class extends Migration {
     {
         Schema::create('rooms', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('hotels_id');
-            $table->foreignId('buildings_id');
-            $table->foreignId('floors_id');
+            $table->foreignId('hotel_id');
+            $table->foreignId('building_id');
+            $table->foreignId('floor_id');
             $table->foreignId('room_category_id');
             $table->timestamps();
         });

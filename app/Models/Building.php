@@ -11,28 +11,26 @@ class Building extends Model
 {
     use HasFactory;
 
-    protected $table = 'buildings';
-
     protected $fillable = [
         'name',
         'address',
         'phone',
         'code',
-        'hotels_id',
+        'hotel_id',
     ];
 
     public function hotel(): BelongsTo
     {
-        return $this->belongsTo(Hotel::class, 'hotels_id');
+        return $this->belongsTo(Hotel::class);
     }
 
     public function floors(): HasMany
     {
-        return $this->hasMany(Floor::class, 'buildings_id');
+        return $this->hasMany(Floor::class);
     }
 
     public function rooms(): HasMany
     {
-        return $this->hasMany(Room::class, 'buildings_id');
+        return $this->hasMany(Room::class);
     }
 }

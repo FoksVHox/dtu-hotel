@@ -10,11 +10,10 @@ return new class extends Migration {
         Schema::create('floors', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('code');
-            $table->foreignId('buildings_id');
-            $table->foreignId('hotels_id');
+            $table->string('code')->unique();
+            $table->foreignId('building_id');
+            $table->foreignId('hotel_id');
             $table->timestamps();
-            $table->unique(['code']);
         });
     }
 

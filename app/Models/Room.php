@@ -11,28 +11,26 @@ class Room extends Model
 {
     use HasFactory;
 
-    protected $table = 'rooms';
-
     protected $fillable = [
-        'hotels_id',
-        'buildings_id',
-        'floors_id',
+        'hotel_id',
+        'building_id',
+        'floor_id',
         'room_category_id',
     ];
 
     public function hotel(): BelongsTo
     {
-        return $this->belongsTo(Hotel::class, 'hotels_id');
+        return $this->belongsTo(Hotel::class);
     }
 
     public function building(): BelongsTo
     {
-        return $this->belongsTo(Building::class, 'buildings_id');
+        return $this->belongsTo(Building::class);
     }
 
     public function floor(): BelongsTo
     {
-        return $this->belongsTo(Floor::class, 'floors_id');
+        return $this->belongsTo(Floor::class);
     }
 
     public function roomCategory(): BelongsTo
@@ -42,11 +40,11 @@ class Room extends Model
 
     public function roomAccessories(): BelongsToMany
     {
-        return $this->belongsToMany(RoomAccessory::class, 'room_accessory_room', 'rooms_id', 'room_accessory_id');
+        return $this->belongsToMany(RoomAccessory::class);
     }
 
     public function bookings(): BelongsToMany
     {
-        return $this->belongsToMany(Booking::class, 'booking_room', 'rooms_id', 'bookings_id');
+        return $this->belongsToMany(Booking::class);
     }
 }

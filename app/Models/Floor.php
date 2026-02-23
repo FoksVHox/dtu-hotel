@@ -11,27 +11,25 @@ class Floor extends Model
 {
     use HasFactory;
 
-    protected $table = 'floors';
-
     protected $fillable = [
         'name',
         'code',
-        'buildings_id',
-        'hotels_id',
+        'building_id',
+        'hotel_id',
     ];
 
     public function building(): BelongsTo
     {
-        return $this->belongsTo(Building::class, 'buildings_id');
+        return $this->belongsTo(Building::class);
     }
 
     public function hotel(): BelongsTo
     {
-        return $this->belongsTo(Hotel::class, 'hotels_id');
+        return $this->belongsTo(Hotel::class);
     }
 
     public function rooms(): HasMany
     {
-        return $this->hasMany(Room::class, 'floors_id');
+        return $this->hasMany(Room::class);
     }
 }
