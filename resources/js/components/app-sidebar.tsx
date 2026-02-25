@@ -1,5 +1,13 @@
 import { Link } from '@inertiajs/react';
-import { BedDouble, BookOpen, CalendarDays, Folder, LayoutGrid, Settings, Wrench } from 'lucide-react';
+import {
+    BedDouble,
+    BookOpen,
+    CalendarDays,
+    Folder,
+    LayoutGrid,
+    Settings,
+    Wrench,
+} from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -14,8 +22,8 @@ import {
 } from '@/components/ui/sidebar';
 import type { NavItem } from '@/types';
 import AppLogo from './app-logo';
-import { index as bookingsIndex } from '@/routes/bookings';
 import { dashboard } from '@/routes';
+import { index as bookingsIndex } from '@/routes/bookings';
 import { index as maintenanceIndex } from '@/routes/maintenance';
 import { edit as profileEdit } from '@/routes/profile';
 import { index as roomsIndex } from '@/routes/rooms';
