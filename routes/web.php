@@ -1,12 +1,12 @@
 <?php
 
+use App\Http\Controllers\BookingController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MaintenanceController;
+use App\Http\Controllers\RoomController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\BookingController;
-use App\Http\Controllers\RoomController;
-use App\Http\Controllers\MaintenanceController;
 
 Route::get('/', function () {
     return Inertia::render('welcome', [
