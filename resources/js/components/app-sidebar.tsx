@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BedDouble, BookOpen, CalendarDays, Folder, LayoutGrid, Settings, Shield, Wrench } from 'lucide-react';
+import { BedDouble, BookOpen, CalendarDays, Folder, LayoutGrid, Settings, Wrench } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
