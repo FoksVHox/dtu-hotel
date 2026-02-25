@@ -52,14 +52,14 @@ jobs:
         with:
           node-version: 'lts/*'
 
-      - name: Enable Yarn (Corepack) and node-modules linker
+      - name: Install Yarn Classic (v1)
         run: |
-          corepack enable
-          corepack prepare yarn@stable --activate
+          npm install -g yarn@1
+          yarn --version
           yarn config set nodeLinker node-modules
 
       - name: Install Node Dependencies
-        run: npm i
+        run: yarn install --immutable
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader

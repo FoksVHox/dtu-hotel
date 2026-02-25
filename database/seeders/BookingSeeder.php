@@ -22,9 +22,9 @@ class BookingSeeder extends Seeder
 
         // Cache rooms pr. hotel (hurtigere end query hver gang)
         $roomIdsByHotel = Room::query()
-            ->select('id', 'hotels_id')
+            ->select('id', 'hotel_id')
             ->get()
-            ->groupBy('hotels_id')
+            ->groupBy('hotel_id')
             ->map(fn ($rows) => $rows->pluck('id')->values());
 
         $targetBookings = 120;
@@ -57,7 +57,7 @@ class BookingSeeder extends Seeder
 
                 // Find rum i det hotel der er optaget i perioden (overlap)
                 $occupiedRoomIds = Room::query()
-                    ->where('hotels_id', $hotel->id)
+                    ->where('hotel_id', $hotel->id)
                     ->whereHas('bookings', function ($q) use ($start, $end) {
                         $q->where('start', '<', $end)
                             ->where('end', '>', $start);
