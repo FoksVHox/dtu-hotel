@@ -18,6 +18,7 @@ class RoomAccessory extends Model
 
     public function rooms(): BelongsToMany
     {
-        return $this->belongsToMany(Room::class);
+        // Migration creates `room_accessory_room` (not Laravel's default `room_room_accessory`).
+        return $this->belongsToMany(Room::class, 'room_accessory_room');
     }
 }
