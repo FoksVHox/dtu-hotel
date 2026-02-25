@@ -1,5 +1,9 @@
 import { Head } from '@inertiajs/react';
+import { useState } from 'react';
+import { CalendarGrid } from '@/components/calendar/calendar-grid';
+import { WeekHeader } from '@/components/calendar/week-header';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
+import { mockBookings, mockRooms } from '@/data/mock-calendar';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import { dashboard } from '@/routes';
@@ -11,7 +15,26 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+function getMonday(date: Date): Date {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    d.setDate(diff);
+    d.setHours(0, 0, 0, 0);
+    return d;
+}
+
 export default function Dashboard() {
+    const [weekStart, setWeekStart] = useState<Date>(() => getMonday(new Date()));
+
+    function shiftWeek(days: number) {
+        setWeekStart((prev) => {
+            const next = new Date(prev);
+            next.setDate(next.getDate() + days);
+            return next;
+        });
+    }
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
@@ -27,9 +50,14 @@ export default function Dashboard() {
                         <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                     </div>
                 </div>
-                <div className="relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 md:min-h-min dark:border-sidebar-border">
-                    <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                </div>
+
+                <WeekHeader
+                    weekStart={weekStart}
+                    onPrev={() => shiftWeek(-7)}
+                    onNext={() => shiftWeek(7)}
+                />
+
+                <CalendarGrid weekStart={weekStart} rooms={mockRooms} bookings={mockBookings} />
             </div>
         </AppLayout>
     );
