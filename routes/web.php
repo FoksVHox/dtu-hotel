@@ -10,8 +10,23 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
-Route::get('dashboard', function () {
-    return Inertia::render('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('dashboard', function () {
+        return Inertia::render('dashboard');
+    })->name('dashboard');
+
+    Route::get('bookings', function () {
+        return Inertia::render('bookings/index');
+    })->name('bookings.index');
+
+    Route::get('rooms', function () {
+        return Inertia::render('rooms/index');
+    })->name('rooms.index');
+
+    Route::get('maintenance', function () {
+        return Inertia::render('maintenance/index');
+    })->name('maintenance.index');
+});
 
 require __DIR__.'/settings.php';
