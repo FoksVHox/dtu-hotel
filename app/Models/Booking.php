@@ -23,7 +23,7 @@ class Booking extends Model
 
     public function guests(): BelongsToMany
     {
-        return $this->belongsToMany(Guest::class);
+        return $this->belongsToMany(Guest::class, 'guest_booking');
     }
 
     protected function casts(): array

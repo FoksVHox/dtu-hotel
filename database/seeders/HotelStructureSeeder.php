@@ -48,7 +48,7 @@ class HotelStructureSeeder extends Seeder
 
             for ($b = 1; $b <= $buildingCount; $b++) {
                 $building = Building::factory()->create([
-                    'hotels_id' => $hotel->id,
+                    'hotel_id' => $hotel->id,
                     'name' => "Building {$b}",
                     'code' => 'H'.$hotel->id.'-B'.$b, // unik og læsbar
                     'address' => $hotel->address,
@@ -59,8 +59,8 @@ class HotelStructureSeeder extends Seeder
 
                 for ($f = 1; $f <= $floorCount; $f++) {
                     $floor = Floor::factory()->create([
-                        'hotels_id' => $hotel->id,
-                        'buildings_id' => $building->id,
+                        'hotel_id' => $hotel->id,
+                        'building_id' => $building->id,
                         'name' => "Floor {$f}",
                         // floors.code er unique globalt i din migration
                         'code' => 'H'.$hotel->id.'-B'.$building->id.'-F'.$f,
@@ -72,9 +72,9 @@ class HotelStructureSeeder extends Seeder
                         $primaryAccessory = $accessories->random();
 
                         $room = Room::factory()->create([
-                            'hotels_id' => $hotel->id,
-                            'buildings_id' => $building->id,
-                            'floors_id' => $floor->id,
+                            'hotel_id' => $hotel->id,
+                            'building_id' => $building->id,
+                            'floor_id' => $floor->id,
                             'room_category_id' => $categories->random()->id,
                         ]);
 

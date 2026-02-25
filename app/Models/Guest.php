@@ -21,7 +21,7 @@ class Guest extends Model
 
     public function bookings(): BelongsToMany
     {
-        return $this->belongsToMany(Booking::class);
+        return $this->belongsToMany(Booking::class, 'guest_booking');
     }
 
     protected function casts(): array
