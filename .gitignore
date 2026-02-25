@@ -39,4 +39,5 @@ Icon
 .fseventsd
 
 # Claude Code
-.claude/
+.claude/fetch-issue.sh
+.cursor/tasks/
