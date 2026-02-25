@@ -34,4 +34,6 @@ class Booking extends Model
             'end' => 'timestamp',
         ];
     }
+
+    
 }

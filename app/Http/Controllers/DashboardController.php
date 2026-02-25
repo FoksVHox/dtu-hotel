@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Room;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -12,7 +13,7 @@ class DashboardController extends Controller
      */
     public function __invoke(Request $request)
     {
-        $rooms = Room::all();
+        $rooms = Room::with('roomCategory', 'floor', 'bookings')->get();
 
         return Inertia::render('dashboard', [
             'rooms' => $rooms,
