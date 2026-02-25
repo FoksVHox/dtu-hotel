@@ -12,6 +12,10 @@ class DashboardController extends Controller
      */
     public function __invoke(Request $request)
     {
-        return Inertia::render('dashboard');
+        $rooms = Room::all();
+        
+        return Inertia::render('dashboard',[
+            'rooms' => $rooms,
+        ]);
     }
 }

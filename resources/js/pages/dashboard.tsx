@@ -24,7 +24,7 @@ function getMonday(date: Date): Date {
     return d;
 }
 
-export default function Dashboard() {
+export default function Dashboard({ rooms }) {
     const [weekStart, setWeekStart] = useState<Date>(() =>
         getMonday(new Date()),
     );
@@ -37,6 +37,8 @@ export default function Dashboard() {
         });
     }
 
+    console.log(rooms);
+    
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
