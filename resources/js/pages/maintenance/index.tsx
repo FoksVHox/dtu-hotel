@@ -2,12 +2,12 @@ import { Head } from '@inertiajs/react';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import { index } from '@/routes/maintenance';
+import maintenance from '@/routes/maintenance';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Room Status Management',
-        href: index().url,
+        href: maintenance.index().url,
     },
 ];
 

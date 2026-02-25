@@ -3,6 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\BookingController;
+use App\Http\Controllers\RoomController;
+use App\Http\Controllers\MaintenanceController;
 
 Route::get('/', function () {
     return Inertia::render('welcome', [
@@ -11,21 +15,13 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', DashboardController::class)->name('dashboard');
 
-    Route::get('bookings', function () {
-        return Inertia::render('bookings/index');
-    })->name('bookings.index');
+    Route::resource('bookings', BookingController::class);
 
-    Route::get('rooms', function () {
-        return Inertia::render('rooms/index');
-    })->name('rooms.index');
+    Route::resource('rooms', RoomController::class);
 
-    Route::get('maintenance', function () {
-        return Inertia::render('maintenance/index');
-    })->name('maintenance.index');
+    Route::get('maintenance', MaintenanceController::class)->name('maintenance.index');
 });
 
 require __DIR__.'/settings.php';

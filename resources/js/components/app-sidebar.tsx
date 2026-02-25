@@ -23,10 +23,10 @@ import {
 import type { NavItem } from '@/types';
 import AppLogo from './app-logo';
 import { dashboard } from '@/routes';
-import { index as bookingsIndex } from '@/routes/bookings';
-import { index as maintenanceIndex } from '@/routes/maintenance';
-import { edit as profileEdit } from '@/routes/profile';
-import { index as roomsIndex } from '@/routes/rooms';
+import bookings from '@/routes/bookings';
+import maintenance from '@/routes/maintenance';
+import profile from '@/routes/profile';
+import rooms from '@/routes/rooms';
 
 const mainNavItems: NavItem[] = [
     {
@@ -36,22 +36,22 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Bookings',
-        href: bookingsIndex(),
+        href: bookings.index(),
         icon: CalendarDays,
     },
     {
         title: 'Rooms',
-        href: roomsIndex(),
+        href: rooms.index(),
         icon: BedDouble,
     },
     {
         title: 'Maintenance',
-        href: maintenanceIndex(),
+        href: maintenance.index(),
         icon: Wrench,
     },
     {
         title: 'Settings',
-        href: profileEdit(),
+        href: profile.edit(),
         icon: Settings,
     },
 ];
