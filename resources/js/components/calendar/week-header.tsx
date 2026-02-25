@@ -20,13 +20,17 @@ function formatWeekRange(weekStart: Date): string {
     const endYear = end.getFullYear();
 
     if (startYear !== endYear) {
-        const startMonthShort = start.toLocaleString('en-GB', { month: 'short' });
+        const startMonthShort = start.toLocaleString('en-GB', {
+            month: 'short',
+        });
         const endMonthShort = end.toLocaleString('en-GB', { month: 'short' });
         return `${startDay} ${startMonthShort} ${startYear} – ${endDay} ${endMonthShort} ${endYear}`;
     }
 
     if (startMonth !== endMonth) {
-        const startMonthShort = start.toLocaleString('en-GB', { month: 'short' });
+        const startMonthShort = start.toLocaleString('en-GB', {
+            month: 'short',
+        });
         const endMonthShort = end.toLocaleString('en-GB', { month: 'short' });
         return `${startDay} ${startMonthShort} – ${endDay} ${endMonthShort} ${endYear}`;
     }
@@ -37,11 +41,23 @@ function formatWeekRange(weekStart: Date): string {
 export function WeekHeader({ weekStart, onPrev, onNext }: WeekHeaderProps) {
     return (
         <div className="flex items-center justify-center gap-4">
-            <Button variant="outline" size="icon" onClick={onPrev} aria-label="Previous week">
+            <Button
+                variant="outline"
+                size="icon"
+                onClick={onPrev}
+                aria-label="Previous week"
+            >
                 <ChevronLeft />
             </Button>
-            <h2 className="text-lg font-semibold">{formatWeekRange(weekStart)}</h2>
-            <Button variant="outline" size="icon" onClick={onNext} aria-label="Next week">
+            <h2 className="text-lg font-semibold">
+                {formatWeekRange(weekStart)}
+            </h2>
+            <Button
+                variant="outline"
+                size="icon"
+                onClick={onNext}
+                aria-label="Next week"
+            >
                 <ChevronRight />
             </Button>
         </div>

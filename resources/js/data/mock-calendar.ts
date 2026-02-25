@@ -7,7 +7,11 @@ export const mockRooms: CalendarRoom[] = [
         building_id: 1,
         floor_id: 1,
         room_category_id: 1,
-        room_category: { id: 1, name: 'Deluxe', description: 'Deluxe room with sea view' },
+        room_category: {
+            id: 1,
+            name: 'Deluxe',
+            description: 'Deluxe room with sea view',
+        },
         floor: { id: 1, name: 'First Floor', code: 'F1' },
     },
     {
@@ -16,7 +20,11 @@ export const mockRooms: CalendarRoom[] = [
         building_id: 1,
         floor_id: 1,
         room_category_id: 2,
-        room_category: { id: 2, name: 'Standard', description: 'Standard double room' },
+        room_category: {
+            id: 2,
+            name: 'Standard',
+            description: 'Standard double room',
+        },
         floor: { id: 1, name: 'First Floor', code: 'F1' },
     },
     {
@@ -25,7 +33,11 @@ export const mockRooms: CalendarRoom[] = [
         building_id: 1,
         floor_id: 2,
         room_category_id: 1,
-        room_category: { id: 1, name: 'Deluxe', description: 'Deluxe room with sea view' },
+        room_category: {
+            id: 1,
+            name: 'Deluxe',
+            description: 'Deluxe room with sea view',
+        },
         floor: { id: 2, name: 'Second Floor', code: 'F2' },
     },
     {
@@ -43,7 +55,11 @@ export const mockRooms: CalendarRoom[] = [
         building_id: 1,
         floor_id: 3,
         room_category_id: 2,
-        room_category: { id: 2, name: 'Standard', description: 'Standard double room' },
+        room_category: {
+            id: 2,
+            name: 'Standard',
+            description: 'Standard double room',
+        },
         floor: { id: 3, name: 'Third Floor', code: 'F3' },
     },
 ];

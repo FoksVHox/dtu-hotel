@@ -25,7 +25,9 @@ function getMonday(date: Date): Date {
 }
 
 export default function Dashboard() {
-    const [weekStart, setWeekStart] = useState<Date>(() => getMonday(new Date()));
+    const [weekStart, setWeekStart] = useState<Date>(() =>
+        getMonday(new Date()),
+    );
 
     function shiftWeek(days: number) {
         setWeekStart((prev) => {
@@ -57,7 +59,11 @@ export default function Dashboard() {
                     onNext={() => shiftWeek(7)}
                 />
 
-                <CalendarGrid weekStart={weekStart} rooms={mockRooms} bookings={mockBookings} />
+                <CalendarGrid
+                    weekStart={weekStart}
+                    rooms={mockRooms}
+                    bookings={mockBookings}
+                />
             </div>
         </AppLayout>
     );

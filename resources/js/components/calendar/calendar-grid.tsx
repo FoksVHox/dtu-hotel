@@ -36,7 +36,11 @@ interface PositionedBooking {
     colSpan: number;
 }
 
-function getBookingsForRoom(roomId: number, bookings: CalendarBooking[], weekStart: Date): PositionedBooking[] {
+function getBookingsForRoom(
+    roomId: number,
+    bookings: CalendarBooking[],
+    weekStart: Date,
+): PositionedBooking[] {
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekEnd.getDate() + 6);
 
@@ -50,7 +54,8 @@ function getBookingsForRoom(roomId: number, bookings: CalendarBooking[], weekSta
                 return acc;
             }
 
-            const clampedStart = bookingStart < weekStart ? weekStart : bookingStart;
+            const clampedStart =
+                bookingStart < weekStart ? weekStart : bookingStart;
             const clampedEnd = bookingEnd > weekEnd ? weekEnd : bookingEnd;
 
             const colStart = daysBetween(weekStart, clampedStart);
@@ -69,21 +74,25 @@ function guestLabel(booking: CalendarBooking): string {
     return `${guest.first_name} ${guest.last_name}`;
 }
 
-export function CalendarGrid({ weekStart, rooms, bookings }: CalendarGridProps) {
+export function CalendarGrid({
+    weekStart,
+    rooms,
+    bookings,
+}: CalendarGridProps) {
     const days = getDayColumns(weekStart);
 
     return (
         <div className="overflow-x-auto rounded-lg border border-sidebar-border/70 dark:border-sidebar-border">
-            <table className="min-w-[800px] w-full table-fixed border-collapse">
+            <table className="w-full min-w-[800px] table-fixed border-collapse">
                 <thead>
                     <tr>
-                        <th className="bg-muted/50 border-b border-r px-3 py-2 text-left text-sm font-medium w-[160px]">
+                        <th className="w-[160px] border-r border-b bg-muted/50 px-3 py-2 text-left text-sm font-medium">
                             Room
                         </th>
                         {days.map((day) => (
                             <th
                                 key={day.toISOString()}
-                                className="bg-muted/50 border-b px-3 py-2 text-center text-sm font-medium"
+                                className="border-b bg-muted/50 px-3 py-2 text-center text-sm font-medium"
                             >
                                 {formatDayHeader(day)}
                             </th>
@@ -93,18 +102,26 @@ export function CalendarGrid({ weekStart, rooms, bookings }: CalendarGridProps) 
                 <tbody>
                     {rooms.length === 0 && (
                         <tr>
-                            <td colSpan={8} className="px-3 py-12 text-center text-sm text-muted-foreground">
+                            <td
+                                colSpan={8}
+                                className="px-3 py-12 text-center text-sm text-muted-foreground"
+                            >
                                 No rooms available.
                             </td>
                         </tr>
                     )}
                     {rooms.map((room) => {
-                        const positioned = getBookingsForRoom(room.id, bookings, weekStart);
+                        const positioned = getBookingsForRoom(
+                            room.id,
+                            bookings,
+                            weekStart,
+                        );
 
                         return (
                             <tr key={room.id}>
-                                <td className="border-b border-r px-3 py-3 text-sm font-medium whitespace-nowrap">
-                                    {room.room_category.name} – {room.floor.code}
+                                <td className="border-r border-b px-3 py-3 text-sm font-medium whitespace-nowrap">
+                                    {room.room_category.name} –{' '}
+                                    {room.floor.code}
                                 </td>
                                 <td colSpan={7} className="border-b p-0">
                                     <div className="relative grid grid-cols-7">
@@ -115,23 +132,34 @@ export function CalendarGrid({ weekStart, rooms, bookings }: CalendarGridProps) 
                                             />
                                         ))}
 
-                                        {positioned.map(({ booking, colStart, colSpan }) => (
-                                            <div
-                                                key={booking.id}
-                                                className="bg-primary/10 border-primary/20 absolute top-1 bottom-1 flex flex-col justify-center overflow-hidden rounded border px-2 text-xs"
-                                                style={{
-                                                    left: `${(colStart / 7) * 100}%`,
-                                                    width: `${(colSpan / 7) * 100}%`,
-                                                }}
-                                            >
-                                                <span className="truncate font-medium">{guestLabel(booking)}</span>
-                                                {booking.guests.length > 0 && (
-                                                    <span className="text-muted-foreground truncate text-[10px]">
-                                                        {BOOKING_STATUS_LABELS[booking.status] ?? 'Unknown'}
+                                        {positioned.map(
+                                            ({
+                                                booking,
+                                                colStart,
+                                                colSpan,
+                                            }) => (
+                                                <div
+                                                    key={booking.id}
+                                                    className="absolute top-1 bottom-1 flex flex-col justify-center overflow-hidden rounded border border-primary/20 bg-primary/10 px-2 text-xs"
+                                                    style={{
+                                                        left: `${(colStart / 7) * 100}%`,
+                                                        width: `${(colSpan / 7) * 100}%`,
+                                                    }}
+                                                >
+                                                    <span className="truncate font-medium">
+                                                        {guestLabel(booking)}
                                                     </span>
-                                                )}
-                                            </div>
-                                        ))}
+                                                    {booking.guests.length >
+                                                        0 && (
+                                                        <span className="truncate text-[10px] text-muted-foreground">
+                                                            {BOOKING_STATUS_LABELS[
+                                                                booking.status
+                                                            ] ?? 'Unknown'}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            ),
+                                        )}
                                     </div>
                                 </td>
                             </tr>
