@@ -1,11 +1,11 @@
 import { Head } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { CalendarGrid } from '@/components/calendar/calendar-grid';
 import { WeekHeader } from '@/components/calendar/week-header';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import { router } from '@inertiajs/react';
-import type { CalendarBooking, CalendarRoom } from '@/types/calendar';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
+import type { CalendarBooking, CalendarRoom } from '@/types/calendar';
 import { dashboard } from '@/routes';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -57,7 +57,10 @@ export default function Dashboard({
     function shiftWeek(days: number) {
         const next = new Date(weekStartDate);
         next.setDate(next.getDate() + days);
-        router.reload({ data: { week_start: formatLocalDate(next) }, replace: true });
+        router.reload({
+            data: { week_start: formatLocalDate(next) },
+            replace: true,
+        });
     }
 
     return (
