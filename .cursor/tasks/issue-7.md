@@ -5,7 +5,7 @@ state:	OPEN
 author:	Wahlb3rg
 labels:	
 comments:	0
-assignees:	
+assignees:	HUS1904
 projects:	
 milestone:	
 number:	7
@@ -27,7 +27,7 @@ state:	OPEN
 author:	HUS1904
 labels:	
 comments:	0
-assignees:	
+assignees:	HUS1904
 projects:	
 milestone:	
 number:	27
@@ -46,7 +46,7 @@ state:	OPEN
 author:	HUS1904
 labels:	
 comments:	0
-assignees:	
+assignees:	HUS1904
 projects:	
 milestone:	
 number:	28

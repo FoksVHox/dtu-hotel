@@ -25,8 +25,10 @@ function formatDayHeader(date: Date): string {
     return `${day} ${date.getDate()}`;
 }
 
+// Extracts the date portion from an ISO 8601 string (e.g. "2026-02-23T14:00:00Z") and builds a local Date.
+// split('T')[0] strips the time part. month - 1 because JS months are 0-indexed (Jan=0, Feb=1, ...).
 function parseDate(dateString: string): Date {
-    const [year, month, day] = dateString.split('-').map(Number);
+    const [year, month, day] = dateString.split('T')[0].split('-').map(Number);
     return new Date(year, month - 1, day);
 }
 
@@ -36,6 +38,10 @@ interface PositionedBooking {
     colSpan: number;
 }
 
+// Finds all bookings for a given room and calculates their column position in the 7-day grid.
+// A booking may start before or end after the visible week, so we "clamp" it to the week boundaries.
+// colStart = which day column the block starts at (0=Monday, 6=Sunday).
+// colSpan  = how many day columns the block spans.
 function getBookingsForRoom(
     roomId: number,
     bookings: CalendarBooking[],
@@ -50,10 +56,12 @@ function getBookingsForRoom(
             const bookingStart = parseDate(booking.start);
             const bookingEnd = parseDate(booking.end);
 
+            // Skip bookings entirely outside the visible week
             if (bookingEnd < weekStart || bookingStart > weekEnd) {
                 return acc;
             }
 
+            // Clamp to visible week: if booking started last week, show from Monday; if it ends next week, show until Sunday
             const clampedStart =
                 bookingStart < weekStart ? weekStart : bookingStart;
             const clampedEnd = bookingEnd > weekEnd ? weekEnd : bookingEnd;
@@ -66,6 +74,8 @@ function getBookingsForRoom(
         }, []);
 }
 
+// Returns the display label for a booking block.
+// If guests exist, shows the first guest's name. Otherwise falls back to the status label (e.g. "Maintenance").
 function guestLabel(booking: CalendarBooking): string {
     if (booking.guests.length === 0) {
         return BOOKING_STATUS_LABELS[booking.status] ?? 'Booking';
@@ -83,8 +93,10 @@ export function CalendarGrid({
 
     return (
         <div className="overflow-x-auto rounded-lg border border-sidebar-border/70 dark:border-sidebar-border">
+            {/* Fixed-width table: 1 "Room" column + 7 equal day columns */}
             <table className="w-full min-w-[800px] table-fixed border-collapse">
                 <thead>
+                    {/* Header row: "Room" | Mon 23 | Tue 24 | Wed 25 | ... | Sun 1 */}
                     <tr>
                         <th className="w-[160px] border-r border-b bg-muted/50 px-3 py-2 text-left text-sm font-medium">
                             Room
@@ -100,6 +112,7 @@ export function CalendarGrid({
                     </tr>
                 </thead>
                 <tbody>
+                    {/* Empty state when no rooms exist */}
                     {rooms.length === 0 && (
                         <tr>
                             <td
@@ -110,6 +123,8 @@ export function CalendarGrid({
                             </td>
                         </tr>
                     )}
+
+                    {/* One row per room */}
                     {rooms.map((room) => {
                         const positioned = getBookingsForRoom(
                             room.id,
@@ -119,12 +134,16 @@ export function CalendarGrid({
 
                         return (
                             <tr key={room.id}>
+                                {/* Room label cell: e.g. "Deluxe – F1" */}
                                 <td className="border-r border-b px-3 py-3 text-sm font-medium whitespace-nowrap">
                                     {room.room_category.name} –{' '}
                                     {room.floor.code}
                                 </td>
+
+                                {/* Booking area: spans all 7 day columns */}
                                 <td colSpan={7} className="border-b p-0">
                                     <div className="relative grid grid-cols-7">
+                                        {/* 7 empty cells forming the background grid with dashed day separators */}
                                         {days.map((day, i) => (
                                             <div
                                                 key={day.toISOString()}
@@ -132,6 +151,9 @@ export function CalendarGrid({
                                             />
                                         ))}
 
+                                        {/* Booking blocks positioned absolutely on top of the grid.
+                                            left = (colStart / 7) * 100% positions the block at the correct day.
+                                            width = (colSpan / 7) * 100% stretches it across the right number of days. */}
                                         {positioned.map(
                                             ({
                                                 booking,
@@ -146,9 +168,11 @@ export function CalendarGrid({
                                                         width: `${(colSpan / 7) * 100}%`,
                                                     }}
                                                 >
+                                                    {/* Guest name (or status label for guest-less bookings like maintenance) */}
                                                     <span className="truncate font-medium">
                                                         {guestLabel(booking)}
                                                     </span>
+                                                    {/* Status subtitle shown only when there are guests */}
                                                     {booking.guests.length >
                                                         0 && (
                                                         <span className="truncate text-[10px] text-muted-foreground">

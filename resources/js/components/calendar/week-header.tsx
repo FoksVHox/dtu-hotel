@@ -7,6 +7,10 @@ interface WeekHeaderProps {
     onNext: () => void;
 }
 
+// Formats the week range with three branches depending on whether the week crosses month/year boundaries:
+//   Same month:       "23–29 March 2026"
+//   Cross-month:      "28 Feb – 6 Mar 2026"
+//   Cross-year:       "29 Dec 2025 – 4 Jan 2026"
 function formatWeekRange(weekStart: Date): string {
     const start = new Date(weekStart);
     const end = new Date(weekStart);
@@ -38,9 +42,11 @@ function formatWeekRange(weekStart: Date): string {
     return `${startDay}–${endDay} ${startMonth} ${startYear}`;
 }
 
+// Renders a centered navigation bar:  [ < ]  "23 Feb – 1 Mar 2026"  [ > ]
 export function WeekHeader({ weekStart, onPrev, onNext }: WeekHeaderProps) {
     return (
         <div className="flex items-center justify-center gap-4">
+            {/* Previous week button */}
             <Button
                 variant="outline"
                 size="icon"
@@ -49,9 +55,13 @@ export function WeekHeader({ weekStart, onPrev, onNext }: WeekHeaderProps) {
             >
                 <ChevronLeft />
             </Button>
+
+            {/* Formatted date range heading */}
             <h2 className="text-lg font-semibold">
                 {formatWeekRange(weekStart)}
             </h2>
+
+            {/* Next week button */}
             <Button
                 variant="outline"
                 size="icon"

@@ -48,9 +48,4 @@ class Room extends Model
     {
         return $this->belongsToMany(Booking::class);
     }
-
-    public function guest(): BelongsToManyThrough
-    {
-        return $this->belongsToManyThrough(Guest::class, Booking::class);
-    }
 }
