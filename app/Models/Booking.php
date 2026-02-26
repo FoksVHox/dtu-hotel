@@ -27,11 +27,14 @@ class Booking extends Model
         return $this->belongsToMany(Guest::class, 'guest_booking');
     }
 
+    // 'datetime' cast stores values as Carbon instances in PHP and serializes to ISO 8601 strings
+    // (e.g. "2026-02-23T14:00:00.000000Z") in JSON. The previous 'timestamp' cast produced Unix
+    // integers which the frontend couldn't use directly.
     protected function casts(): array
     {
         return [
-            'start' => 'timestamp',
-            'end' => 'timestamp',
+            'start' => 'datetime',
+            'end' => 'datetime',
         ];
     }
 }
