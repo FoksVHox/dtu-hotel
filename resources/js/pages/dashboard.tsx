@@ -1,12 +1,12 @@
 import { Head } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { CalendarGrid } from '@/components/calendar/calendar-grid';
 import { CalendarLegend } from '@/components/calendar/calendar-legend';
 import { WeekHeader } from '@/components/calendar/week-header';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import { router } from '@inertiajs/react';
-import type { CalendarBooking, CalendarRoom } from '@/types/calendar';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
+import type { CalendarBooking, CalendarRoom } from '@/types/calendar';
 import { dashboard } from '@/routes';
 import { addDays, format, parseISO, startOfWeek } from 'date-fns';
 
