@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\Guest;
 use App\Models\Room;
@@ -56,7 +57,7 @@ test('dashboard returns bookings with guests and rooms for the current week', fu
     $booking = Booking::factory()->create([
         'start' => $weekStart->copy()->addDay()->setTime(14, 0),
         'end' => $weekStart->copy()->addDays(3)->setTime(11, 0),
-        'status' => 1,
+        'status' => BookingStatus::Confirmed,
     ]);
     $booking->rooms()->attach($room);
     $booking->guests()->attach($guest);
@@ -114,14 +115,14 @@ test('dashboard filters bookings to the requested week', function () {
     $inRangeBooking = Booking::factory()->create([
         'start' => $targetWeek->copy()->addDay()->setTime(14, 0),
         'end' => $targetWeek->copy()->addDays(3)->setTime(11, 0),
-        'status' => 1,
+        'status' => BookingStatus::Confirmed,
     ]);
     $inRangeBooking->rooms()->attach($room);
 
     $outOfRangeBooking = Booking::factory()->create([
         'start' => $targetWeek->copy()->addWeeks(3)->setTime(14, 0),
         'end' => $targetWeek->copy()->addWeeks(3)->addDays(2)->setTime(11, 0),
-        'status' => 1,
+        'status' => BookingStatus::Confirmed,
     ]);
     $outOfRangeBooking->rooms()->attach($room);
 

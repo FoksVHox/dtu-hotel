@@ -21,7 +21,7 @@ class DashboardController extends Controller
 
         $rooms = Room::with(['roomCategory', 'floor'])->get();
 
-        $bookings = Booking::with(['guests:id,first_name,last_name', 'rooms:id'])
+        $bookings = Booking::with(['guests', 'rooms'])
             ->whereHas('rooms', fn ($query) => $query->whereIn('rooms.id', $rooms->pluck('id')))
             ->where('end', '>=', $weekStart)
             ->where('start', '<=', $weekEnd)

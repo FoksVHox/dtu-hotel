@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { addDays, format, getMonth, getYear } from 'date-fns';
 
 interface WeekHeaderProps {
     weekStart: Date;
@@ -7,39 +8,25 @@ interface WeekHeaderProps {
     onNext: () => void;
 }
 
-// Formats the week range with three branches depending on whether the week crosses month/year boundaries:
-//   Same month:       "23–29 March 2026"
-//   Cross-month:      "28 Feb – 6 Mar 2026"
-//   Cross-year:       "29 Dec 2025 – 4 Jan 2026"
+/**
+ * Formats the week range with three branches:
+ *   Same month:  "23–29 March 2026"
+ *   Cross-month: "28 Feb – 6 Mar 2026"
+ *   Cross-year:  "29 Dec 2025 – 4 Jan 2026"
+ */
 function formatWeekRange(weekStart: Date): string {
-    const start = new Date(weekStart);
-    const end = new Date(weekStart);
-    end.setDate(end.getDate() + 6);
+    const start = weekStart;
+    const end = addDays(weekStart, 6);
 
-    const startDay = start.getDate();
-    const endDay = end.getDate();
-    const startMonth = start.toLocaleString('en-GB', { month: 'long' });
-    const endMonth = end.toLocaleString('en-GB', { month: 'long' });
-    const startYear = start.getFullYear();
-    const endYear = end.getFullYear();
-
-    if (startYear !== endYear) {
-        const startMonthShort = start.toLocaleString('en-GB', {
-            month: 'short',
-        });
-        const endMonthShort = end.toLocaleString('en-GB', { month: 'short' });
-        return `${startDay} ${startMonthShort} ${startYear} – ${endDay} ${endMonthShort} ${endYear}`;
+    if (getYear(start) !== getYear(end)) {
+        return `${format(start, 'd MMM yyyy')} – ${format(end, 'd MMM yyyy')}`;
     }
 
-    if (startMonth !== endMonth) {
-        const startMonthShort = start.toLocaleString('en-GB', {
-            month: 'short',
-        });
-        const endMonthShort = end.toLocaleString('en-GB', { month: 'short' });
-        return `${startDay} ${startMonthShort} – ${endDay} ${endMonthShort} ${endYear}`;
+    if (getMonth(start) !== getMonth(end)) {
+        return `${format(start, 'd MMM')} – ${format(end, 'd MMM yyyy')}`;
     }
 
-    return `${startDay}–${endDay} ${startMonth} ${startYear}`;
+    return `${format(start, 'd')}–${format(end, 'd MMMM yyyy')}`;
 }
 
 // Renders a centered navigation bar:  [ < ]  "23 Feb – 1 Mar 2026"  [ > ]
