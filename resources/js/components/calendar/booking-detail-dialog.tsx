@@ -64,9 +64,7 @@ export function BookingDetailDialog({
                             {config.label}
                         </span>
                     </DialogTitle>
-                    <DialogDescription>
-                        Booking #{booking.id}
-                    </DialogDescription>
+                    <DialogDescription>Booking #{booking.id}</DialogDescription>
                 </DialogHeader>
 
                 <div className="flex flex-col gap-4">
@@ -110,7 +108,7 @@ export function BookingDetailDialog({
                         <>
                             <Separator />
                             <div className="flex flex-col gap-2">
-                                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                                <span className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                                     {booking.rooms.length === 1
                                         ? 'Room'
                                         : 'Rooms'}
@@ -134,7 +132,7 @@ export function BookingDetailDialog({
                         <>
                             <Separator />
                             <div className="flex flex-col gap-3">
-                                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                                <span className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
                                     {booking.guests.length === 1
                                         ? 'Guest'
                                         : 'Guests'}

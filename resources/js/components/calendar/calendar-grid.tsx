@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
     addDays,
     differenceInCalendarDays,
@@ -6,6 +5,7 @@ import {
     format,
     parseISO,
 } from 'date-fns';
+import { useState } from 'react';
 import { BookingDetailDialog } from '@/components/calendar/booking-detail-dialog';
 import type { CalendarBooking, CalendarRoom } from '@/types/calendar';
 import { getBookingStatusConfig } from '@/types/calendar';
@@ -133,7 +133,9 @@ export function CalendarGrid({
                                                 colSpan,
                                             }) => {
                                                 const config =
-                                                    getBookingStatusConfig(booking);
+                                                    getBookingStatusConfig(
+                                                        booking,
+                                                    );
 
                                                 return (
                                                     <div

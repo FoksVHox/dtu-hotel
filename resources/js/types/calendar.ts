@@ -62,7 +62,9 @@ export interface BookingStatusConfig {
     secondary: string;
 }
 
-export function getBookingStatusConfig(booking: CalendarBooking): BookingStatusConfig {
+export function getBookingStatusConfig(
+    booking: CalendarBooking,
+): BookingStatusConfig {
     return BOOKING_STATUSES[booking.status] ?? BOOKING_STATUSES[1];
 }
 
