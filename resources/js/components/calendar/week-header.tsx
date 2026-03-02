@@ -29,11 +29,9 @@ function formatWeekRange(weekStart: Date): string {
     return `${format(start, 'd')}–${format(end, 'd MMMM yyyy')}`;
 }
 
-// Renders a centered navigation bar:  [ < ]  "23 Feb – 1 Mar 2026"  [ > ]
 export function WeekHeader({ weekStart, onPrev, onNext }: WeekHeaderProps) {
     return (
         <div className="flex items-center justify-center gap-4">
-            {/* Previous week button */}
             <Button
                 variant="outline"
                 size="icon"
@@ -43,12 +41,10 @@ export function WeekHeader({ weekStart, onPrev, onNext }: WeekHeaderProps) {
                 <ChevronLeft />
             </Button>
 
-            {/* Formatted date range heading */}
             <h2 className="text-lg font-semibold">
                 {formatWeekRange(weekStart)}
             </h2>
 
-            {/* Next week button */}
             <Button
                 variant="outline"
                 size="icon"

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
     addDays,
     differenceInCalendarDays,
@@ -5,8 +6,9 @@ import {
     format,
     parseISO,
 } from 'date-fns';
+import { BookingDetailDialog } from '@/components/calendar/booking-detail-dialog';
 import type { CalendarBooking, CalendarRoom } from '@/types/calendar';
-import { BOOKING_STATUSES } from '@/types/calendar';
+import { getBookingStatusConfig } from '@/types/calendar';
 
 interface CalendarGridProps {
     weekStart: Date;
@@ -50,13 +52,9 @@ function getBookingsForRoom(
         }, []);
 }
 
-function statusConfig(booking: CalendarBooking) {
-    return BOOKING_STATUSES[booking.status] ?? BOOKING_STATUSES[1];
-}
-
 function guestLabel(booking: CalendarBooking): string {
     if (booking.guests.length === 0) {
-        return statusConfig(booking).label;
+        return getBookingStatusConfig(booking).label;
     }
     const guest = booking.guests[0];
     return `${guest.first_name} ${guest.last_name}`;
@@ -71,6 +69,9 @@ export function CalendarGrid({
         start: weekStart,
         end: addDays(weekStart, 6),
     });
+
+    const [selectedBooking, setSelectedBooking] =
+        useState<CalendarBooking | null>(null);
 
     return (
         <div className="overflow-x-auto rounded-lg border border-sidebar-border/70 dark:border-sidebar-border">
@@ -132,12 +133,30 @@ export function CalendarGrid({
                                                 colSpan,
                                             }) => {
                                                 const config =
-                                                    statusConfig(booking);
+                                                    getBookingStatusConfig(booking);
 
                                                 return (
                                                     <div
                                                         key={booking.id}
-                                                        className="absolute top-1 bottom-1 flex flex-col justify-center overflow-hidden rounded border px-2 text-xs"
+                                                        role="button"
+                                                        tabIndex={0}
+                                                        onClick={() =>
+                                                            setSelectedBooking(
+                                                                booking,
+                                                            )
+                                                        }
+                                                        onKeyDown={(e) => {
+                                                            if (
+                                                                e.key ===
+                                                                    'Enter' ||
+                                                                e.key === ' '
+                                                            ) {
+                                                                setSelectedBooking(
+                                                                    booking,
+                                                                );
+                                                            }
+                                                        }}
+                                                        className="absolute top-1 bottom-1 flex cursor-pointer flex-col justify-center overflow-hidden rounded border px-2 text-xs transition-opacity hover:opacity-80"
                                                         style={{
                                                             left: `${(colStart / 7) * 100}%`,
                                                             width: `${(colSpan / 7) * 100}%`,
@@ -175,6 +194,16 @@ export function CalendarGrid({
                     })}
                 </tbody>
             </table>
+
+            <BookingDetailDialog
+                booking={selectedBooking}
+                open={selectedBooking !== null}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setSelectedBooking(null);
+                    }
+                }}
+            />
         </div>
     );
 }

@@ -17,10 +17,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-// Props come from Laravel's DashboardController via Inertia.
-// rooms: all hotel rooms with their category and floor.
-// bookings: only bookings overlapping the current week (filtered server-side).
-// weekStart: the Monday date string for the current week view (e.g. "2026-02-23").
 export default function Dashboard({
     rooms,
     bookings,
@@ -46,7 +42,6 @@ export default function Dashboard({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                {/* 3 placeholder cards — will become stat widgets (occupancy, revenue, etc.) */}
                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">
                     <div className="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                         <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
@@ -59,14 +54,12 @@ export default function Dashboard({
                     </div>
                 </div>
 
-                {/* Week navigation bar: "< 23 Feb – 1 Mar 2026 >" */}
                 <WeekHeader
                     weekStart={weekStartDate}
                     onPrev={() => shiftWeek(-7)}
                     onNext={() => shiftWeek(7)}
                 />
 
-                {/* Room/booking grid table: rooms as rows, days as columns, bookings as overlaid blocks */}
                 <CalendarGrid
                     weekStart={weekStartDate}
                     rooms={rooms}

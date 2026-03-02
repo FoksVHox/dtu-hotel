@@ -65,7 +65,7 @@ state:	OPEN
 author:	HUS1904
 labels:	
 comments:	0
-assignees:	
+assignees:	HUS1904
 projects:	
 milestone:	
 number:	29
@@ -84,7 +84,7 @@ state:	OPEN
 author:	HUS1904
 labels:	
 comments:	0
-assignees:	
+assignees:	HUS1904
 projects:	
 milestone:	
 number:	30
@@ -102,7 +102,7 @@ state:	OPEN
 author:	HUS1904
 labels:	
 comments:	0
-assignees:	
+assignees:	HUS1904
 projects:	
 milestone:	
 number:	31
@@ -111,5 +111,27 @@ Goal: Keep the grid up to date with/without manual page reload.
 
 - [ ]  Refresh button triggers re-fetch
 
+
+---
+## Sub-issue #70
+title:	Filter and search calendar grid rows
+state:	OPEN
+author:	HUS1904
+labels:	
+comments:	0
+assignees:	
+projects:	
+milestone:	
+number:	70
+--
+Goal: Reduce visual noise in the calendar grid by letting users 
+filter which room rows are shown.
+
+- [ ] "Only show rooms with bookings" toggle — hides empty rows
+- [ ] Filter by status (Pending, Confirmed, Checked In etc.)
+- [ ] Filter by room category (Deluxe, Standard, Suite etc.)
+- [ ] Filter by floor
+- [ ] Active filters are visible and individually clearable
+- [ ] "Clear all filters" button resets to default view
 
 ---
