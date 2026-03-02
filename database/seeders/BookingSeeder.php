@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\Guest;
 use App\Models\Hotel;
@@ -30,8 +31,7 @@ class BookingSeeder extends Seeder
         $targetBookings = 120;
         $createdBookings = 0;
 
-        // TODO: Indsæt enum her (når BookingStatus enum er lavet)
-        $statuses = [0, 1, 2]; // fx 0=pending, 1=confirmed, 2=cancelled
+        $statuses = BookingStatus::cases();
 
         for ($i = 0; $i < $targetBookings; $i++) {
             $createdThisRound = false;
@@ -82,7 +82,7 @@ class BookingSeeder extends Seeder
                 $booking = Booking::factory()->create([
                     'start' => $start,
                     'end' => $end,
-                    'status' => $statuses[array_rand($statuses)],
+                    'status' => fake()->randomElement($statuses),
                 ]);
 
                 $booking->rooms()->sync($selectedRoomIds);
