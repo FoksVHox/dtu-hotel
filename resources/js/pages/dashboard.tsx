@@ -6,9 +6,9 @@ import { CalendarLegend } from '@/components/calendar/calendar-legend';
 import { WeekHeader } from '@/components/calendar/week-header';
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
+import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
 import type { CalendarBooking, CalendarRoom } from '@/types/calendar';
-import { dashboard } from '@/routes';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
