@@ -1,6 +1,6 @@
+import { addDays, format, getMonth, getYear } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { addDays, format, getMonth, getYear } from 'date-fns';
 
 interface WeekHeaderProps {
     weekStart: Date;

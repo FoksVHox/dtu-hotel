@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { router } from '@inertiajs/react';
+import { addDays, format, parseISO, startOfWeek } from 'date-fns';
 import { CalendarGrid } from '@/components/calendar/calendar-grid';
 import { CalendarLegend } from '@/components/calendar/calendar-legend';
 import { WeekHeader } from '@/components/calendar/week-header';
@@ -8,7 +9,6 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
 import type { CalendarBooking, CalendarRoom } from '@/types/calendar';
 import { dashboard } from '@/routes';
-import { addDays, format, parseISO, startOfWeek } from 'date-fns';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

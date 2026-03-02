@@ -1,5 +1,3 @@
-import type { CalendarBooking, CalendarRoom } from '@/types/calendar';
-import { BOOKING_STATUSES } from '@/types/calendar';
 import {
     addDays,
     differenceInCalendarDays,
@@ -7,6 +5,8 @@ import {
     format,
     parseISO,
 } from 'date-fns';
+import type { CalendarBooking, CalendarRoom } from '@/types/calendar';
+import { BOOKING_STATUSES } from '@/types/calendar';
 
 interface CalendarGridProps {
     weekStart: Date;
@@ -42,7 +42,8 @@ function getBookingsForRoom(
             const clampedEnd = bookingEnd > weekEnd ? weekEnd : bookingEnd;
 
             const colStart = differenceInCalendarDays(clampedStart, weekStart);
-            const colSpan = differenceInCalendarDays(clampedEnd, clampedStart) + 1;
+            const colSpan =
+                differenceInCalendarDays(clampedEnd, clampedStart) + 1;
 
             acc.push({ booking, colStart, colSpan });
             return acc;
@@ -119,10 +120,7 @@ export function CalendarGrid({
                                     <div className="relative grid grid-cols-7">
                                         {days.map((day, i) => (
                                             <div
-                                                key={format(
-                                                    day,
-                                                    'yyyy-MM-dd',
-                                                )}
+                                                key={format(day, 'yyyy-MM-dd')}
                                                 className={`h-14 ${i < 6 ? 'border-r border-dashed' : ''}`}
                                             />
                                         ))}
@@ -155,8 +153,8 @@ export function CalendarGrid({
                                                                 booking,
                                                             )}
                                                         </span>
-                                                        {booking.guests
-                                                            .length > 0 && (
+                                                        {booking.guests.length >
+                                                            0 && (
                                                             <span
                                                                 className="truncate text-[10px]"
                                                                 style={{

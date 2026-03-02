@@ -44,8 +44,7 @@ export const BookingStatus = {
     Maintenance: 6,
 } as const;
 
-export type BookingStatus =
-    (typeof BookingStatus)[keyof typeof BookingStatus];
+export type BookingStatus = (typeof BookingStatus)[keyof typeof BookingStatus];
 
 export interface BookingStatusConfig {
     label: string;

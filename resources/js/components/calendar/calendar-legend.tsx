@@ -11,10 +11,7 @@ export function CalendarLegend() {
                             backgroundColor: config.text,
                         }}
                     />
-                    <span
-                        className="text-xs"
-                        style={{ color: config.text }}
-                    >
+                    <span className="text-xs" style={{ color: config.text }}>
                         {config.label}
                     </span>
                 </div>
