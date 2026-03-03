@@ -31,7 +31,13 @@ function formatWeekRange(weekStart: Date): string {
     return `${format(start, 'd')}–${format(end, 'd MMMM yyyy')}`;
 }
 
-export function WeekHeader({ weekStart, onPrev, onNext, onRefresh, isRefreshing = false }: WeekHeaderProps) {
+export function WeekHeader({
+    weekStart,
+    onPrev,
+    onNext,
+    onRefresh,
+    isRefreshing = false,
+}: WeekHeaderProps) {
     return (
         <div className="flex items-center justify-center gap-4">
             <Button
