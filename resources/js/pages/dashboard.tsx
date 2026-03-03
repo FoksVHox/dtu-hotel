@@ -64,10 +64,7 @@ export default function Dashboard({
                     >
                         <TodayActivityCard activity={todayActivity} />
                     </Deferred>
-                    <Deferred
-                        data="roomStatus"
-                        fallback={<StatCardSkeleton />}
-                    >
+                    <Deferred data="roomStatus" fallback={<StatCardSkeleton />}>
                         <RoomStatusCard status={roomStatus} />
                     </Deferred>
                     <Deferred
