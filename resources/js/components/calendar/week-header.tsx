@@ -1,11 +1,13 @@
 import { addDays, format, getMonth, getYear } from 'date-fns';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface WeekHeaderProps {
     weekStart: Date;
     onPrev: () => void;
     onNext: () => void;
+    onRefresh?: () => void;
+    isRefreshing?: boolean;
 }
 
 /**
@@ -29,11 +31,15 @@ function formatWeekRange(weekStart: Date): string {
     return `${format(start, 'd')}–${format(end, 'd MMMM yyyy')}`;
 }
 
-// Renders a centered navigation bar:  [ < ]  "23 Feb – 1 Mar 2026"  [ > ]
-export function WeekHeader({ weekStart, onPrev, onNext }: WeekHeaderProps) {
+export function WeekHeader({
+    weekStart,
+    onPrev,
+    onNext,
+    onRefresh,
+    isRefreshing = false,
+}: WeekHeaderProps) {
     return (
         <div className="flex items-center justify-center gap-4">
-            {/* Previous week button */}
             <Button
                 variant="outline"
                 size="icon"
@@ -43,12 +49,10 @@ export function WeekHeader({ weekStart, onPrev, onNext }: WeekHeaderProps) {
                 <ChevronLeft />
             </Button>
 
-            {/* Formatted date range heading */}
             <h2 className="text-lg font-semibold">
                 {formatWeekRange(weekStart)}
             </h2>
 
-            {/* Next week button */}
             <Button
                 variant="outline"
                 size="icon"
@@ -57,6 +61,18 @@ export function WeekHeader({ weekStart, onPrev, onNext }: WeekHeaderProps) {
             >
                 <ChevronRight />
             </Button>
+
+            {onRefresh && (
+                <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={onRefresh}
+                    disabled={isRefreshing}
+                    aria-label="Refresh calendar"
+                >
+                    <RefreshCw className={isRefreshing ? 'animate-spin' : ''} />
+                </Button>
+            )}
         </div>
     );
 }
