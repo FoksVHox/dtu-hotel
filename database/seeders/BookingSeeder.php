@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\Guest;
 use App\Models\Hotel;
@@ -22,16 +23,15 @@ class BookingSeeder extends Seeder
 
         // Cache rooms pr. hotel (hurtigere end query hver gang)
         $roomIdsByHotel = Room::query()
-            ->select('id', 'hotels_id')
+            ->select('id', 'hotel_id')
             ->get()
-            ->groupBy('hotels_id')
+            ->groupBy('hotel_id')
             ->map(fn ($rows) => $rows->pluck('id')->values());
 
         $targetBookings = 120;
         $createdBookings = 0;
 
-        // TODO: Indsæt enum her (når BookingStatus enum er lavet)
-        $statuses = [0, 1, 2]; // fx 0=pending, 1=confirmed, 2=cancelled
+        $statuses = BookingStatus::cases();
 
         for ($i = 0; $i < $targetBookings; $i++) {
             $createdThisRound = false;
@@ -57,7 +57,7 @@ class BookingSeeder extends Seeder
 
                 // Find rum i det hotel der er optaget i perioden (overlap)
                 $occupiedRoomIds = Room::query()
-                    ->where('hotels_id', $hotel->id)
+                    ->where('hotel_id', $hotel->id)
                     ->whereHas('bookings', function ($q) use ($start, $end) {
                         $q->where('start', '<', $end)
                             ->where('end', '>', $start);
@@ -82,7 +82,7 @@ class BookingSeeder extends Seeder
                 $booking = Booking::factory()->create([
                     'start' => $start,
                     'end' => $end,
-                    'status' => $statuses[array_rand($statuses)],
+                    'status' => fake()->randomElement($statuses),
                 ]);
 
                 $booking->rooms()->sync($selectedRoomIds);

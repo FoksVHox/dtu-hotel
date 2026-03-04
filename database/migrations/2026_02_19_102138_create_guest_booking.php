@@ -11,8 +11,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('guest_booking', function (Blueprint $table) {
-            $table->foreignIdFor(Guest::class);
-            $table->foreignIdFor(Booking::class);
+            $table->foreignIdFor(Guest::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Booking::class)->constrained()->cascadeOnDelete();
+
+            $table->primary(['guest_id', 'booking_id']);
         });
     }
 

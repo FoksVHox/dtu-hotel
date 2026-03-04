@@ -11,8 +11,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('room_accessory_room', function (Blueprint $table) {
-            $table->foreignIdFor(RoomAccessory::class);
-            $table->foreignIdFor(Room::class);
+            $table->foreignIdFor(RoomAccessory::class)->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(Room::class)->constrained()->cascadeOnDelete();
+
+            $table->primary(['room_accessory_id', 'room_id']);
         });
     }
 

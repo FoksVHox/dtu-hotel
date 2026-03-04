@@ -21,7 +21,8 @@ class Guest extends Model
 
     public function bookings(): BelongsToMany
     {
-        return $this->belongsToMany(Booking::class);
+        // Migration creates `guest_booking` (not Laravel's default `booking_guest`).
+        return $this->belongsToMany(Booking::class, 'guest_booking');
     }
 
     protected function casts(): array

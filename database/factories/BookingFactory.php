@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\BookingStatus;
 use App\Models\Booking;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Carbon;
@@ -15,7 +16,7 @@ class BookingFactory extends Factory
         return [
             'start' => Carbon::now(),
             'end' => Carbon::now(),
-            'status' => $this->faker->randomNumber(),
+            'status' => fake()->randomElement(BookingStatus::cases()),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ];
