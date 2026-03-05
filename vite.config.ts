@@ -24,4 +24,8 @@ export default defineConfig({
     esbuild: {
         jsx: 'automatic',
     },
+    server: {
+        port: 5173,
+        strictPort: false, // if 5173 is taken, try 5174, 5175...
+    },
 });

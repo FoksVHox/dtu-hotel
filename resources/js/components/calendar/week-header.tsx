@@ -1,11 +1,13 @@
 import { addDays, format, getMonth, getYear } from 'date-fns';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface WeekHeaderProps {
     weekStart: Date;
     onPrev: () => void;
     onNext: () => void;
+    onRefresh?: () => void;
+    isRefreshing?: boolean;
 }
 
 /**
@@ -29,7 +31,13 @@ function formatWeekRange(weekStart: Date): string {
     return `${format(start, 'd')}–${format(end, 'd MMMM yyyy')}`;
 }
 
-export function WeekHeader({ weekStart, onPrev, onNext }: WeekHeaderProps) {
+export function WeekHeader({
+    weekStart,
+    onPrev,
+    onNext,
+    onRefresh,
+    isRefreshing = false,
+}: WeekHeaderProps) {
     return (
         <div className="flex items-center justify-center gap-4">
             <Button
@@ -53,6 +61,18 @@ export function WeekHeader({ weekStart, onPrev, onNext }: WeekHeaderProps) {
             >
                 <ChevronRight />
             </Button>
+
+            {onRefresh && (
+                <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={onRefresh}
+                    disabled={isRefreshing}
+                    aria-label="Refresh calendar"
+                >
+                    <RefreshCw className={isRefreshing ? 'animate-spin' : ''} />
+                </Button>
+            )}
         </div>
     );
 }

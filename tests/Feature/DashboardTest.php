@@ -183,3 +183,33 @@ test('dashboard defaults to the current week when no week_start param is given',
             ->where('weekStart', now()->startOfWeek()->toDateString())
         );
 });
+
+test('dashboard refresh returns updated bookings', function () {
+    $this->actingAs(User::factory()->create());
+
+    $room = Room::factory()->create();
+    $guest = Guest::factory()->create();
+
+    $this->get(route('dashboard'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('dashboard')
+            ->has('bookings', 0)
+        );
+
+    $booking = Booking::factory()->create([
+        'start' => now()->startOfWeek()->addDay()->setTime(14, 0),
+        'end' => now()->startOfWeek()->addDays(3)->setTime(11, 0),
+        'status' => BookingStatus::Confirmed,
+    ]);
+    $booking->rooms()->attach($room);
+    $booking->guests()->attach($guest);
+
+    $this->get(route('dashboard'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('dashboard')
+            ->has('bookings', 1)
+            ->has('rooms')
+        );
+});

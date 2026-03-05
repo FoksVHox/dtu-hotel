@@ -1,6 +1,6 @@
-import { Head } from '@inertiajs/react';
-import { router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { addDays, format, parseISO, startOfWeek } from 'date-fns';
+import { useState } from 'react';
 import { CalendarGrid } from '@/components/calendar/calendar-grid';
 import { CalendarLegend } from '@/components/calendar/calendar-legend';
 import { WeekHeader } from '@/components/calendar/week-header';
@@ -30,11 +30,21 @@ export default function Dashboard({
         weekStartsOn: 1,
     });
 
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
     function shiftWeek(offset: number) {
         const next = addDays(weekStartDate, offset);
         router.reload({
             data: { week_start: format(next, 'yyyy-MM-dd') },
             replace: true,
+        });
+    }
+
+    function refreshCalendar() {
+        router.reload({
+            only: ['rooms', 'bookings'],
+            onStart: () => setIsRefreshing(true),
+            onFinish: () => setIsRefreshing(false),
         });
     }
 
@@ -58,6 +68,8 @@ export default function Dashboard({
                     weekStart={weekStartDate}
                     onPrev={() => shiftWeek(-7)}
                     onNext={() => shiftWeek(7)}
+                    onRefresh={refreshCalendar}
+                    isRefreshing={isRefreshing}
                 />
 
                 <CalendarGrid
