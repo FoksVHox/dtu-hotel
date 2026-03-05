@@ -1,14 +1,12 @@
 import {
-    ArrowDown,
-    ArrowUp,
     CalendarRange,
     Clock,
-    Minus,
     TrendingUp,
     XCircle,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { TrendIndicator } from '@/components/ui/trend-indicator';
 import type { BookingPipeline } from '@/types/dashboard';
 
 function StatRow({
@@ -28,38 +26,6 @@ function StatRow({
             </span>
             <span className="text-sm font-semibold">{value}</span>
         </div>
-    );
-}
-
-function TrendIndicator({
-    current,
-    previous,
-}: {
-    current: number;
-    previous: number;
-}) {
-    const diff = current - previous;
-
-    if (diff > 0) {
-        return (
-            <span className="inline-flex items-center gap-0.5 text-xs font-medium text-emerald-500">
-                <ArrowUp className="size-3" />
-            </span>
-        );
-    }
-
-    if (diff < 0) {
-        return (
-            <span className="inline-flex items-center gap-0.5 text-xs font-medium text-rose-500">
-                <ArrowDown className="size-3" />
-            </span>
-        );
-    }
-
-    return (
-        <span className="inline-flex items-center gap-0.5 text-xs font-medium text-muted-foreground">
-            <Minus className="size-3" />
-        </span>
     );
 }
 
