@@ -22,6 +22,7 @@ export interface CalendarRoom {
     building_id: number;
     floor_id: number;
     room_category_id: number;
+    status: number; // RoomStatus enum value ###DM
     room_category: CalendarRoomCategory;
     floor: CalendarFloor;
 }

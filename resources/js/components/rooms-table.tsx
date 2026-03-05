@@ -7,7 +7,7 @@ export type Room = {
   code: string
   category: string
   floor: number
-  status: number // enum value 1..6
+  status: number // enum value 1..4
 }
 
 type SortKey = 'code' | 'category' | 'floor' | 'status'
@@ -94,6 +94,9 @@ export function RoomsTable({ rooms }: { rooms: Room[] }) {
               <td className="px-4 py-3">{room.floor}</td>
               <td className="px-4 py-3">
                 <RoomStatusBadge status={room.status} />
+                {/* <div className="flex items-center gap-2">*/}
+                  {/* <span className="text-xs text-muted-foreground">({room.status})</span> */}
+                {/* </div> */}
               </td>
 
               <td className="px-4 py-3">

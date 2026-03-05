@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\BookingStatus;
+use App\Enums\RoomStatus;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -20,28 +20,28 @@ class RoomController extends Controller
                     'code' => 'A101',
                     'category' => 'Single',
                     'floor' => 1,
-                    'status' => BookingStatus::Confirmed->value,
+                    'status' => RoomStatus::Available->value,
                 ],
                 [
                     'id' => 2,
                     'code' => 'A102',
                     'category' => 'Double',
                     'floor' => 1,
-                    'status' => BookingStatus::Pending->value,
+                    'status' => RoomStatus::Occupied->value,
                 ],
                 [
                     'id' => 3,
                     'code' => 'B201',
                     'category' => 'Suite',
                     'floor' => 2,
-                    'status' => BookingStatus::CheckedIn->value,
+                    'status' => RoomStatus::Cleaning->value,
                 ],
                 [
                     'id' => 4,
                     'code' => 'B202',
                     'category' => 'Single',
                     'floor' => 2,
-                    'status' => BookingStatus::Maintenance->value,
+                    'status' => RoomStatus::OutOfOrder->value,
                 ],
             ],
         ]);

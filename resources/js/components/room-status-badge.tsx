@@ -1,13 +1,13 @@
 import { Badge } from '@/components/ui/badge'
 
+// Status values: 1..4 Changed to match the RoomStatus enum in types/room-status.ts ###DM
+// Note: The status values should ideally be typed as RoomStatus, but since this component is used in multiple places with different data sources, we'll keep it as number for flexibility. ###DM
 const STATUS_CONFIG: Record<number, { label: string; className: string }> = {
-  1: { label: 'Pending', className: 'border-blue-500/40 text-blue-400' },
-  2: { label: 'Confirmed', className: 'border-cyan-500/40 text-cyan-400' },
-  3: { label: 'Checked In', className: 'border-green-500/40 text-green-400' },
-  4: { label: 'Checked Out', className: 'border-zinc-500/40 text-zinc-300' },
-  5: { label: 'Cancelled', className: 'border-pink-500/40 text-pink-400' },
-  6: { label: 'Maintenance', className: 'border-amber-500/40 text-amber-400' },
-}
+  1: { label: 'Available', className: 'border-green-500/40 text-green-400' },
+  2: { label: 'Occupied', className: 'border-red-500/40 text-red-400' },
+  3: { label: 'Cleaning', className: 'border-amber-500/40 text-amber-400' },
+  4: { label: 'Out of Order', className: 'border-zinc-500/40 text-zinc-400' },
+} 
 
 export function RoomStatusBadge({ status }: { status: number }) {
   const cfg = STATUS_CONFIG[status]
