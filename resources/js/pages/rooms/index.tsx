@@ -1,25 +1,21 @@
-import { Head } from '@inertiajs/react';
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem } from '@/types';
-import rooms from '@/routes/rooms';
+import { Head } from '@inertiajs/react'
+import AppLayout from '@/layouts/app-layout'
+import type { BreadcrumbItem } from '@/types'
+import roomsRoute from '@/routes/rooms'
+import { RoomsTable, type Room } from '@/components/rooms-table'
 
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Room Management',
-        href: rooms.index().url,
-    },
-];
+  { title: 'Room Management', href: roomsRoute.index().url },
+]
 
-export default function RoomsIndex() {
-    return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Room Management" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <div className="relative min-h-[200px] flex-1 overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
-                    <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
-                </div>
+export default function RoomsIndex({ rooms }: { rooms: Room[] }) {
+  return (
+    <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title="Room Management" />
+
+       <div className="flex flex-1 flex-col gap-4 p-4">
+              <RoomsTable rooms={rooms ?? []} />
             </div>
-        </AppLayout>
-    );
+          </AppLayout>
+  )
 }
