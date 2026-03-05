@@ -1,9 +1,4 @@
-import {
-    CalendarRange,
-    Clock,
-    TrendingUp,
-    XCircle,
-} from 'lucide-react';
+import { CalendarRange, Clock, TrendingUp, XCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { TrendIndicator } from '@/components/ui/trend-indicator';
