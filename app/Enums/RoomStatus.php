@@ -2,7 +2,6 @@
 
 namespace App\Enums;
 
-// Room status badge component #37
 
 enum RoomStatus: int
 {
