@@ -1,5 +1,7 @@
 import { Head } from '@inertiajs/react'
 import { useMemo } from 'react'
+import { Plus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { RoomsTable, type Room } from '@/components/rooms-table'
 import AppLayout from '@/layouts/app-layout'
@@ -50,6 +52,15 @@ export default function RoomsIndex({ rooms }: { rooms: Room[] }) {
       <Head title="Room Management" />
 
       <div className="flex flex-1 flex-col gap-4 p-4">
+        <div className="flex justify-end">
+          <Button
+            type="button"
+            className="bg-red-700 text-white shadow-sm hover:bg-red-800"
+          >
+            <Plus className="h-4 w-4" />
+            Add Room
+          </Button>
+        </div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <Card>
             <CardHeader className="pb-2">
@@ -87,7 +98,6 @@ export default function RoomsIndex({ rooms }: { rooms: Room[] }) {
             </CardContent>
           </Card>
         </div>
-
         <RoomsTable rooms={safeRooms} />
       </div>
     </AppLayout>
