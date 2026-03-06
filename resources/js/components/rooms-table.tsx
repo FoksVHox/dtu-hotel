@@ -12,7 +12,14 @@ export type Room = {
 
 type SortKey = 'code' | 'category' | 'floor' | 'status'
 
-export function RoomsTable({ rooms }: { rooms: Room[] }) {
+export function RoomsTable({
+  rooms,
+  onDelete,
+}: {
+  rooms: Room[]
+  onDelete?: (roomId: number) => void
+}) {
+
   const [sortKey, setSortKey] = useState<SortKey>('code')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
 
@@ -120,7 +127,7 @@ export function RoomsTable({ rooms }: { rooms: Room[] }) {
                   <button
                     className="rounded-md border border-white/10 p-2 hover:bg-white/5"
                     title="Delete"
-                    onClick={() => console.log('delete', room.id)}
+                    onClick={() => onDelete?.(room.id)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>
