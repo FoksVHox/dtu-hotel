@@ -2,6 +2,8 @@ export interface CalendarGuest {
     id: number;
     first_name: string;
     last_name: string;
+    phone: string;
+    email: string;
 }
 
 export interface CalendarRoomCategory {
@@ -27,13 +29,19 @@ export interface CalendarRoom {
     floor: CalendarFloor;
 }
 
+export interface CalendarBookingRoom {
+    id: number;
+    room_category: CalendarRoomCategory;
+    floor: CalendarFloor;
+}
+
 export interface CalendarBooking {
     id: number;
     start: string;
     end: string;
     status: BookingStatus;
     guests: CalendarGuest[];
-    rooms: { id: number }[];
+    rooms: CalendarBookingRoom[];
 }
 
 export const BookingStatus = {
@@ -53,6 +61,12 @@ export interface BookingStatusConfig {
     border: string;
     text: string;
     secondary: string;
+}
+
+export function getBookingStatusConfig(
+    booking: CalendarBooking,
+): BookingStatusConfig {
+    return BOOKING_STATUSES[booking.status] ?? BOOKING_STATUSES[1];
 }
 
 export const BOOKING_STATUSES: Record<BookingStatus, BookingStatusConfig> = {
