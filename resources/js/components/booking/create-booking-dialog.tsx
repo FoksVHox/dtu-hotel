@@ -173,7 +173,7 @@ export function CreateBookingDialog({
         }
         if (
             newGuestDraft.phone.trim() &&
-            !/^[+\d\s()\-]+$/.test(newGuestDraft.phone)
+            !/^[+\d\s()-]+$/.test(newGuestDraft.phone)
         ) {
             draftErrors.phone = 'Please enter a valid phone number.';
         }
