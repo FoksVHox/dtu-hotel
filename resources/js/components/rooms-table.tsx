@@ -52,7 +52,7 @@ export function RoomsTable({
 
   if (!rooms.length) {
     return (
-      <div className="rounded-xl border border-white/10 p-6 text-sm text-white/60">
+      <div className="rounded-xl border border-border bg-card p-6 text-sm text-muted-foreground">
         No rooms exist yet
       </div>
     )
