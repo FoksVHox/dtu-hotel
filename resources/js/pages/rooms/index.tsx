@@ -169,12 +169,12 @@ export default function RoomsIndex({ rooms }: { rooms: Room[] }) {
               </div>
 
               <div className="grid gap-2">
-                <Label>Category</Label>
+                <Label htmlFor="room-category">Category</Label>
                 <Select
                   value={form.category}
                   onValueChange={(value) => setForm((prev) => ({ ...prev, category: value }))}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="room-category">
                     <SelectValue placeholder="Select category" />
                   </SelectTrigger>
                   <SelectContent>
