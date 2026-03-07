@@ -12,6 +12,30 @@ export type Room = {
 
 type SortKey = 'code' | 'category' | 'floor' | 'status'
 
+// Th component moved outside RoomsTable for linting compliance
+type ThProps = {
+  label: string
+  k: SortKey
+  sortKey: SortKey
+  sortDir: 'asc' | 'desc'
+  toggleSort: (key: SortKey) => void
+}
+
+const Th = ({ label, k, sortKey, sortDir, toggleSort }: ThProps) => (
+  <button
+    type="button"
+    onClick={() => toggleSort(k)}
+    className="flex items-center gap-2 transition-colors hover:text-foreground"
+  >
+    {label}
+    {sortKey === k ? (
+      <span className="text-muted-foreground">
+        {sortDir === 'asc' ? '↑' : '↓'}
+      </span>
+    ) : null}
+  </button>
+)
+
 export function RoomsTable({
   rooms,
   onDelete,
@@ -19,26 +43,21 @@ export function RoomsTable({
   rooms: Room[]
   onDelete?: (roomId: number) => void
 }) {
-
   const [sortKey, setSortKey] = useState<SortKey>('code')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
 
   const sortedRooms = useMemo(() => {
     const copy = [...rooms]
-
     copy.sort((a, b) => {
       const aVal = a[sortKey]
       const bVal = b[sortKey]
-
       if (typeof aVal === 'number' && typeof bVal === 'number') {
         return sortDir === 'asc' ? aVal - bVal : bVal - aVal
       }
-
       return sortDir === 'asc'
         ? String(aVal).localeCompare(String(bVal))
         : String(bVal).localeCompare(String(aVal))
     })
-
     return copy
   }, [rooms, sortKey, sortDir])
 
@@ -52,47 +71,32 @@ export function RoomsTable({
 
   if (!rooms.length) {
     return (
-      <div className="rounded-xl border border-white/10 p-6 text-sm text-white/60">
+      <div className="rounded-xl border border-border bg-card p-6 text-sm text-muted-foreground">
         No rooms exist yet
       </div>
     )
   }
 
-  const Th = ({ label, k }: { label: string; k: SortKey }) => (
-    <button
-      type="button"
-      onClick={() => toggleSort(k)}
-      className="flex items-center gap-2 transition-colors hover:text-foreground" // Added hover effect to header ###DM
-    >
-      {label}
-      {sortKey === k ? (
-        <span className="text-muted-foreground">{sortDir === 'asc' ? '↑' : '↓'}</span> // Added sort direction indicator ###DM
-      ) : null}
-    </button>
-  )
-
   return (
     <div className="overflow-hidden rounded-xl border border-white/10">
       <table className="w-full text-sm">
-        {/* DM: Added background color to the header */}
         <thead className="bg-muted/50 text-muted-foreground">
           <tr>
             <th className="px-4 py-3 text-left">
-              <Th label="Room Code" k="code" />
+              <Th label="Room Code" k="code" sortKey={sortKey} sortDir={sortDir} toggleSort={toggleSort} />
             </th>
             <th className="px-4 py-3 text-left">
-              <Th label="Category" k="category" />
+              <Th label="Category" k="category" sortKey={sortKey} sortDir={sortDir} toggleSort={toggleSort} />
             </th>
             <th className="px-4 py-3 text-left">
-              <Th label="Floor" k="floor" />
+              <Th label="Floor" k="floor" sortKey={sortKey} sortDir={sortDir} toggleSort={toggleSort} />
             </th>
             <th className="px-4 py-3 text-left">
-              <Th label="Status" k="status" />
+              <Th label="Status" k="status" sortKey={sortKey} sortDir={sortDir} toggleSort={toggleSort} />
             </th>
             <th className="px-4 py-3 text-right">Actions</th>
           </tr>
         </thead>
-
         <tbody className="divide-y divide-white/10">
           {sortedRooms.map((room) => (
             <tr key={room.id} className="hover:bg-white/5">
@@ -101,11 +105,7 @@ export function RoomsTable({
               <td className="px-4 py-3">{room.floor}</td>
               <td className="px-4 py-3">
                 <RoomStatusBadge status={room.status} />
-                {/* <div className="flex items-center gap-2">*/}
-                  {/* <span className="text-xs text-muted-foreground">({room.status})</span> */}
-                {/* </div> */}
               </td>
-
               <td className="px-4 py-3">
                 <div className="flex justify-end gap-2">
                   <button
@@ -115,7 +115,6 @@ export function RoomsTable({
                   >
                     <Pencil className="h-4 w-4" />
                   </button>
-
                   <button
                     className="rounded-md border border-white/10 p-2 hover:bg-white/5"
                     title="Maintenance"
@@ -123,7 +122,6 @@ export function RoomsTable({
                   >
                     <Wrench className="h-4 w-4" />
                   </button>
-
                   <button
                     className="rounded-md border border-white/10 p-2 hover:bg-white/5"
                     title="Delete"
