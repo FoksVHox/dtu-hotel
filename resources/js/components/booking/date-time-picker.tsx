@@ -34,11 +34,18 @@ export function DateTimePicker({
 }: DateTimePickerProps) {
     const [open, setOpen] = React.useState(false);
 
-    const parsed = value ? parse(value, "yyyy-MM-dd'T'HH:mm", new Date()) : null;
-    const selectedDate = parsed && !isNaN(parsed.getTime()) ? parsed : undefined;
+    const parsed = value
+        ? parse(value, "yyyy-MM-dd'T'HH:mm", new Date())
+        : null;
+    const selectedDate =
+        parsed && !isNaN(parsed.getTime()) ? parsed : undefined;
 
-    const hours = selectedDate ? String(selectedDate.getHours()).padStart(2, '0') : '14';
-    const minutes = selectedDate ? String(selectedDate.getMinutes()).padStart(2, '0') : '00';
+    const hours = selectedDate
+        ? String(selectedDate.getHours()).padStart(2, '0')
+        : '14';
+    const minutes = selectedDate
+        ? String(selectedDate.getMinutes()).padStart(2, '0')
+        : '00';
 
     function handleDateSelect(date: Date | undefined) {
         if (!date) return;

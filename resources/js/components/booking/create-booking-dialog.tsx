@@ -1,14 +1,17 @@
 import { useForm } from '@inertiajs/react';
-import { AlertCircle, CalendarPlus, Plus, Search, UserPlus, X } from 'lucide-react';
+import {
+    AlertCircle,
+    CalendarPlus,
+    Plus,
+    Search,
+    UserPlus,
+    X,
+} from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import InputError from '@/components/input-error';
 import { DateTimePicker } from '@/components/booking/date-time-picker';
-import {
-    Alert,
-    AlertDescription,
-    AlertTitle,
-} from '@/components/ui/alert';
+import InputError from '@/components/input-error';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -29,11 +32,11 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { store } from '@/actions/App/Http/Controllers/BookingController';
-import { search } from '@/actions/App/Http/Controllers/GuestController';
+import type { CreateBookingForm, NewGuest, SearchGuest } from '@/types/booking';
 import type { CalendarRoom } from '@/types/calendar';
 import { BookingStatus } from '@/types/calendar';
-import type { CreateBookingForm, NewGuest, SearchGuest } from '@/types/booking';
+import { store } from '@/actions/App/Http/Controllers/BookingController';
+import { search } from '@/actions/App/Http/Controllers/GuestController';
 
 const BOOKING_STATUS_OPTIONS = [
     { value: BookingStatus.Pending, label: 'Pending' },
@@ -123,9 +126,7 @@ export function CreateBookingDialog({
                     }
                     const results: SearchGuest[] = await response.json();
                     setGuestResults(
-                        results.filter(
-                            (g) => !data.guest_ids.includes(g.id),
-                        ),
+                        results.filter((g) => !data.guest_ids.includes(g.id)),
                     );
                 } catch {
                     setGuestResults([]);
@@ -435,8 +436,7 @@ export function CreateBookingDialog({
                                             key={guest.id}
                                             className="inline-flex items-center gap-1 rounded-md border bg-muted/50 px-2 py-0.5 text-xs"
                                         >
-                                            {guest.first_name}{' '}
-                                            {guest.last_name}
+                                            {guest.first_name} {guest.last_name}
                                             <button
                                                 type="button"
                                                 onClick={() =>
@@ -455,8 +455,7 @@ export function CreateBookingDialog({
                                             key={`new-${idx}`}
                                             className="inline-flex items-center gap-1 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-xs"
                                         >
-                                            {guest.first_name}{' '}
-                                            {guest.last_name}
+                                            {guest.first_name} {guest.last_name}
                                             <span className="text-emerald-500">
                                                 (new)
                                             </span>
@@ -481,9 +480,7 @@ export function CreateBookingDialog({
                                     placeholder="Search existing guests..."
                                     value={guestQuery}
                                     onChange={(e) =>
-                                        handleGuestQueryChange(
-                                            e.target.value,
-                                        )
+                                        handleGuestQueryChange(e.target.value)
                                     }
                                     className="pl-8"
                                 />
@@ -517,7 +514,6 @@ export function CreateBookingDialog({
                                 </div>
                             )}
 
-
                             {/* New guest inline form */}
                             {showNewGuestForm ? (
                                 <div className="flex flex-col gap-2.5 rounded-md border bg-muted/30 p-3">
@@ -529,9 +525,7 @@ export function CreateBookingDialog({
                                         <div className="grid gap-1">
                                             <Input
                                                 placeholder="First name"
-                                                value={
-                                                    newGuestDraft.first_name
-                                                }
+                                                value={newGuestDraft.first_name}
                                                 onChange={(e) =>
                                                     setNewGuestDraft(
                                                         (prev) => ({
@@ -554,9 +548,7 @@ export function CreateBookingDialog({
                                         <div className="grid gap-1">
                                             <Input
                                                 placeholder="Last name"
-                                                value={
-                                                    newGuestDraft.last_name
-                                                }
+                                                value={newGuestDraft.last_name}
                                                 onChange={(e) =>
                                                     setNewGuestDraft(
                                                         (prev) => ({
