@@ -16,7 +16,7 @@ class FloorFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
-            'code' => $this->faker->word(),
+            'code' => $this->faker->unique()->word(),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
 

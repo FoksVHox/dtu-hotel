@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Dashboard\BuildBookingPipeline;
+use App\Actions\Dashboard\BuildRoomStatus;
+use App\Actions\Dashboard\BuildTodayActivity;
 use App\Models\Booking;
 use App\Models\Room;
 use Carbon\Carbon;
@@ -31,6 +34,9 @@ class DashboardController extends Controller
             'rooms' => $rooms,
             'bookings' => $bookings,
             'weekStart' => $weekStart->toDateString(),
+            'todayActivity' => Inertia::defer(fn () => app(BuildTodayActivity::class)()),
+            'roomStatus' => Inertia::defer(fn () => app(BuildRoomStatus::class)()),
+            'bookingPipeline' => Inertia::defer(fn () => app(BuildBookingPipeline::class)()),
         ]);
     }
 }
