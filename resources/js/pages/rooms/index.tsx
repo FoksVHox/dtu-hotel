@@ -50,7 +50,7 @@ const initialForm: RoomForm = {
   status: '',
 }
 
-export default function RoomsIndex({ rooms }: { rooms: Room[] }) {
+export default function RoomsIndex({ rooms }: { rooms?: Room[] }) {
   const safeRooms = rooms ?? []
 
   const [localRooms, setLocalRooms] = useState<Room[]>(safeRooms)
