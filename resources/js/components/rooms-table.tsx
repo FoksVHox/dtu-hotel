@@ -62,11 +62,11 @@ export function RoomsTable({
     <button
       type="button"
       onClick={() => toggleSort(k)}
-      className="flex items-center gap-2 transition-colors hover:text-foreground" // Added hover effect to header ###DM
+      className="flex items-center gap-2 transition-colors hover:text-foreground"
     >
       {label}
       {sortKey === k ? (
-        <span className="text-muted-foreground">{sortDir === 'asc' ? '↑' : '↓'}</span> // Added sort direction indicator ###DM
+        <span className="text-muted-foreground">{sortDir === 'asc' ? '↑' : '↓'}</span>
       ) : null}
     </button>
   )
@@ -74,7 +74,6 @@ export function RoomsTable({
   return (
     <div className="overflow-hidden rounded-xl border border-white/10">
       <table className="w-full text-sm">
-        {/* DM: Added background color to the header */}
         <thead className="bg-muted/50 text-muted-foreground">
           <tr>
             <th className="px-4 py-3 text-left">
