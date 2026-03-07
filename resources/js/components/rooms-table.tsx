@@ -101,9 +101,6 @@ export function RoomsTable({
               <td className="px-4 py-3">{room.floor}</td>
               <td className="px-4 py-3">
                 <RoomStatusBadge status={room.status} />
-                {/* <div className="flex items-center gap-2">*/}
-                  {/* <span className="text-xs text-muted-foreground">({room.status})</span> */}
-                {/* </div> */}
               </td>
 
               <td className="px-4 py-3">
