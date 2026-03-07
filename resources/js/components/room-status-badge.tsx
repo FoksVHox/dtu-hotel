@@ -14,7 +14,7 @@ export function RoomStatusBadge({ status }: { status: number }) {
 
   if (!cfg) {
     return (
-      <Badge variant="outline" className="border-white/10 text-white/60">
+      <Badge variant="outline" className="border-border text-muted-foreground">
         Unknown
       </Badge>
     )
