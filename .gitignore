@@ -39,6 +39,6 @@ Icon
 .Trashes
 .fseventsd
 
-# Claude Code
-.claude/fetch-issue.sh
+# Local scripts & task files
+fetch-issue.sh
 .cursor/tasks/
