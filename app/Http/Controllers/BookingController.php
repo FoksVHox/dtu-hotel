@@ -32,34 +32,40 @@ class BookingController extends Controller
     {
         $validated = $request->validated();
 
-        DB::transaction(function () use ($validated): void {
-            $booking = Booking::query()->create([
-                'start' => $validated['start'],
-                'end' => $validated['end'],
-                'status' => $validated['status'],
-            ]);
-
-            $booking->rooms()->attach($validated['room_ids']);
-
-            $guestIds = $validated['guest_ids'] ?? [];
-
-            foreach ($validated['new_guests'] ?? [] as $newGuest) {
-                $guest = Guest::query()->create([
-                    'first_name' => $newGuest['first_name'],
-                    'last_name' => $newGuest['last_name'],
-                    'email' => $newGuest['email'],
-                    'phone' => $newGuest['phone'] ?? '',
-                    'address' => '',
-                    'date_of_birth' => now(),
+        try {
+            DB::transaction(function () use ($validated): void {
+                $booking = Booking::query()->create([
+                    'start' => $validated['start'],
+                    'end' => $validated['end'],
+                    'status' => $validated['status'],
                 ]);
 
-                $guestIds[] = $guest->id;
-            }
+                $booking->rooms()->attach($validated['room_ids']);
 
-            if (count($guestIds) > 0) {
-                $booking->guests()->attach($guestIds);
-            }
-        });
+                $guestIds = $validated['guest_ids'] ?? [];
+
+                foreach ($validated['new_guests'] ?? [] as $newGuest) {
+                    $guest = Guest::query()->create([
+                        'first_name' => $newGuest['first_name'],
+                        'last_name' => $newGuest['last_name'],
+                        'email' => $newGuest['email'],
+                        'phone' => $newGuest['phone'] ?? '',
+                        'address' => '',
+                        'date_of_birth' => now(),
+                    ]);
+
+                    $guestIds[] = $guest->id;
+                }
+
+                if (count($guestIds) > 0) {
+                    $booking->guests()->attach($guestIds);
+                }
+            });
+        } catch (\Throwable) {
+            return redirect()->back()->withErrors([
+                'booking' => 'Something went wrong while creating the booking. Please try again.',
+            ]);
+        }
 
         return redirect()->back();
     }

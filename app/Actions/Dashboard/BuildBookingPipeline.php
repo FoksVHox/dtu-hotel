@@ -10,6 +10,11 @@ use Carbon\Carbon;
 class BuildBookingPipeline
 {
     /**
+     * Build booking pipeline statistics for the dashboard.
+     *
+     * Counts active bookings for the current and next week, pending confirmations,
+     * cancellations this week, and computes occupancy percentages for trend comparison.
+     *
      * @return array{thisWeekBookings: int, nextWeekBookings: int, pendingConfirmations: int, cancelledThisWeek: int, occupancyThisWeek: int, occupancyLastWeek: int}
      */
     public function __invoke(): array
@@ -61,8 +66,11 @@ class BuildBookingPipeline
     }
 
     /**
-     * Percentage of rooms that have at least one active booking overlapping the given week.
+     * Calculate the percentage of rooms with at least one active booking overlapping the given week.
+     *
      * Active means any status except Cancelled and Maintenance.
+     *
+     * @return int Occupancy percentage (0–100).
      */
     private function calculateWeeklyOccupancy(int $totalRooms, Carbon $weekStart, Carbon $weekEnd): int
     {

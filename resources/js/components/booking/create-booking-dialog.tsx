@@ -36,7 +36,7 @@ import type { CreateBookingForm, NewGuest, SearchGuest } from '@/types/booking';
 import type { CalendarRoom } from '@/types/calendar';
 import { BookingStatus } from '@/types/calendar';
 import { store } from '@/actions/App/Http/Controllers/BookingController';
-import { search } from '@/actions/App/Http/Controllers/GuestController';
+import SearchGuests from '@/actions/App/Http/Controllers/SearchGuestsController';
 
 const BOOKING_STATUS_OPTIONS = [
     { value: BookingStatus.Pending, label: 'Pending' },
@@ -118,7 +118,7 @@ export function CreateBookingDialog({
                 setIsSearching(true);
                 try {
                     const response = await fetch(
-                        search.url({ query: { q: query } }),
+                        SearchGuests.url({ query: { q: query } }),
                     );
                     if (!response.ok) {
                         setGuestResults([]);

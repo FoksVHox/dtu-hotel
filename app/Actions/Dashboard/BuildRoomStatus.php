@@ -9,6 +9,11 @@ use Carbon\Carbon;
 class BuildRoomStatus
 {
     /**
+     * Build a snapshot of current room statuses for the dashboard.
+     *
+     * Determines how many rooms are occupied, available, under maintenance,
+     * and checked out today, along with their respective percentages.
+     *
      * @return array{totalRooms: int, occupied: int, available: int, maintenance: int, checkedOutToday: int, occupiedPercent: int, availablePercent: int, maintenancePercent: int}
      */
     public function __invoke(): array
