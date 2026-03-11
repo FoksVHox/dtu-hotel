@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\RoomStatus;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\Room;
 
 class RoomController extends Controller
 {
@@ -13,37 +14,10 @@ class RoomController extends Controller
      */
     public function index()
     {
+        $rooms = Room:: with(['roomCategory', 'floor' ]) -> get();
         return Inertia::render('rooms/index', [
-            'rooms' => [
-                [
-                    'id' => 1,
-                    'code' => 'A101',
-                    'category' => 'Single',
-                    'floor' => 1,
-                    'status' => RoomStatus::Available->value,
-                ],
-                [
-                    'id' => 2,
-                    'code' => 'A102',
-                    'category' => 'Double',
-                    'floor' => 1,
-                    'status' => RoomStatus::Occupied->value,
-                ],
-                [
-                    'id' => 3,
-                    'code' => 'B201',
-                    'category' => 'Suite',
-                    'floor' => 2,
-                    'status' => RoomStatus::Cleaning->value,
-                ],
-                [
-                    'id' => 4,
-                    'code' => 'B202',
-                    'category' => 'Single',
-                    'floor' => 2,
-                    'status' => RoomStatus::OutOfOrder->value,
-                ],
-            ],
+            'rooms' => $rooms,
+
         ]);
     }
 

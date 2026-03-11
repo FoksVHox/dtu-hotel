@@ -5,9 +5,24 @@ import { RoomStatusBadge } from '@/components/room-status-badge';
 export type Room = {
     id: number;
     code: string;
-    category: string;
-    floor: number;
-    status: number; // enum value 1..4
+    status: number;
+    floor: {
+        id: number;
+        name: string;
+        code: string;
+        building_id: number;
+        hotel_id: number;
+        created_at?: string;
+        updated_at?: string;
+    };
+    room_category: {
+        id: number;
+        name: string;
+        description?: string | null;
+        created_at?: string;
+        updated_at?: string;
+        deleted_at?: string | null;
+    };
 };
 
 type SortKey = 'code' | 'category' | 'floor' | 'status';
@@ -48,16 +63,42 @@ export function RoomsTable({
 
     const sortedRooms = useMemo(() => {
         const copy = [...rooms];
+
         copy.sort((a, b) => {
-            const aVal = a[sortKey];
-            const bVal = b[sortKey];
+            let aVal: string | number;
+            let bVal: string | number;
+
+            switch (sortKey) {
+                case 'code':
+                    aVal = a.code;
+                    bVal = b.code;
+                    break;
+                case 'category':
+                    aVal = a.room_category?.name ?? '';
+                    bVal = b.room_category?.name ?? '';
+                    break;
+                case 'floor':
+                    aVal = a.floor?.name ?? '';
+                    bVal = b.floor?.name ?? '';
+                    break;
+                case 'status':
+                    aVal = a.status;
+                    bVal = b.status;
+                    break;
+                default:
+                    aVal = '';
+                    bVal = '';
+            }
+
             if (typeof aVal === 'number' && typeof bVal === 'number') {
                 return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
             }
+
             return sortDir === 'asc'
                 ? String(aVal).localeCompare(String(bVal))
                 : String(bVal).localeCompare(String(aVal));
         });
+
         return copy;
     }, [rooms, sortKey, sortDir]);
 
@@ -127,8 +168,8 @@ export function RoomsTable({
                             <td className="px-4 py-3 font-medium">
                                 {room.code}
                             </td>
-                            <td className="px-4 py-3">{room.category}</td>
-                            <td className="px-4 py-3">{room.floor}</td>
+                            <td className="px-4 py-3">{room.room_category?.name}</td>
+                            <td className="px-4 py-3">{room.floor?.name}</td>
                             <td className="px-4 py-3">
                                 <RoomStatusBadge status={room.status} />
                             </td>

@@ -50,9 +50,11 @@ const initialForm: RoomForm = {
     status: '',
 };
 
-export default function RoomsIndex({ rooms }: { rooms?: Room[] }) {
+export default function RoomsIndex({ rooms }: { rooms?: Room[]  } ) {
     const safeRooms = rooms ?? [];
-
+    console.log(rooms);
+    console.log(rooms[4].floor.name)
+    console.log(rooms[4].room_category)
     const [localRooms, setLocalRooms] = useState<Room[]>(safeRooms);
     const [isAddRoomOpen, setIsAddRoomOpen] = useState(false);
     const [form, setForm] = useState<RoomForm>(initialForm);
@@ -84,14 +86,14 @@ export default function RoomsIndex({ rooms }: { rooms?: Room[] }) {
 
     const categoryOptions = useMemo(() => {
         const unique = Array.from(
-            new Set(localRooms.map((room) => room.category)),
+            new Set(localRooms.map((room) => room.room_category.id)),
         );
         return unique.length ? unique : ['Single', 'Double', 'Suite'];
     }, [localRooms]);
 
     const floorOptions = useMemo(() => {
         const unique = Array.from(
-            new Set(localRooms.map((room) => room.floor)),
+            new Set(localRooms.map((room) => room.floor.name)),
         ).sort((a, b) => a - b);
         return unique.length ? unique : [1, 2, 3];
     }, [localRooms]);

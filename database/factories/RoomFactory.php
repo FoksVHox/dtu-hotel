@@ -17,6 +17,7 @@ class RoomFactory extends Factory
     public function definition(): array
     {
         return [
+            'code' => $this -> faker -> unique()->word(),
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
 
