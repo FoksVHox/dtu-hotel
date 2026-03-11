@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\RoomStatus;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -12,52 +13,65 @@ class RoomController extends Controller
      */
     public function index()
     {
-        return Inertia::render('rooms/index');
+        return Inertia::render('rooms/index', [
+            'rooms' => [
+                [
+                    'id' => 1,
+                    'code' => 'A101',
+                    'category' => 'Single',
+                    'floor' => 1,
+                    'status' => RoomStatus::Available->value,
+                ],
+                [
+                    'id' => 2,
+                    'code' => 'A102',
+                    'category' => 'Double',
+                    'floor' => 1,
+                    'status' => RoomStatus::Occupied->value,
+                ],
+                [
+                    'id' => 3,
+                    'code' => 'B201',
+                    'category' => 'Suite',
+                    'floor' => 2,
+                    'status' => RoomStatus::Cleaning->value,
+                ],
+                [
+                    'id' => 4,
+                    'code' => 'B202',
+                    'category' => 'Single',
+                    'floor' => 2,
+                    'status' => RoomStatus::OutOfOrder->value,
+                ],
+            ],
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         //
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(string $id)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
         //
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
         //
