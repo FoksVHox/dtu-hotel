@@ -4,6 +4,7 @@ import {
     eachDayOfInterval,
     format,
     parseISO,
+    startOfDay,
 } from 'date-fns';
 import { useState } from 'react';
 import { BookingDetailDialog } from '@/components/calendar/booking-detail-dialog';
@@ -32,8 +33,8 @@ function getBookingsForRoom(
     return bookings
         .filter((b) => b.rooms.some((r) => r.id === roomId))
         .reduce<PositionedBooking[]>((acc, booking) => {
-            const bookingStart = parseISO(booking.start);
-            const bookingEnd = parseISO(booking.end);
+            const bookingStart = startOfDay(parseISO(booking.start));
+            const bookingEnd = startOfDay(parseISO(booking.end));
 
             if (bookingEnd < weekStart || bookingStart > weekEnd) {
                 return acc;
@@ -74,8 +75,8 @@ export function CalendarGrid({
         useState<CalendarBooking | null>(null);
 
     return (
-        <div className="overflow-x-auto rounded-lg border border-sidebar-border/70 dark:border-sidebar-border">
-            <table className="w-full min-w-[800px] table-fixed border-collapse">
+        <div className="overflow-hidden rounded-lg border border-sidebar-border/70 dark:border-sidebar-border">
+            <table className="w-full table-fixed border-collapse">
                 <thead>
                     <tr>
                         <th className="w-[160px] border-r border-b bg-muted/50 px-3 py-2 text-left text-sm font-medium">

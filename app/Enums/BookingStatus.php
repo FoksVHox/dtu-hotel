@@ -4,6 +4,7 @@ namespace App\Enums;
 
 enum BookingStatus: int
 {
+    case Unknown = 0;
     case Pending = 1;
     case Confirmed = 2;
     case CheckedIn = 3;
@@ -14,6 +15,7 @@ enum BookingStatus: int
     public function label(): string
     {
         return match ($this) {
+            self::Unknown => 'Unknown',
             self::Pending => 'Pending',
             self::Confirmed => 'Confirmed',
             self::CheckedIn => 'Checked In',

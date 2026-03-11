@@ -1,6 +1,7 @@
 import { Deferred, Head, router } from '@inertiajs/react';
 import { addDays, format, parseISO, startOfWeek } from 'date-fns';
 import { useState } from 'react';
+import { CreateBookingDialog } from '@/components/booking/create-booking-dialog';
 import { CalendarGrid } from '@/components/calendar/calendar-grid';
 import { CalendarLegend } from '@/components/calendar/calendar-legend';
 import { WeekHeader } from '@/components/calendar/week-header';
@@ -45,6 +46,7 @@ export default function Dashboard({
     });
 
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const [createBookingOpen, setCreateBookingOpen] = useState(false);
 
     function shiftWeek(offset: number) {
         const next = addDays(weekStartDate, offset);
@@ -66,8 +68,8 @@ export default function Dashboard({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+            <div className="flex h-full flex-1 flex-col gap-6 overflow-hidden rounded-xl p-4">
+                <div className="mb-20 grid auto-rows-min gap-4 md:grid-cols-3">
                     <Deferred
                         data="todayActivity"
                         fallback={<StatCardSkeleton />}
@@ -91,6 +93,7 @@ export default function Dashboard({
                     onNext={() => shiftWeek(7)}
                     onRefresh={refreshCalendar}
                     isRefreshing={isRefreshing}
+                    onCreateBooking={() => setCreateBookingOpen(true)}
                 />
 
                 <CalendarGrid
@@ -100,6 +103,12 @@ export default function Dashboard({
                 />
 
                 <CalendarLegend />
+
+                <CreateBookingDialog
+                    open={createBookingOpen}
+                    onOpenChange={setCreateBookingOpen}
+                    rooms={rooms}
+                />
             </div>
         </AppLayout>
     );

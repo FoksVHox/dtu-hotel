@@ -4,6 +4,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\SearchGuestsController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -20,6 +21,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('bookings', BookingController::class);
 
     Route::resource('rooms', RoomController::class);
+
+    Route::get('guests/search', SearchGuestsController::class)->name('guests.search');
 
     Route::get('maintenance', MaintenanceController::class)->name('maintenance.index');
 });
