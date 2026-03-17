@@ -15,6 +15,7 @@ interface CalendarGridProps {
     weekStart: Date;
     rooms: CalendarRoom[];
     bookings: CalendarBooking[];
+    onEdit?: (booking: CalendarBooking) => void;
 }
 
 interface PositionedBooking {
@@ -65,6 +66,7 @@ export function CalendarGrid({
     weekStart,
     rooms,
     bookings,
+    onEdit,
 }: CalendarGridProps) {
     const days = eachDayOfInterval({
         start: weekStart,
@@ -205,6 +207,10 @@ export function CalendarGrid({
                     if (!open) {
                         setSelectedBooking(null);
                     }
+                }}
+                onEdit={(booking) => {
+                    setSelectedBooking(null);
+                    onEdit?.(booking);
                 }}
             />
         </div>

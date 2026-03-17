@@ -1,7 +1,7 @@
 import { Deferred, Head, router } from '@inertiajs/react';
 import { addDays, format, parseISO, startOfWeek } from 'date-fns';
-import { useState } from 'react';
-import { CreateBookingDialog } from '@/components/booking/create-booking-dialog';
+import { useCallback, useState } from 'react';
+import { BookingFormDialog } from '@/components/booking/booking-form-dialog';
 import { CalendarGrid } from '@/components/calendar/calendar-grid';
 import { CalendarLegend } from '@/components/calendar/calendar-legend';
 import { WeekHeader } from '@/components/calendar/week-header';
@@ -46,7 +46,22 @@ export default function Dashboard({
     });
 
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const [createBookingOpen, setCreateBookingOpen] = useState(false);
+    const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
+    const [editBooking, setEditBooking] = useState<CalendarBooking | null>(
+        null,
+    );
+
+    const handleEditBooking = useCallback((booking: CalendarBooking) => {
+        setEditBooking(booking);
+        setBookingDialogOpen(true);
+    }, []);
+
+    function handleBookingDialogOpenChange(isOpen: boolean) {
+        setBookingDialogOpen(isOpen);
+        if (!isOpen) {
+            setEditBooking(null);
+        }
+    }
 
     function shiftWeek(offset: number) {
         const next = addDays(weekStartDate, offset);
@@ -93,21 +108,26 @@ export default function Dashboard({
                     onNext={() => shiftWeek(7)}
                     onRefresh={refreshCalendar}
                     isRefreshing={isRefreshing}
-                    onCreateBooking={() => setCreateBookingOpen(true)}
+                    onCreateBooking={() => {
+                        setEditBooking(null);
+                        setBookingDialogOpen(true);
+                    }}
                 />
 
                 <CalendarGrid
                     weekStart={weekStartDate}
                     rooms={rooms}
                     bookings={bookings}
+                    onEdit={handleEditBooking}
                 />
 
                 <CalendarLegend />
 
-                <CreateBookingDialog
-                    open={createBookingOpen}
-                    onOpenChange={setCreateBookingOpen}
+                <BookingFormDialog
+                    open={bookingDialogOpen}
+                    onOpenChange={handleBookingDialogOpenChange}
                     rooms={rooms}
+                    booking={editBooking}
                 />
             </div>
         </AppLayout>
