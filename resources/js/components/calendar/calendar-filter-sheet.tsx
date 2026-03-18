@@ -17,8 +17,8 @@ import type {
     CalendarFilters,
     CalendarFloor,
     CalendarRoomCategory,
-
-    BookingStatus} from '@/types/calendar';
+    BookingStatus,
+} from '@/types/calendar';
 import {
     BOOKING_STATUSES,
     DEFAULT_CALENDAR_FILTERS,
