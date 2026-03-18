@@ -1,5 +1,5 @@
 import { addDays, format, getMonth, getYear } from 'date-fns';
-import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface WeekHeaderProps {
@@ -8,6 +8,7 @@ interface WeekHeaderProps {
     onNext: () => void;
     onRefresh?: () => void;
     isRefreshing?: boolean;
+    onCreateBooking?: () => void;
 }
 
 /**
@@ -37,42 +38,58 @@ export function WeekHeader({
     onNext,
     onRefresh,
     isRefreshing = false,
+    onCreateBooking,
 }: WeekHeaderProps) {
     return (
-        <div className="flex items-center justify-center gap-4">
-            <Button
-                variant="outline"
-                size="icon"
-                onClick={onPrev}
-                aria-label="Previous week"
-            >
-                <ChevronLeft />
-            </Button>
+        <div className="flex items-center justify-between">
+            <div className="w-[140px]" />
 
-            <h2 className="text-lg font-semibold">
-                {formatWeekRange(weekStart)}
-            </h2>
-
-            <Button
-                variant="outline"
-                size="icon"
-                onClick={onNext}
-                aria-label="Next week"
-            >
-                <ChevronRight />
-            </Button>
-
-            {onRefresh && (
+            <div className="flex items-center gap-4">
                 <Button
                     variant="outline"
                     size="icon"
-                    onClick={onRefresh}
-                    disabled={isRefreshing}
-                    aria-label="Refresh calendar"
+                    onClick={onPrev}
+                    aria-label="Previous week"
                 >
-                    <RefreshCw className={isRefreshing ? 'animate-spin' : ''} />
+                    <ChevronLeft />
                 </Button>
-            )}
+
+                <h2 className="text-lg font-semibold">
+                    {formatWeekRange(weekStart)}
+                </h2>
+
+                <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={onNext}
+                    aria-label="Next week"
+                >
+                    <ChevronRight />
+                </Button>
+
+                {onRefresh && (
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={onRefresh}
+                        disabled={isRefreshing}
+                        aria-label="Refresh calendar"
+                    >
+                        <RefreshCw
+                            className={isRefreshing ? 'animate-spin' : ''}
+                        />
+                    </Button>
+                )}
+            </div>
+
+            <div className="flex w-[140px] justify-end">
+                {onCreateBooking && (
+                    <Button onClick={onCreateBooking} size="sm">
+                        <Plus className="size-4" />
+                        New Booking
+                    </Button>
+                )}
+            </div>
         </div>
     );
 }

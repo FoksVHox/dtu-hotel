@@ -10,6 +10,11 @@ use Carbon\Carbon;
 class BuildTodayActivity
 {
     /**
+     * Build today's activity statistics for the dashboard.
+     *
+     * Counts today's check-ins, check-outs, currently checked-in bookings,
+     * expected occupancy percentage, and pending confirmations.
+     *
      * @return array{checkInsToday: int, checkOutsToday: int, currentlyCheckedIn: int, expectedOccupancy: int, pendingConfirmations: int}
      */
     public function __invoke(): array

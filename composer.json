@@ -9,13 +9,13 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/fortify": "^1.30",
-        "laravel/framework": "^12.0",
+        "laravel/framework": "^13.0",
         "laravel/horizon": "^5.44",
         "laravel/scout": "^10.24",
-        "laravel/tinker": "^2.10.1",
+        "laravel/tinker": "^3.0",
         "laravel/wayfinder": "^0.1.9"
     },
     "require-dev": {
@@ -55,6 +55,7 @@
             "Composer\\Config::disableProcessTimeout",
             "./vendor/bin/sail up -d",
             "./vendor/bin/sail yarn",
+            "./vendor/bin/sail composer install",
             "./vendor/bin/sail artisan migrate --force",
             "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"./vendor/bin/sail artisan horizon:listen --poll\" \"./vendor/bin/sail artisan pail --timeout=0\" \"./vendor/bin/sail yarn run dev\" --names=server,horizon,logs,vite --kill-others"
         ],
