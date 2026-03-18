@@ -1,0 +1,6 @@
+{
+  "enabledMcpjsonServers": ["laravel-boost"],
+  "permissions": {
+    "allow": ["Bash(gh issue:*)"]
+  }
+}
