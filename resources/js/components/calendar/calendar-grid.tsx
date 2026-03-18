@@ -16,6 +16,7 @@ interface CalendarGridProps {
     rooms: CalendarRoom[];
     bookings: CalendarBooking[];
     onEdit?: (booking: CalendarBooking) => void;
+    hasActiveFilters?: boolean;
 }
 
 interface PositionedBooking {
@@ -67,6 +68,7 @@ export function CalendarGrid({
     rooms,
     bookings,
     onEdit,
+    hasActiveFilters = false,
 }: CalendarGridProps) {
     const days = eachDayOfInterval({
         start: weekStart,
@@ -101,7 +103,9 @@ export function CalendarGrid({
                                 colSpan={8}
                                 className="px-3 py-12 text-center text-sm text-muted-foreground"
                             >
-                                No rooms available.
+                                {hasActiveFilters
+                                    ? 'No rooms match the active filters.'
+                                    : 'No rooms available.'}
                             </td>
                         </tr>
                     )}
