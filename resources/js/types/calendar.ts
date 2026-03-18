@@ -24,7 +24,7 @@ export interface CalendarRoom {
     building_id: number;
     floor_id: number;
     room_category_id: number;
-    status: number; // RoomStatus enum value
+    status: BookingStatus;
     room_category: CalendarRoomCategory;
     floor: CalendarFloor;
 }
@@ -45,6 +45,7 @@ export interface CalendarBooking {
 }
 
 export const BookingStatus = {
+    Unknown: 0,
     Pending: 1,
     Confirmed: 2,
     CheckedIn: 3,
@@ -66,10 +67,17 @@ export interface BookingStatusConfig {
 export function getBookingStatusConfig(
     booking: CalendarBooking,
 ): BookingStatusConfig {
-    return BOOKING_STATUSES[booking.status] ?? BOOKING_STATUSES[1];
+    return BOOKING_STATUSES[booking.status] ?? BOOKING_STATUSES[BookingStatus.Unknown];
 }
 
 export const BOOKING_STATUSES: Record<BookingStatus, BookingStatusConfig> = {
+    [BookingStatus.Unknown]: {
+        label: 'Unknown',
+        bg: '#1f1f1f',
+        border: '#3f3f46',
+        text: '#a1a1aa',
+        secondary: '#71717a',
+    },
     [BookingStatus.Pending]: {
         label: 'Pending',
         bg: '#1e2a4a',

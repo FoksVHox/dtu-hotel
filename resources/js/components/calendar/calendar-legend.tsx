@@ -1,9 +1,13 @@
-import { BOOKING_STATUSES } from '@/types/calendar';
+import { BOOKING_STATUSES, BookingStatus } from '@/types/calendar';
 
 export function CalendarLegend() {
+    const legendStatuses = Object.entries(BOOKING_STATUSES).filter(
+        ([status]) => Number(status) !== BookingStatus.Unknown,
+    );
+
     return (
         <div className="flex flex-wrap items-center gap-4 px-1">
-            {Object.values(BOOKING_STATUSES).map((config) => (
+            {legendStatuses.map(([, config]) => (
                 <div key={config.label} className="flex items-center gap-1.5">
                     <span
                         className="inline-block h-3 w-3 rounded-sm border"

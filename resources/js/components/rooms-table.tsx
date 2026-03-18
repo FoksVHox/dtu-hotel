@@ -1,11 +1,12 @@
 import { Pencil, Trash2, Wrench } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { RoomStatusBadge } from '@/components/room-status-badge';
+import type { BookingStatus } from '@/types/calendar';
 
 export type Room = {
     id: number;
     code: string;
-    status: number;
+    status: BookingStatus;
     floor: {
         id: number;
         name: string;
@@ -27,7 +28,6 @@ export type Room = {
 
 type SortKey = 'code' | 'category' | 'floor' | 'status';
 
-// Th component moved outside RoomsTable for linting compliance
 type ThProps = {
     label: string;
     k: SortKey;

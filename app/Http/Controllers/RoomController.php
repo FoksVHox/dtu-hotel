@@ -2,23 +2,55 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\RoomStatus;
+use App\Enums\BookingStatus;
+use App\Models\Booking;
+use App\Models\Room;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use App\Models\Room;
+use Inertia\Response;
 
 class RoomController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): Response
     {
-        $rooms = Room:: with(['roomCategory', 'floor' ]) -> get();
+        $rooms = Room::query()
+            ->with([
+                'roomCategory',
+                'floor',
+                'bookings' => fn ($query) => $query
+                    ->whereIn('status', array_column(BookingStatus::cases(), 'value'))
+                    ->orderByDesc('start')
+                    ->orderByDesc('id'),
+            ])
+            ->get()
+            ->map(function (Room $room): array {
+                $status = $this->resolveRoomStatus($room->bookings);
+
+                return [
+                    ...$room->toArray(),
+                    'status' => $status->value,
+                ];
+            });
+
         return Inertia::render('rooms/index', [
             'rooms' => $rooms,
 
         ]);
+    }
+
+    private function resolveRoomStatus(Collection $bookings): BookingStatus
+    {
+        if ($bookings->isEmpty()) {
+            return BookingStatus::Unknown;
+        }
+
+        /** @var Booking|null $latestBooking */
+        $latestBooking = $bookings
+            ->sortByDesc(fn (Booking $booking): int => $booking->start?->getTimestamp() ?? 0)
+            ->first();
+
+        return $latestBooking?->status ?? BookingStatus::Unknown;
     }
 
     public function create()

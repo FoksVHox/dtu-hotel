@@ -23,18 +23,40 @@ import {
 } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
+import {
+    BOOKING_STATUSES,
+    BookingStatus,
+    type BookingStatus as BookingStatusValue,
+} from '@/types/calendar';
 import roomsRoute from '@/routes/rooms';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Room Management', href: roomsRoute.index().url },
 ];
 
-const ROOM_STATUS = {
-    Available: 1,
-    Occupied: 2,
-    Cleaning: 3,
-    OutOfOrder: 4,
-} as const;
+const ROOM_STATUS_OPTIONS: BookingStatusValue[] = [
+    BookingStatus.Unknown,
+    BookingStatus.Pending,
+    BookingStatus.Confirmed,
+    BookingStatus.CheckedIn,
+    BookingStatus.CheckedOut,
+    BookingStatus.Cancelled,
+    BookingStatus.Maintenance,
+];
+
+const EMPTY_STATUS_COUNTS: Record<BookingStatusValue, number> = {
+    [BookingStatus.Unknown]: 0,
+    [BookingStatus.Pending]: 0,
+    [BookingStatus.Confirmed]: 0,
+    [BookingStatus.CheckedIn]: 0,
+    [BookingStatus.CheckedOut]: 0,
+    [BookingStatus.Cancelled]: 0,
+    [BookingStatus.Maintenance]: 0,
+};
+
+function getRoomStatusLabel(status: BookingStatusValue): string {
+    return BOOKING_STATUSES[status].label;
+}
 
 type RoomForm = {
     code: string;
@@ -52,35 +74,27 @@ const initialForm: RoomForm = {
 
 export default function RoomsIndex({ rooms }: { rooms?: Room[]  } ) {
     const safeRooms = rooms ?? [];
-    console.log(rooms);
-    console.log(rooms[4].floor.name)
-    console.log(rooms[4].room_category)
     const [localRooms, setLocalRooms] = useState<Room[]>(safeRooms);
     const [isAddRoomOpen, setIsAddRoomOpen] = useState(false);
     const [form, setForm] = useState<RoomForm>(initialForm);
 
     const counts = useMemo(
-        () =>
-            localRooms.reduce(
-                (acc, room) => {
-                    acc.total += 1;
+        () => {
+            const byStatus = { ...EMPTY_STATUS_COUNTS };
 
-                    if (room.status === ROOM_STATUS.Available) {
-                        acc.available += 1;
-                    }
+            localRooms.forEach((room) => {
+                if (Object.hasOwn(byStatus, room.status)) {
+                    byStatus[room.status] += 1;
+                } else {
+                    byStatus[BookingStatus.Unknown] += 1;
+                }
+            });
 
-                    if (room.status === ROOM_STATUS.Occupied) {
-                        acc.occupied += 1;
-                    }
-
-                    if (room.status === ROOM_STATUS.OutOfOrder) {
-                        acc.outOfOrder += 1;
-                    }
-
-                    return acc;
-                },
-                { total: 0, available: 0, occupied: 0, outOfOrder: 0 },
-            ),
+            return {
+                total: localRooms.length,
+                byStatus,
+            };
+        },
         [localRooms],
     );
 
@@ -252,30 +266,14 @@ export default function RoomsIndex({ rooms }: { rooms?: Room[]  } ) {
                                         <SelectValue placeholder="Select status" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem
-                                            value={String(
-                                                ROOM_STATUS.Available,
-                                            )}
-                                        >
-                                            Available
-                                        </SelectItem>
-                                        <SelectItem
-                                            value={String(ROOM_STATUS.Occupied)}
-                                        >
-                                            Occupied
-                                        </SelectItem>
-                                        <SelectItem
-                                            value={String(ROOM_STATUS.Cleaning)}
-                                        >
-                                            Cleaning
-                                        </SelectItem>
-                                        <SelectItem
-                                            value={String(
-                                                ROOM_STATUS.OutOfOrder,
-                                            )}
-                                        >
-                                            Out of Order
-                                        </SelectItem>
+                                        {ROOM_STATUS_OPTIONS.map((status) => (
+                                            <SelectItem
+                                                key={status}
+                                                value={String(status)}
+                                            >
+                                                {getRoomStatusLabel(status)}
+                                            </SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -315,44 +313,20 @@ export default function RoomsIndex({ rooms }: { rooms?: Room[]  } ) {
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm text-muted-foreground">
-                                Available
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-2xl font-semibold">
-                                {counts.available}
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm text-muted-foreground">
-                                Occupied
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-2xl font-semibold">
-                                {counts.occupied}
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm text-muted-foreground">
-                                Out of Order
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-2xl font-semibold">
-                                {counts.outOfOrder}
-                            </p>
-                        </CardContent>
-                    </Card>
+                    {ROOM_STATUS_OPTIONS.map((status) => (
+                        <Card key={status}>
+                            <CardHeader className="pb-2">
+                                <CardTitle className="text-sm text-muted-foreground">
+                                    {getRoomStatusLabel(status)}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-2xl font-semibold">
+                                    {counts.byStatus[status]}
+                                </p>
+                            </CardContent>
+                        </Card>
+                    ))}
                 </div>
 
                 <RoomsTable rooms={localRooms} onDelete={handleDeleteRoom} />

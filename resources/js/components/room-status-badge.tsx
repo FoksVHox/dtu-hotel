@@ -1,31 +1,29 @@
 import { Badge } from '@/components/ui/badge';
+import {
+    BOOKING_STATUSES,
+    BookingStatus,
+    type BookingStatus as BookingStatusValue,
+} from '@/types/calendar';
 
-// Status values: 1..4 — keep in sync with the RoomStatus enum used elsewhere in the app. ###DM
-// Note: The status values should ideally be typed as RoomStatus, but since this component is used in multiple places with different data sources, we'll keep it as number for flexibility. ###DM
-const STATUS_CONFIG: Record<number, { label: string; className: string }> = {
-    1: { label: 'Available', className: 'border-green-500/40 text-green-400' },
-    2: { label: 'Occupied', className: 'border-red-500/40 text-red-400' },
-    3: { label: 'Cleaning', className: 'border-amber-500/40 text-amber-400' },
-    4: { label: 'Out of Order', className: 'border-zinc-500/40 text-zinc-400' },
+const STATUS_CLASSNAMES: Record<BookingStatusValue, string> = {
+    [BookingStatus.Unknown]: 'border-zinc-500/40 text-zinc-400',
+    [BookingStatus.Pending]: 'border-blue-500/40 text-blue-400',
+    [BookingStatus.Confirmed]: 'border-cyan-500/40 text-cyan-400',
+    [BookingStatus.CheckedIn]: 'border-green-500/40 text-green-400',
+    [BookingStatus.CheckedOut]: 'border-slate-500/40 text-slate-400',
+    [BookingStatus.Cancelled]: 'border-rose-500/40 text-rose-400',
+    [BookingStatus.Maintenance]: 'border-amber-500/40 text-amber-400',
 };
 
-export function RoomStatusBadge({ status }: { status: number }) {
-    const cfg = STATUS_CONFIG[status];
-
-    if (!cfg) {
-        return (
-            <Badge
-                variant="outline"
-                className="border-border text-muted-foreground"
-            >
-                Unknown
-            </Badge>
-        );
-    }
+export function RoomStatusBadge({ status }: { status: BookingStatusValue }) {
+    const label =
+        BOOKING_STATUSES[status]?.label ?? BOOKING_STATUSES[BookingStatus.Unknown].label;
+    const className =
+        STATUS_CLASSNAMES[status] ?? STATUS_CLASSNAMES[BookingStatus.Unknown];
 
     return (
-        <Badge variant="outline" className={cfg.className}>
-            {cfg.label}
+        <Badge variant="outline" className={className}>
+            {label}
         </Badge>
     );
 }
