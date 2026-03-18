@@ -1,15 +1,15 @@
 import { X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import type {
-    CalendarFilters,
-    CalendarFloor,
-    CalendarRoomCategory,
-} from '@/types/calendar';
 import {
     BOOKING_STATUSES,
     DEFAULT_CALENDAR_FILTERS,
     hasActiveFilters,
+} from '@/types/calendar';
+import type {
+    CalendarFilters,
+    CalendarFloor,
+    CalendarRoomCategory,
 } from '@/types/calendar';
 import type { BookingStatus } from '@/types/calendar';
 

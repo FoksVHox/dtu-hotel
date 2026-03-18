@@ -17,9 +17,9 @@ import type {
     CalendarFilters,
     CalendarFloor,
     CalendarRoomCategory,
-} from '@/types/calendar';
+
+    BookingStatus} from '@/types/calendar';
 import {
-    BookingStatus,
     BOOKING_STATUSES,
     DEFAULT_CALENDAR_FILTERS,
     hasActiveFilters,
@@ -85,7 +85,10 @@ export function CalendarFilterSheet({
                     )}
                 </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="flex flex-col overflow-hidden">
+            <SheetContent
+                side="right"
+                className="flex flex-col overflow-hidden"
+            >
                 <SheetHeader>
                     <SheetTitle>Filters</SheetTitle>
                     <SheetDescription>
@@ -162,8 +165,9 @@ export function CalendarFilterSheet({
                             </span>
                             {Object.entries(BOOKING_STATUSES).map(
                                 ([value, config]) => {
-                                    const status =
-                                        Number(value) as BookingStatus;
+                                    const status = Number(
+                                        value,
+                                    ) as BookingStatus;
                                     return (
                                         <div
                                             key={value}
