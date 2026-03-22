@@ -14,8 +14,7 @@ class RoomController extends Controller
 {
     public function index(): Response
     {
-        $rooms = Room::query()
-            ->with(['building', 'floor', 'roomCategory'])
+        $rooms = Room::with(['building', 'floor', 'roomCategory'])
             ->get()
             ->map(fn (Room $room) => [
                 'id' => $room->id,

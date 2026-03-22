@@ -13,8 +13,7 @@ class MaintenanceController extends Controller
 {
     public function __invoke(Request $request): Response
     {
-        $cleaningRooms = Room::query()
-            ->where('status', RoomStatus::Cleaning)
+        $cleaningRooms = Room::where('status', RoomStatus::Cleaning)
             ->with([
                 'building',
                 'floor',

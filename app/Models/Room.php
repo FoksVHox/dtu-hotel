@@ -22,14 +22,6 @@ class Room extends Model
         'scheduled_cleaning_at',
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'status' => RoomStatus::class,
-            'scheduled_cleaning_at' => 'datetime',
-        ];
-    }
-
     public function hotel(): BelongsTo
     {
         return $this->belongsTo(Hotel::class);
@@ -64,5 +56,13 @@ class Room extends Model
     public function maintenanceLogs(): HasMany
     {
         return $this->hasMany(MaintenanceLog::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'status' => RoomStatus::class,
+            'scheduled_cleaning_at' => 'datetime',
+        ];
     }
 }

@@ -13,15 +13,15 @@ class MaintenanceLog extends Model
         'performed_at',
     ];
 
+    public function room(): BelongsTo
+    {
+        return $this->belongsTo(Room::class);
+    }
+
     protected function casts(): array
     {
         return [
             'performed_at' => 'datetime',
         ];
-    }
-
-    public function room(): BelongsTo
-    {
-        return $this->belongsTo(Room::class);
     }
 }

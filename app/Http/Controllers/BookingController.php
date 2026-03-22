@@ -18,8 +18,7 @@ class BookingController extends Controller
 {
     public function index(): Response
     {
-        $bookings = Booking::query()
-            ->with(['guests', 'rooms.building', 'rooms.floor', 'rooms.roomCategory'])
+        $bookings = Booking::with(['guests', 'rooms.building', 'rooms.floor', 'rooms.roomCategory'])
             ->latest()
             ->get()
             ->map(fn (Booking $booking) => [

@@ -6,9 +6,6 @@ use App\Models\Booking;
 use App\Models\MaintenanceLog;
 use App\Models\Room;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 // ── Authentication ────────────────────────────────────────────────────────────
 
