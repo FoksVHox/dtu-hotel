@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
             HotelStructureSeeder::class,
             GuestSeeder::class,
             BookingSeeder::class,
+            HousekeepingSeeder::class,
         ]);
     }
 }

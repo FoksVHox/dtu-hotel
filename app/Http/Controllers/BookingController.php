@@ -2,31 +2,49 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\BookingStatus;
+use App\Enums\RoomStatus;
 use App\Http\Requests\StoreBookingRequest;
+use App\Http\Requests\UpdateBookingRequest;
 use App\Models\Booking;
 use App\Models\Guest;
+use App\Models\Room;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class BookingController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): Response
     {
-        return Inertia::render('bookings/index');
+        $bookings = Booking::with(['guests', 'rooms.building', 'rooms.floor', 'rooms.roomCategory'])
+            ->latest()
+            ->get()
+            ->map(fn (Booking $booking) => [
+                'id' => $booking->id,
+                'start' => $booking->start->toIso8601String(),
+                'end' => $booking->end->toIso8601String(),
+                'status' => $booking->status->value,
+                'guests' => $booking->guests->map(fn (Guest $guest) => [
+                    'id' => $guest->id,
+                    'first_name' => $guest->first_name,
+                    'last_name' => $guest->last_name,
+                    'email' => $guest->email,
+                    'phone' => $guest->phone,
+                ]),
+                'rooms' => $booking->rooms->map(fn (Room $room) => [
+                    'id' => $room->id,
+                    'code' => $room->building->code.'-'.$room->floor->name.'-'.$room->id,
+                    'room_category' => ['name' => $room->roomCategory?->name ?? ''],
+                    'floor' => ['code' => $room->floor->code],
+                ]),
+            ]);
+
+        return Inertia::render('bookings/index', ['bookings' => $bookings]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+    public function create(): void {}
 
     public function store(StoreBookingRequest $request): RedirectResponse
     {
@@ -70,35 +88,45 @@ class BookingController extends Controller
         return redirect()->back();
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(string $id): void {}
+
+    public function edit(string $id): void {}
+
+    public function update(UpdateBookingRequest $request, Booking $booking): RedirectResponse
     {
-        //
+        DB::transaction(function () use ($request, $booking): void {
+            $newStatus = BookingStatus::from($request->validated()['status']);
+            $booking->update(['status' => $newStatus]);
+
+            $roomStatus = match ($newStatus) {
+                BookingStatus::CheckedIn => RoomStatus::Occupied,
+                BookingStatus::CheckedOut => RoomStatus::Cleaning,
+                BookingStatus::Cancelled => RoomStatus::Available,
+                default => null,
+            };
+
+            if ($roomStatus !== null) {
+                $booking->rooms()->update(['status' => $roomStatus->value]);
+            }
+        });
+
+        return redirect()->back();
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function destroy(Booking $booking): RedirectResponse
     {
-        //
-    }
+        $deletableStatuses = [
+            BookingStatus::Pending,
+            BookingStatus::Confirmed,
+            BookingStatus::Cancelled,
+        ];
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        if (! in_array($booking->status, $deletableStatuses, strict: true)) {
+            return redirect()->back()->withErrors(['booking' => 'This booking cannot be deleted in its current status.']);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $booking->delete();
+
+        return redirect()->back();
     }
 }

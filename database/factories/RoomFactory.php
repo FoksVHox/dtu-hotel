@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\RoomStatus;
 use App\Models\Building;
 use App\Models\Floor;
 use App\Models\Hotel;
@@ -24,6 +25,7 @@ class RoomFactory extends Factory
             'building_id' => Building::factory(),
             'floor_id' => Floor::factory(),
             'room_category_id' => RoomCategory::factory(),
+            'status' => RoomStatus::Available,
         ];
     }
 }
