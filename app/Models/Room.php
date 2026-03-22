@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Enums\RoomStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Room extends Model
 {
@@ -16,7 +18,17 @@ class Room extends Model
         'building_id',
         'floor_id',
         'room_category_id',
+        'status',
+        'scheduled_cleaning_at',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'status' => RoomStatus::class,
+            'scheduled_cleaning_at' => 'datetime',
+        ];
+    }
 
     public function hotel(): BelongsTo
     {
@@ -47,5 +59,10 @@ class Room extends Model
     public function bookings(): BelongsToMany
     {
         return $this->belongsToMany(Booking::class);
+    }
+
+    public function maintenanceLogs(): HasMany
+    {
+        return $this->hasMany(MaintenanceLog::class);
     }
 }
