@@ -8,6 +8,7 @@ use App\Http\Requests\StoreBookingRequest;
 use App\Http\Requests\UpdateBookingRequest;
 use App\Models\Booking;
 use App\Models\Guest;
+use App\Models\Room;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -17,7 +18,31 @@ class BookingController extends Controller
 {
     public function index(): Response
     {
-        return Inertia::render('bookings/index');
+        $bookings = Booking::query()
+            ->with(['guests', 'rooms.building', 'rooms.floor', 'rooms.roomCategory'])
+            ->latest()
+            ->get()
+            ->map(fn (Booking $booking) => [
+                'id' => $booking->id,
+                'start' => $booking->start->toIso8601String(),
+                'end' => $booking->end->toIso8601String(),
+                'status' => $booking->status->value,
+                'guests' => $booking->guests->map(fn (Guest $guest) => [
+                    'id' => $guest->id,
+                    'first_name' => $guest->first_name,
+                    'last_name' => $guest->last_name,
+                    'email' => $guest->email,
+                    'phone' => $guest->phone,
+                ]),
+                'rooms' => $booking->rooms->map(fn (Room $room) => [
+                    'id' => $room->id,
+                    'code' => $room->building->code.'-'.$room->floor->name.'-'.$room->id,
+                    'room_category' => ['name' => $room->roomCategory?->name ?? ''],
+                    'floor' => ['code' => $room->floor->code],
+                ]),
+            ]);
+
+        return Inertia::render('bookings/index', ['bookings' => $bookings]);
     }
 
     public function create(): void {}
@@ -89,5 +114,20 @@ class BookingController extends Controller
         return redirect()->back();
     }
 
-    public function destroy(string $id): void {}
+    public function destroy(Booking $booking): RedirectResponse
+    {
+        $deletableStatuses = [
+            BookingStatus::Pending,
+            BookingStatus::Confirmed,
+            BookingStatus::Cancelled,
+        ];
+
+        if (! in_array($booking->status, $deletableStatuses, strict: true)) {
+            return redirect()->back()->withErrors(['booking' => 'This booking cannot be deleted in its current status.']);
+        }
+
+        $booking->delete();
+
+        return redirect()->back();
+    }
 }
