@@ -50,13 +50,74 @@ The overlap query uses `start < requested_end AND end > requested_start` (standa
 
 ## Controller (`app/Http/Controllers/BookingController.php`)
 
-`store()` wraps everything in `DB::transaction()`. Inside:
+### `store()`
+
+Wraps everything in `DB::transaction()`. Inside:
 1. Creates the `Booking` record
 2. Attaches `room_ids` via the `booking_room` pivot
 3. Creates any `new_guests` as `Guest` records, collects their IDs
 4. Attaches all guest IDs via the `guest_booking` pivot
 
 On any `\Throwable`, the transaction rolls back and the controller returns `redirect()->back()->withErrors(['booking' => '...'])`.
+
+### `update()`
+
+Data flow:
+```
+Frontend (bookings/index.tsx — Select dropdown)
+  → PATCH /bookings/{booking} (Wayfinder: BookingController.update())
+  → UpdateBookingRequest (validates status is a valid BookingStatus int)
+  → BookingController::update()
+  → DB::transaction: booking.update(status), rooms().update(status)
+  → redirect()->back()
+```
+
+Accepts a `status` integer (validated against `BookingStatus` cases). Updates the booking status and propagates room status changes:
+
+| New booking status | Room status set to |
+|--------------------|--------------------|
+| `CheckedIn` | `Occupied` |
+| `CheckedOut` | `Cleaning` |
+| `Cancelled` | `Available` |
+| Any other | No change |
+
+Validation: `app/Http/Requests/UpdateBookingRequest.php` — `status` must be a valid `BookingStatus` value.
+
+### `destroy()`
+
+Data flow:
+```
+Frontend (bookings/index.tsx — Delete button + confirmation dialog)
+  → DELETE /bookings/{booking} (Wayfinder: BookingController.destroy())
+  → BookingController::destroy()
+  → Status check → booking.delete()
+  → redirect()->back()
+```
+
+Only bookings with status `Pending`, `Confirmed`, or `Cancelled` can be deleted. Attempting to delete a `CheckedIn`, `CheckedOut`, or `Maintenance` booking returns `redirect()->back()->withErrors(['booking' => '...'])`.
+
+## Booking Management page (`resources/js/pages/bookings/index.tsx`)
+
+The main booking management UI. Renders:
+
+- **Stat cards** — total, checked-in, active (Pending + Confirmed), and cancelled counts
+- **Sortable table** — sortable by check-in date, check-out date, primary guest name, room count, or status
+- **Inline status select** — PATCH to `update()` directly from the table row
+- **Delete button** — disabled for non-deletable statuses; triggers a confirmation dialog before DELETE
+- **Row click** — opens `BookingDetailDialog` for a read-only detail view
+
+### `BookingStatusBadge` (`resources/js/components/booking-status-badge.tsx`)
+
+Renders a color-coded `Badge` for a given numeric status value. Used in both the management table and the detail dialog. Status-to-color mapping:
+
+| Status | Color |
+|--------|-------|
+| Pending | Blue |
+| Confirmed | Cyan |
+| Checked In | Green |
+| Checked Out | Zinc |
+| Cancelled | Red |
+| Maintenance | Amber |
 
 ## Guest search
 
@@ -78,7 +139,8 @@ Key behaviors:
 - `Maintenance` bookings block rooms even when creating other bookings
 - `Cancelled` bookings are ignored in availability checks
 - `CheckedIn` / `CheckedOut` appear in today's activity stats on the dashboard
+- Updating a booking to `CheckedIn`, `CheckedOut`, or `Cancelled` automatically updates the status of all attached rooms (see `update()` above)
 
 ## What's not yet implemented
 
-`BookingController` has stub methods for `show`, `edit`, `update`, `destroy` — these are not yet built.
+`BookingController` has stub methods for `show` and `edit` — these are not yet built.
