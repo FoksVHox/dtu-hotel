@@ -21,3 +21,27 @@ export interface CreateBookingForm {
     end: string;
     status: number;
 }
+
+export interface BookingGuest {
+    id: number;
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone: string;
+}
+
+export interface BookingRoom {
+    id: number;
+    code: string;
+    room_category: { name: string };
+    floor: { code: string };
+}
+
+export interface Booking {
+    id: number;
+    start: string; // ISO 8601
+    end: string; // ISO 8601
+    status: number; // BookingStatus value
+    guests: BookingGuest[];
+    rooms: BookingRoom[];
+}
