@@ -8,7 +8,10 @@ const STATUS_CONFIG: Record<number, { label: string; className: string }> = {
     3: { label: 'Checked In', className: 'border-green-500/40 text-green-400' },
     4: { label: 'Checked Out', className: 'border-zinc-500/40 text-zinc-400' },
     5: { label: 'Cancelled', className: 'border-red-500/40 text-red-400' },
-    6: { label: 'Maintenance', className: 'border-amber-500/40 text-amber-400' },
+    6: {
+        label: 'Maintenance',
+        className: 'border-amber-500/40 text-amber-400',
+    },
 };
 
 export function BookingStatusBadge({ status }: { status: number }) {
@@ -16,7 +19,10 @@ export function BookingStatusBadge({ status }: { status: number }) {
 
     if (!cfg) {
         return (
-            <Badge variant="outline" className="border-border text-muted-foreground">
+            <Badge
+                variant="outline"
+                className="border-border text-muted-foreground"
+            >
                 Unknown
             </Badge>
         );

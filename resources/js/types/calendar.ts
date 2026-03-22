@@ -63,10 +63,12 @@ export interface BookingStatusConfig {
     secondary: string;
 }
 
-export function getBookingStatusConfig(
-    booking: { status: number },
-): BookingStatusConfig {
-    return BOOKING_STATUSES[booking.status as BookingStatus] ?? BOOKING_STATUSES[1];
+export function getBookingStatusConfig(booking: {
+    status: number;
+}): BookingStatusConfig {
+    return (
+        BOOKING_STATUSES[booking.status as BookingStatus] ?? BOOKING_STATUSES[1]
+    );
 }
 
 export const BOOKING_STATUSES: Record<BookingStatus, BookingStatusConfig> = {

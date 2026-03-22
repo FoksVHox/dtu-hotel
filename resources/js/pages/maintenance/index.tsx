@@ -2,11 +2,11 @@ import { Head, router } from '@inertiajs/react';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { CheckCheck } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { update } from '@/actions/App/Http/Controllers/RoomController';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
+import { update } from '@/actions/App/Http/Controllers/RoomController';
 import maintenance from '@/routes/maintenance';
 
 type HousekeepingRoom = {
@@ -56,7 +56,9 @@ export default function MaintenanceIndex({
             return;
         }
 
-        router.patch(update(roomId).url, { scheduled_cleaning_at: scheduleValue });
+        router.patch(update(roomId).url, {
+            scheduled_cleaning_at: scheduleValue,
+        });
         setSchedulingId(null);
         setScheduleValue('');
     }
@@ -148,7 +150,9 @@ export default function MaintenanceIndex({
                                                         type="button"
                                                         size="sm"
                                                         onClick={() =>
-                                                            saveSchedule(room.id)
+                                                            saveSchedule(
+                                                                room.id,
+                                                            )
                                                         }
                                                     >
                                                         Save
@@ -174,7 +178,9 @@ export default function MaintenanceIndex({
                                                     type="button"
                                                     className="text-muted-foreground transition-colors hover:text-foreground"
                                                     onClick={() => {
-                                                        setSchedulingId(room.id);
+                                                        setSchedulingId(
+                                                            room.id,
+                                                        );
                                                         setScheduleValue(
                                                             room.scheduled_cleaning_at
                                                                 ? room.scheduled_cleaning_at.slice(
