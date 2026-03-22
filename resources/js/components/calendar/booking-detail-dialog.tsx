@@ -19,11 +19,33 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
-import type { CalendarBooking } from '@/types/calendar';
 import { getBookingStatusConfig } from '@/types/calendar';
 
+interface BookingDetailRoom {
+    id: number;
+    room_category?: { name: string };
+    floor?: { code: string };
+}
+
+interface BookingDetailGuest {
+    id: number;
+    first_name: string;
+    last_name: string;
+    email?: string;
+    phone?: string;
+}
+
+interface BookingDetailBooking {
+    id: number;
+    start: string;
+    end: string;
+    status: number;
+    guests: BookingDetailGuest[];
+    rooms: BookingDetailRoom[];
+}
+
 interface BookingDetailDialogProps {
-    booking: CalendarBooking | null;
+    booking: BookingDetailBooking | null;
     open: boolean;
     onOpenChange: (open: boolean) => void;
 }

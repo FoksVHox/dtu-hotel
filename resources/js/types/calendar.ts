@@ -64,9 +64,9 @@ export interface BookingStatusConfig {
 }
 
 export function getBookingStatusConfig(
-    booking: CalendarBooking,
+    booking: { status: number },
 ): BookingStatusConfig {
-    return BOOKING_STATUSES[booking.status] ?? BOOKING_STATUSES[1];
+    return BOOKING_STATUSES[booking.status as BookingStatus] ?? BOOKING_STATUSES[1];
 }
 
 export const BOOKING_STATUSES: Record<BookingStatus, BookingStatusConfig> = {

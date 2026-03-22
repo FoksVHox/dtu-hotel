@@ -19,7 +19,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import AppLayout from '@/layouts/app-layout';
 import bookingsRoute from '@/routes/bookings';
 import type { Booking } from '@/types/booking';
-import type { CalendarBooking } from '@/types/calendar';
 import { BookingStatus } from '@/types/calendar';
 import type { BreadcrumbItem } from '@/types';
 
@@ -88,7 +87,7 @@ export default function BookingsIndex({ bookings }: { bookings: Booking[] }) {
     }, [bookings, sortKey, sortDir]);
 
     function handleStatusChange(bookingId: number, status: string): void {
-        router.patch(update(bookingId).url, { status: Number(status) });
+        router.patch(update.patch(bookingId).url, { status: Number(status) });
     }
 
     return (
@@ -297,7 +296,7 @@ export default function BookingsIndex({ bookings }: { bookings: Booking[] }) {
             </div>
 
             <BookingDetailDialog
-                booking={selectedBooking as CalendarBooking | null}
+                booking={selectedBooking}
                 open={detailOpen}
                 onOpenChange={setDetailOpen}
             />
