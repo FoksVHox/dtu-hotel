@@ -71,6 +71,29 @@ export function getBookingStatusConfig(booking: {
     );
 }
 
+export interface CalendarFilters {
+    categoryIds: number[];
+    floorIds: number[];
+    statuses: BookingStatus[];
+    onlyWithBookings: boolean;
+}
+
+export const DEFAULT_CALENDAR_FILTERS: CalendarFilters = {
+    categoryIds: [],
+    floorIds: [],
+    statuses: [],
+    onlyWithBookings: false,
+};
+
+export function hasActiveFilters(filters: CalendarFilters): boolean {
+    return (
+        filters.categoryIds.length > 0 ||
+        filters.floorIds.length > 0 ||
+        filters.statuses.length > 0 ||
+        filters.onlyWithBookings
+    );
+}
+
 export const BOOKING_STATUSES: Record<BookingStatus, BookingStatusConfig> = {
     [BookingStatus.Pending]: {
         label: 'Pending',

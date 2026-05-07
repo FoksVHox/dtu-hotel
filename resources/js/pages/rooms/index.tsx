@@ -30,10 +30,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const ROOM_STATUS = {
-    Available: 1,
-    Occupied: 2,
-    Cleaning: 3,
-    OutOfOrder: 4,
+    Available: 0,
+    Occupied: 1,
+    Cleaning: 2,
+    OutOfOrder: 3,
 } as const;
 
 type RoomForm = {

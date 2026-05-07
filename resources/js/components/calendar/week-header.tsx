@@ -9,6 +9,7 @@ interface WeekHeaderProps {
     onRefresh?: () => void;
     isRefreshing?: boolean;
     onCreateBooking?: () => void;
+    filterSlot?: React.ReactNode;
 }
 
 /**
@@ -39,6 +40,7 @@ export function WeekHeader({
     onRefresh,
     isRefreshing = false,
     onCreateBooking,
+    filterSlot,
 }: WeekHeaderProps) {
     return (
         <div className="flex items-center justify-between">
@@ -82,7 +84,8 @@ export function WeekHeader({
                 )}
             </div>
 
-            <div className="flex w-[140px] justify-end">
+            <div className="flex items-center justify-end gap-2">
+                {filterSlot}
                 {onCreateBooking && (
                     <Button onClick={onCreateBooking} size="sm">
                         <Plus className="size-4" />

@@ -2,14 +2,13 @@
 
 namespace App\Enums;
 
-// Room status badge component #37
 
 enum RoomStatus: int
 {
-    case Available = 1;
-    case Occupied = 2;
-    case Cleaning = 3;
-    case OutOfOrder = 4;
+    case Available = 0;
+    case Occupied = 1;
+    case Cleaning = 2;
+    case OutOfOrder = 3;
 
     public function label(): string
     {

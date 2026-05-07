@@ -1,13 +1,15 @@
 import { useForm } from '@inertiajs/react';
+import { format, parseISO } from 'date-fns';
 import {
     AlertCircle,
     CalendarPlus,
+    Pencil,
     Plus,
     Search,
     UserPlus,
     X,
 } from 'lucide-react';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { DateTimePicker } from '@/components/booking/date-time-picker';
 import InputError from '@/components/input-error';
@@ -33,9 +35,12 @@ import {
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import type { CreateBookingForm, NewGuest, SearchGuest } from '@/types/booking';
-import type { CalendarRoom } from '@/types/calendar';
+import type { CalendarBooking, CalendarRoom } from '@/types/calendar';
 import { BookingStatus } from '@/types/calendar';
-import { store } from '@/actions/App/Http/Controllers/BookingController';
+import {
+    store,
+    update,
+} from '@/actions/App/Http/Controllers/BookingController';
 import SearchGuests from '@/actions/App/Http/Controllers/SearchGuestsController';
 
 const BOOKING_STATUS_OPTIONS = [
@@ -44,18 +49,22 @@ const BOOKING_STATUS_OPTIONS = [
     { value: BookingStatus.CheckedIn, label: 'Checked In' },
 ] as const;
 
-interface CreateBookingDialogProps {
+interface BookingFormDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     rooms: CalendarRoom[];
+    booking?: CalendarBooking | null;
 }
 
-export function CreateBookingDialog({
+export function BookingFormDialog({
     open,
     onOpenChange,
     rooms,
-}: CreateBookingDialogProps) {
-    const { data, setData, post, processing, reset, clearErrors } =
+    booking,
+}: BookingFormDialogProps) {
+    const isEditing = !!booking;
+
+    const { data, setData, post, put, processing, reset, clearErrors } =
         useForm<CreateBookingForm>({
             room_ids: [],
             guest_ids: [],
@@ -86,6 +95,29 @@ export function CreateBookingDialog({
     const [formErrors, setFormErrors] = useState<string[]>([]);
 
     const searchTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+
+    useEffect(() => {
+        if (open && booking) {
+            setData({
+                room_ids: booking.rooms.map((r) => r.id),
+                guest_ids: booking.guests.map((g) => g.id),
+                new_guests: [],
+                start: format(parseISO(booking.start), "yyyy-MM-dd'T'HH:mm"),
+                end: format(parseISO(booking.end), "yyyy-MM-dd'T'HH:mm"),
+                status: booking.status,
+            });
+            setSelectedGuests(
+                booking.guests.map((g) => ({
+                    id: g.id,
+                    first_name: g.first_name,
+                    last_name: g.last_name,
+                    email: g.email,
+                    phone: g.phone,
+                })),
+            );
+            setNewGuests([]);
+        }
+    }, [open, booking]);
 
     const filteredRooms = roomQuery.trim()
         ? rooms.filter((room) => {
@@ -219,16 +251,32 @@ export function CreateBookingDialog({
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setFormErrors([]);
-        post(store().url, {
-            onSuccess: () => {
-                resetForm();
-                onOpenChange(false);
-                toast.success('Booking created successfully.');
-            },
-            onError: (errors) => {
-                setFormErrors(Object.values(errors));
-            },
-        });
+
+        if (isEditing) {
+            put(update(booking.id).url, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    resetForm();
+                    onOpenChange(false);
+                    toast.success('Booking updated successfully.');
+                },
+                onError: (errors) => {
+                    setFormErrors(Object.values(errors));
+                },
+            });
+        } else {
+            post(store().url, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    resetForm();
+                    onOpenChange(false);
+                    toast.success('Booking created successfully.');
+                },
+                onError: (errors) => {
+                    setFormErrors(Object.values(errors));
+                },
+            });
+        }
     }
 
     function resetForm() {
@@ -262,12 +310,22 @@ export function CreateBookingDialog({
             <DialogContent className="flex max-h-[90vh] flex-col sm:max-w-lg">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
-                        <CalendarPlus className="size-5 text-muted-foreground" />
-                        New Booking
+                        {isEditing ? (
+                            <>
+                                <Pencil className="size-5 text-muted-foreground" />
+                                Edit Booking
+                            </>
+                        ) : (
+                            <>
+                                <CalendarPlus className="size-5 text-muted-foreground" />
+                                New Booking
+                            </>
+                        )}
                     </DialogTitle>
                     <DialogDescription>
-                        Create a new booking by selecting rooms, guests, and
-                        dates.
+                        {isEditing
+                            ? 'Update the booking details below.'
+                            : 'Create a new booking by selecting rooms, guests, and dates.'}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -280,7 +338,9 @@ export function CreateBookingDialog({
                             <Alert variant="destructive">
                                 <AlertCircle className="size-4" />
                                 <AlertTitle>
-                                    Unable to create booking
+                                    {isEditing
+                                        ? 'Unable to update booking'
+                                        : 'Unable to create booking'}
                                 </AlertTitle>
                                 <AlertDescription>
                                     <ul className="list-inside list-disc">
@@ -663,7 +723,13 @@ export function CreateBookingDialog({
                             type="submit"
                             disabled={!canSubmit || processing}
                         >
-                            {processing ? 'Creating...' : 'Create Booking'}
+                            {isEditing
+                                ? processing
+                                    ? 'Updating...'
+                                    : 'Update Booking'
+                                : processing
+                                  ? 'Creating...'
+                                  : 'Create Booking'}
                         </Button>
                     </DialogFooter>
                 </form>

@@ -1,7 +1,9 @@
 import { Deferred, Head, router } from '@inertiajs/react';
 import { addDays, format, parseISO, startOfWeek } from 'date-fns';
-import { useState } from 'react';
-import { CreateBookingDialog } from '@/components/booking/create-booking-dialog';
+import { useCallback, useMemo, useState } from 'react';
+import { BookingFormDialog } from '@/components/booking/booking-form-dialog';
+import { CalendarFilterBar } from '@/components/calendar/calendar-filter-bar';
+import { CalendarFilterSheet } from '@/components/calendar/calendar-filter-sheet';
 import { CalendarGrid } from '@/components/calendar/calendar-grid';
 import { CalendarLegend } from '@/components/calendar/calendar-legend';
 import { WeekHeader } from '@/components/calendar/week-header';
@@ -11,7 +13,12 @@ import { StatCardSkeleton } from '@/components/dashboard/stat-card-skeleton';
 import { TodayActivityCard } from '@/components/dashboard/today-activity-card';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem } from '@/types';
-import type { CalendarBooking, CalendarRoom } from '@/types/calendar';
+import type {
+    CalendarBooking,
+    CalendarFilters,
+    CalendarRoom,
+} from '@/types/calendar';
+import { DEFAULT_CALENDAR_FILTERS, hasActiveFilters } from '@/types/calendar';
 import type {
     BookingPipeline,
     RoomStatus,
@@ -46,7 +53,80 @@ export default function Dashboard({
     });
 
     const [isRefreshing, setIsRefreshing] = useState(false);
-    const [createBookingOpen, setCreateBookingOpen] = useState(false);
+    const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
+    const [editBooking, setEditBooking] = useState<CalendarBooking | null>(
+        null,
+    );
+    const [filters, setFilters] = useState<CalendarFilters>(
+        DEFAULT_CALENDAR_FILTERS,
+    );
+
+    const categories = useMemo(() => {
+        const seen = new Map<number, (typeof rooms)[number]['room_category']>();
+        for (const room of rooms) {
+            if (!seen.has(room.room_category.id)) {
+                seen.set(room.room_category.id, room.room_category);
+            }
+        }
+        return [...seen.values()];
+    }, [rooms]);
+
+    const floors = useMemo(() => {
+        const seen = new Map<number, (typeof rooms)[number]['floor']>();
+        for (const room of rooms) {
+            if (!seen.has(room.floor.id)) {
+                seen.set(room.floor.id, room.floor);
+            }
+        }
+        return [...seen.values()];
+    }, [rooms]);
+
+    const { filteredRooms, filteredBookings } = useMemo(() => {
+        let roomResult = rooms;
+
+        if (filters.categoryIds.length > 0) {
+            roomResult = roomResult.filter((r) =>
+                filters.categoryIds.includes(r.room_category_id),
+            );
+        }
+
+        if (filters.floorIds.length > 0) {
+            roomResult = roomResult.filter((r) =>
+                filters.floorIds.includes(r.floor_id),
+            );
+        }
+
+        let bookingResult = bookings;
+
+        if (filters.statuses.length > 0) {
+            bookingResult = bookingResult.filter((b) =>
+                filters.statuses.includes(b.status),
+            );
+        }
+
+        if (filters.onlyWithBookings) {
+            const roomIdsWithBookings = new Set(
+                bookingResult.flatMap((b) => b.rooms.map((r) => r.id)),
+            );
+            roomResult = roomResult.filter((r) =>
+                roomIdsWithBookings.has(r.id),
+            );
+        }
+
+        return { filteredRooms: roomResult, filteredBookings: bookingResult };
+    }, [rooms, bookings, filters]);
+
+    const handleEditBooking = useCallback((booking: CalendarBooking) => {
+        setEditBooking(booking);
+        setBookingDialogOpen(true);
+    }, []);
+
+    function handleBookingDialogOpenChange(isOpen: boolean) {
+        setBookingDialogOpen(isOpen);
+        if (!isOpen) {
+            setEditBooking(null);
+        }
+    }
 
     function shiftWeek(offset: number) {
         const next = addDays(weekStartDate, offset);
@@ -93,21 +173,42 @@ export default function Dashboard({
                     onNext={() => shiftWeek(7)}
                     onRefresh={refreshCalendar}
                     isRefreshing={isRefreshing}
-                    onCreateBooking={() => setCreateBookingOpen(true)}
+                    onCreateBooking={() => {
+                        setEditBooking(null);
+                        setBookingDialogOpen(true);
+                    }}
+                    filterSlot={
+                        <CalendarFilterSheet
+                            filters={filters}
+                            onFiltersChange={setFilters}
+                            categories={categories}
+                            floors={floors}
+                        />
+                    }
+                />
+
+                <CalendarFilterBar
+                    filters={filters}
+                    onFiltersChange={setFilters}
+                    categories={categories}
+                    floors={floors}
                 />
 
                 <CalendarGrid
                     weekStart={weekStartDate}
-                    rooms={rooms}
-                    bookings={bookings}
+                    rooms={filteredRooms}
+                    bookings={filteredBookings}
+                    onEdit={handleEditBooking}
+                    hasActiveFilters={hasActiveFilters(filters)}
                 />
 
                 <CalendarLegend />
 
-                <CreateBookingDialog
-                    open={createBookingOpen}
-                    onOpenChange={setCreateBookingOpen}
+                <BookingFormDialog
+                    open={bookingDialogOpen}
+                    onOpenChange={handleBookingDialogOpenChange}
                     rooms={rooms}
+                    booking={editBooking}
                 />
             </div>
         </AppLayout>
