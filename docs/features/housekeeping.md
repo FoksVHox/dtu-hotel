@@ -33,7 +33,7 @@ Schedule cleaning (maintenance/index.tsx — date/time picker)
 
 | Column | Type | Description |
 |--------|------|-------------|
-| `status` | `tinyint` | `RoomStatus` enum value (default `Available = 1`) |
+| `status` | `tinyint` | `RoomStatus` enum value (default `Available = 0`) |
 | `scheduled_cleaning_at` | `timestamp\|null` | Optional time staff plan to clean the room |
 
 ### `maintenance_logs` table

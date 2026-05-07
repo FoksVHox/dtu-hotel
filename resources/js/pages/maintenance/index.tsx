@@ -48,7 +48,7 @@ export default function MaintenanceIndex({
     }
 
     function markClean(roomId: number): void {
-        router.patch(update(roomId).url, { status: 1 });
+        router.patch(update(roomId).url, { status: 0 });
     }
 
     function saveSchedule(roomId: number): void {
