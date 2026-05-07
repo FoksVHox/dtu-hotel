@@ -1,11 +1,8 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia as Assert;
 use Laravel\Fortify\Features;
-
-uses(RefreshDatabase::class);
 
 test('two factor challenge redirects to login when not authenticated', function () {
     if (! Features::canManageTwoFactorAuthentication()) {

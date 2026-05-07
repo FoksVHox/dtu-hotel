@@ -15,18 +15,27 @@ Each room belongs to a `RoomCategory` (e.g., "Standard", "Suite"). Floor and bui
 
 ## Room status
 
-Room status is **not stored** in the database. It is derived from active bookings at query time.
+Room status is stored as a column on the `rooms` table and managed explicitly (not derived from bookings at query time).
 
 The `RoomStatus` enum defines four states:
 
 | Status | Value | Meaning |
 |--------|-------|---------|
-| Available | 1 | No active booking |
-| Occupied | 2 | Has a `CheckedIn` booking now |
-| Cleaning | 3 | Has a `CheckedOut` booking today |
-| OutOfOrder | 4 | Has a `Maintenance` booking now |
+| Available | 1 | Ready to receive a guest |
+| Occupied | 2 | Guest is currently checked in |
+| Cleaning | 3 | Guest has checked out; room needs cleaning |
+| OutOfOrder | 4 | Room is under maintenance |
 
-`BuildRoomStatus` (`app/Actions/Dashboard/BuildRoomStatus.php`) computes this for the dashboard. The `room-status-badge.tsx` component renders the appropriate badge color.
+Status transitions happen in two places:
+
+**Booking status changes** (`BookingController::update()`) — when a booking's status changes, all attached rooms are updated:
+- `CheckedIn` → rooms set to `Occupied`
+- `CheckedOut` → rooms set to `Cleaning`
+- `Cancelled` → rooms set to `Available`
+
+**Manual cleaning workflow** (`RoomController::update()`) — staff mark a `Cleaning` room as done, which sets it back to `Available` and creates a `MaintenanceLog` record. See [housekeeping](housekeeping.md) for full details.
+
+The `room-status-badge.tsx` component renders the appropriate badge color for each status.
 
 ## Room accessories
 
@@ -48,7 +57,16 @@ Renders a table via `rooms-table.tsx` with a status badge column. The table curr
 
 ## RoomController
 
-`RoomController` has a working `index()` action. The `create`, `store`, `show`, `edit`, `update`, and `destroy` methods are stubs — room management CRUD is not yet fully implemented.
+`index()` returns all rooms with building, floor, and category eager-loaded. Each room is mapped to:
+- `id`, `code` (e.g. `A-1-42`), `category`, `floor` (integer), `status` (enum value), `scheduled_cleaning_at`
+
+`update()` handles two independent operations in the same request:
+- **Status update** — if `status` is present, transitions the room status and (if transitioning `Cleaning → Available`) creates a `MaintenanceLog` record
+- **Scheduling** — if `scheduled_cleaning_at` is present, persists it to the room
+
+See `app/Http/Requests/UpdateRoomRequest.php` for validation rules.
+
+The `create`, `store`, `show`, `edit`, and `destroy` methods are stubs — room management CRUD is not yet fully implemented.
 
 ## Adding a new room
 
