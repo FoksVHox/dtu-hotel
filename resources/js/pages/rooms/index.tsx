@@ -2,6 +2,12 @@ import { Head } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { RoomsTable, type Room } from '@/components/rooms-table';
+import { RoomFilterBar } from '@/components/rooms/room-filter-bar';
+import {
+    RoomFilterSheet,
+    DEFAULT_ROOM_FILTERS,
+    type RoomFilters,
+} from '@/components/rooms/room-filter-sheet';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -56,6 +62,7 @@ export default function RoomsIndex({ rooms }: { rooms?: Room[] }) {
     const [localRooms, setLocalRooms] = useState<Room[]>(safeRooms);
     const [isAddRoomOpen, setIsAddRoomOpen] = useState(false);
     const [form, setForm] = useState<RoomForm>(initialForm);
+    const [filters, setFilters] = useState<RoomFilters>(DEFAULT_ROOM_FILTERS);
 
     const counts = useMemo(
         () =>
@@ -95,6 +102,24 @@ export default function RoomsIndex({ rooms }: { rooms?: Room[] }) {
         ).sort((a, b) => a - b);
         return unique.length ? unique : [1, 2, 3];
     }, [localRooms]);
+
+    const filteredRooms = useMemo(() => {
+        let result = localRooms;
+
+        if (filters.categories.length > 0) {
+            result = result.filter((r) => filters.categories.includes(r.category));
+        }
+
+        if (filters.floors.length > 0) {
+            result = result.filter((r) => filters.floors.includes(r.floor));
+        }
+
+        if (filters.statuses.length > 0) {
+            result = result.filter((r) => filters.statuses.includes(r.status));
+        }
+
+        return result;
+    }, [localRooms, filters]);
 
     const canSave =
         form.code.trim().length > 0 &&
@@ -342,7 +367,13 @@ export default function RoomsIndex({ rooms }: { rooms?: Room[] }) {
                     </Card>
                 </div>
 
-                <div className="flex justify-end">
+                <div className="flex items-center justify-end gap-2">
+                    <RoomFilterSheet
+                        filters={filters}
+                        onFiltersChange={setFilters}
+                        categories={categoryOptions}
+                        floors={floorOptions}
+                    />
                     <Button
                         type="button"
                         size="sm"
@@ -353,7 +384,9 @@ export default function RoomsIndex({ rooms }: { rooms?: Room[] }) {
                     </Button>
                 </div>
 
-                <RoomsTable rooms={localRooms} onDelete={handleDeleteRoom} />
+                <RoomFilterBar filters={filters} onFiltersChange={setFilters} />
+
+                <RoomsTable rooms={filteredRooms} onDelete={handleDeleteRoom} />
             </div>
         </AppLayout>
     );
