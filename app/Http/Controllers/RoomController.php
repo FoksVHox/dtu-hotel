@@ -14,16 +14,29 @@ class RoomController extends Controller
 {
     public function index(): Response
     {
-        $rooms = Room::with(['floor', 'roomCategory'])
+        $today = now();
+
+        $rooms = Room::with([
+            'floor',
+            'roomCategory',
+            'bookings' => fn ($q) => $q->orderBy('start'),
+        ])
             ->get()
-            ->map(fn (Room $room) => [
-                'id' => $room->id,
-                'code' => $room->floor->name.'-'.$room->id,
-                'category' => $room->roomCategory->name,
-                'floor' => (int) filter_var($room->floor->name, FILTER_SANITIZE_NUMBER_INT),
-                'status' => $room->status->value,
-                'scheduled_cleaning_at' => $room->scheduled_cleaning_at?->toIso8601String(),
-            ]);
+            ->map(function (Room $room) use ($today) {
+                $booking = $room->bookings->first(fn ($b) => $b->start <= $today && $b->end >= $today)
+                    ?? $room->bookings->first(fn ($b) => $b->start > $today)
+                    ?? $room->bookings->last();
+
+                return [
+                    'id' => $room->id,
+                    'code' => $room->floor->name.'-'.$room->id,
+                    'category' => $room->roomCategory->name,
+                    'floor' => (int) filter_var($room->floor->name, FILTER_SANITIZE_NUMBER_INT),
+                    'status' => $room->status->value,
+                    'booking_status' => $booking?->status->value,
+                    'scheduled_cleaning_at' => $room->scheduled_cleaning_at?->toIso8601String(),
+                ];
+            });
 
         return Inertia::render('rooms/index', ['rooms' => $rooms]);
     }

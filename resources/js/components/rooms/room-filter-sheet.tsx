@@ -153,8 +153,12 @@ export function RoomFilterSheet({
                                 />
                                 <Label
                                     htmlFor={`status-${value}`}
-                                    className="cursor-pointer text-sm font-normal"
+                                    className="flex cursor-pointer items-center gap-1.5 text-sm font-normal"
                                 >
+                                    <span
+                                        className="inline-block size-2.5 rounded-sm"
+                                        style={{ backgroundColor: cfg.text }}
+                                    />
                                     {cfg.label}
                                 </Label>
                             </div>

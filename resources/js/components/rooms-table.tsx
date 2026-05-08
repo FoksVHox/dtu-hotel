@@ -7,7 +7,8 @@ export type Room = {
   code: string
   category: string
   floor: number
-  status: number // enum value 1..4
+  status: number
+  booking_status: number | null
 }
 
 type SortKey = 'code' | 'category' | 'floor' | 'status'
@@ -89,7 +90,7 @@ export function RoomsTable({ rooms, onDelete }: { rooms: Room[]; onDelete?: (id:
               <td className="px-4 py-3 font-medium">{room.code}</td>
               <td className="px-4 py-3">{room.category}</td>
               <td className="px-4 py-3">
-                <RoomStatusBadge status={room.status} />
+                <RoomStatusBadge status={room.booking_status} fallbackStatus={room.status} />
                 {/* <div className="flex items-center gap-2">*/}
                   {/* <span className="text-xs text-muted-foreground">({room.status})</span> */}
                 {/* </div> */}

@@ -116,7 +116,7 @@ export default function RoomsIndex({ rooms }: { rooms?: Room[] }) {
         }
 
         if (filters.statuses.length > 0) {
-            result = result.filter((r) => filters.statuses.includes(r.status));
+            result = result.filter((r) => r.booking_status !== null && filters.statuses.includes(r.booking_status));
         }
 
         if (search.trim()) {
@@ -161,6 +161,7 @@ export default function RoomsIndex({ rooms }: { rooms?: Room[] }) {
             category: form.category,
             floor: Number(form.floor),
             status: Number(form.status),
+            booking_status: null,
         };
 
         setLocalRooms((prev) => [...prev, newRoom]);
