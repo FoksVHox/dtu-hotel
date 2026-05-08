@@ -21,6 +21,7 @@ import type {
 } from '@/types/calendar';
 import {
     BOOKING_STATUSES,
+    BookingStatus as BookingStatusEnum,
     DEFAULT_CALENDAR_FILTERS,
     hasActiveFilters,
 } from '@/types/calendar';
@@ -163,8 +164,13 @@ export function CalendarFilterSheet({
                             <span className="text-xs font-medium text-muted-foreground">
                                 Booking Status
                             </span>
-                            {Object.entries(BOOKING_STATUSES).map(
-                                ([value, config]) => {
+                            {Object.entries(BOOKING_STATUSES)
+                                .filter(
+                                    ([value]) =>
+                                        Number(value) !==
+                                        BookingStatusEnum.Cancelled,
+                                )
+                                .map(([value, config]) => {
                                     const status = Number(
                                         value,
                                     ) as BookingStatus;
@@ -190,15 +196,14 @@ export function CalendarFilterSheet({
                                                     className="inline-block size-2.5 rounded-sm"
                                                     style={{
                                                         backgroundColor:
-                                                            config.text,
+                                                            config.dot,
                                                     }}
                                                 />
                                                 {config.label}
                                             </Label>
                                         </div>
                                     );
-                                },
-                            )}
+                                })}
                         </div>
 
                         <Separator />

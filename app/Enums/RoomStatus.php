@@ -2,7 +2,6 @@
 
 namespace App\Enums;
 
-
 enum RoomStatus: int
 {
     case Available = 0;

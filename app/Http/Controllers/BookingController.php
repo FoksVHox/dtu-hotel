@@ -99,21 +99,66 @@ class BookingController extends Controller
 
     public function update(UpdateBookingRequest $request, Booking $booking): RedirectResponse
     {
-        DB::transaction(function () use ($request, $booking): void {
-            $newStatus = BookingStatus::from($request->validated()['status']);
-            $booking->update(['status' => $newStatus]);
+        $validated = $request->validated();
 
-            $roomStatus = match ($newStatus) {
-                BookingStatus::CheckedIn => RoomStatus::Occupied,
-                BookingStatus::CheckedOut => RoomStatus::Cleaning,
-                BookingStatus::Cancelled => RoomStatus::Available,
-                default => null,
-            };
+        try {
+            DB::transaction(function () use ($validated, $request, $booking): void {
+                $newStatus = BookingStatus::from($validated['status']);
 
-            if ($roomStatus !== null) {
-                $booking->rooms()->update(['status' => $roomStatus->value]);
-            }
-        });
+                $bookingChanges = ['status' => $newStatus];
+
+                if (array_key_exists('start', $validated)) {
+                    $bookingChanges['start'] = $validated['start'];
+                }
+
+                if (array_key_exists('end', $validated)) {
+                    $bookingChanges['end'] = $validated['end'];
+                }
+
+                $booking->update($bookingChanges);
+
+                if (array_key_exists('room_ids', $validated)) {
+                    $booking->rooms()->sync($validated['room_ids']);
+                }
+
+                if ($request->hasAny(['guest_ids', 'new_guests'])) {
+                    $guestIds = $validated['guest_ids'] ?? [];
+
+                    foreach ($validated['new_guests'] ?? [] as $newGuest) {
+                        $guest = Guest::query()->create([
+                            'first_name' => $newGuest['first_name'],
+                            'last_name' => $newGuest['last_name'],
+                            'email' => $newGuest['email'],
+                            'phone' => $newGuest['phone'] ?? '',
+                            'address' => '',
+                            'date_of_birth' => now(),
+                        ]);
+
+                        $guestIds[] = $guest->id;
+                    }
+
+                    $booking->guests()->sync($guestIds);
+                }
+
+                $roomStatus = match ($newStatus) {
+                    BookingStatus::CheckedIn => RoomStatus::Occupied,
+                    BookingStatus::CheckedOut => RoomStatus::Cleaning,
+                    BookingStatus::Cancelled => RoomStatus::Available,
+                    BookingStatus::Unknown,
+                    BookingStatus::Pending,
+                    BookingStatus::Confirmed,
+                    BookingStatus::Maintenance => null,
+                };
+
+                if ($roomStatus !== null) {
+                    $booking->rooms()->update(['status' => $roomStatus->value]);
+                }
+            });
+        } catch (\Throwable) {
+            return redirect()->back()->withErrors([
+                'booking' => 'Something went wrong while updating the booking. Please try again.',
+            ]);
+        }
 
         return redirect()->back();
     }
@@ -130,7 +175,11 @@ class BookingController extends Controller
             return redirect()->back()->withErrors(['booking' => 'This booking cannot be deleted in its current status.']);
         }
 
-        $booking->delete();
+        DB::transaction(function () use ($booking): void {
+            $booking->rooms()->detach();
+            $booking->guests()->detach();
+            $booking->delete();
+        });
 
         return redirect()->back();
     }
