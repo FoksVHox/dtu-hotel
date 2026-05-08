@@ -139,7 +139,10 @@ class BookingController extends Controller
                     BookingStatus::CheckedIn => RoomStatus::Occupied,
                     BookingStatus::CheckedOut => RoomStatus::Cleaning,
                     BookingStatus::Cancelled => RoomStatus::Available,
-                    default => null,
+                    BookingStatus::Unknown,
+                    BookingStatus::Pending,
+                    BookingStatus::Confirmed,
+                    BookingStatus::Maintenance => null,
                 };
 
                 if ($roomStatus !== null) {

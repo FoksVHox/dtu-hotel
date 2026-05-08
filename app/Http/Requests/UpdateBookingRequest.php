@@ -2,10 +2,11 @@
 
 namespace App\Http\Requests;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Validator;
 
-class UpdateBookingRequest extends BookingFormRequest
+class UpdateBookingRequest extends StoreBookingRequest
 {
     protected function excludedBookingId(): ?int
     {
@@ -38,10 +39,46 @@ class UpdateBookingRequest extends BookingFormRequest
                     $this->validateGuestsPresent($validator);
                 }
 
+                $this->validatePartialDateOrder($validator);
+
                 if ($this->hasAny(['room_ids', 'start', 'end'])) {
                     $this->validateRoomAvailability($validator);
                 }
             },
         ];
+    }
+
+    /**
+     * Validate date order when only one of start/end is sent — the
+     * `after:start` rule on the `end` field only fires when both are
+     * present, so a one-sided change can otherwise corrupt the booking.
+     */
+    private function validatePartialDateOrder(Validator $validator): void
+    {
+        $hasStart = $this->has('start');
+        $hasEnd = $this->has('end');
+
+        if ($hasStart === $hasEnd) {
+            return;
+        }
+
+        $booking = $this->route('booking');
+        $start = $hasStart ? $this->input('start') : $booking->start;
+        $end = $hasEnd ? $this->input('end') : $booking->end;
+
+        try {
+            $startAt = Carbon::parse($start);
+            $endAt = Carbon::parse($end);
+        } catch (\Throwable) {
+            return;
+        }
+
+        if ($endAt->lessThanOrEqualTo($startAt)) {
+            $field = $hasStart ? 'start' : 'end';
+            $validator->errors()->add(
+                $field,
+                'Check-out date must be after check-in date.',
+            );
+        }
     }
 }

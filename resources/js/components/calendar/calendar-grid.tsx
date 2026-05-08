@@ -119,6 +119,13 @@ export function CalendarGrid({
                             weekStart,
                         );
 
+                        const coveredDays = new Set<number>();
+                        for (const { colStart, colSpan } of positioned) {
+                            for (let i = colStart; i < colStart + colSpan; i++) {
+                                coveredDays.add(i);
+                            }
+                        }
+
                         return (
                             <tr key={room.id}>
                                 <td className="border-r border-b px-3 py-3 text-sm font-medium whitespace-nowrap">
@@ -131,7 +138,7 @@ export function CalendarGrid({
                                         {days.map((day, i) => {
                                             const baseClass = `h-14 ${i < 6 ? 'border-r border-dashed' : ''}`;
 
-                                            if (!onEmptyCell) {
+                                            if (!onEmptyCell || coveredDays.has(i)) {
                                                 return (
                                                     <div
                                                         key={format(
