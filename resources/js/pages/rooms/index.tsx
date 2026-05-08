@@ -137,17 +137,6 @@ export default function RoomsIndex({ rooms }: { rooms?: Room[] }) {
             <Head title="Room Management" />
 
             <div className="flex flex-1 flex-col gap-4 p-4">
-                <div className="flex justify-end">
-                    <Button
-                        type="button"
-                        size="sm"
-                        onClick={() => setIsAddRoomOpen(true)}
-                    >
-                        <Plus className="h-4 w-4" />
-                        Add Room
-                    </Button>
-                </div>
-
                 <Dialog
                     open={isAddRoomOpen}
                     onOpenChange={(open) => {
@@ -351,6 +340,17 @@ export default function RoomsIndex({ rooms }: { rooms?: Room[] }) {
                             </p>
                         </CardContent>
                     </Card>
+                </div>
+
+                <div className="flex justify-end">
+                    <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => setIsAddRoomOpen(true)}
+                    >
+                        <Plus className="h-4 w-4" />
+                        Add Room
+                    </Button>
                 </div>
 
                 <RoomsTable rooms={localRooms} onDelete={handleDeleteRoom} />
