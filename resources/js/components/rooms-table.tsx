@@ -77,9 +77,6 @@ export function RoomsTable({ rooms, onDelete }: { rooms: Room[]; onDelete?: (id:
               <Th label="Category" k="category" />
             </th>
             <th className="px-4 py-3 text-left">
-              <Th label="Floor" k="floor" />
-            </th>
-            <th className="px-4 py-3 text-left">
               <Th label="Status" k="status" />
             </th>
             <th className="px-4 py-3 text-right">Actions</th>
@@ -91,7 +88,6 @@ export function RoomsTable({ rooms, onDelete }: { rooms: Room[]; onDelete?: (id:
             <tr key={room.id} className="hover:bg-white/5">
               <td className="px-4 py-3 font-medium">{room.code}</td>
               <td className="px-4 py-3">{room.category}</td>
-              <td className="px-4 py-3">{room.floor}</td>
               <td className="px-4 py-3">
                 <RoomStatusBadge status={room.status} />
                 {/* <div className="flex items-center gap-2">*/}
