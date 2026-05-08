@@ -18,6 +18,8 @@ class BookingController extends Controller
 {
     public function index(): Response
     {
+        $rooms = Room::with(['roomCategory', 'floor'])->get();
+
         $bookings = Booking::with(['guests', 'rooms.building', 'rooms.floor', 'rooms.roomCategory'])
             ->latest()
             ->get()
@@ -41,7 +43,10 @@ class BookingController extends Controller
                 ]),
             ]);
 
-        return Inertia::render('bookings/index', ['bookings' => $bookings]);
+        return Inertia::render('bookings/index', [
+            'bookings' => $bookings,
+            'rooms' => $rooms,
+        ]);
     }
 
     public function create(): void {}

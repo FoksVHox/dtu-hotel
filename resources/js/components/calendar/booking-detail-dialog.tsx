@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { destroy } from '@/actions/App/Http/Controllers/BookingController';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -32,8 +33,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
-import { getBookingStatusConfig } from '@/types/calendar';
-import { destroy } from '@/actions/App/Http/Controllers/BookingController';
+import { getBookingStatusConfig, type CalendarBooking } from '@/types/calendar';
 
 interface BookingDetailRoom {
     id: number;
@@ -90,7 +90,7 @@ export function BookingDetailDialog({
 
     function handleEdit() {
         onOpenChange(false);
-        onEdit?.(booking!);
+        onEdit?.(booking as CalendarBooking);
     }
 
     function handleDelete() {
