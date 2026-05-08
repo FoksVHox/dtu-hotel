@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { RoomsTable, type Room } from '@/components/rooms-table';
 import { RoomFilterBar } from '@/components/rooms/room-filter-bar';
@@ -63,6 +63,7 @@ export default function RoomsIndex({ rooms }: { rooms?: Room[] }) {
     const [isAddRoomOpen, setIsAddRoomOpen] = useState(false);
     const [form, setForm] = useState<RoomForm>(initialForm);
     const [filters, setFilters] = useState<RoomFilters>(DEFAULT_ROOM_FILTERS);
+    const [search, setSearch] = useState('');
 
     const counts = useMemo(
         () =>
@@ -118,8 +119,18 @@ export default function RoomsIndex({ rooms }: { rooms?: Room[] }) {
             result = result.filter((r) => filters.statuses.includes(r.status));
         }
 
+        if (search.trim()) {
+            const q = search.trim().toLowerCase();
+            result = result.filter(
+                (r) =>
+                    r.code.toLowerCase().includes(q) ||
+                    r.category.toLowerCase().includes(q) ||
+                    String(r.floor).includes(q),
+            );
+        }
+
         return result;
-    }, [localRooms, filters]);
+    }, [localRooms, filters, search]);
 
     const canSave =
         form.code.trim().length > 0 &&
@@ -368,6 +379,15 @@ export default function RoomsIndex({ rooms }: { rooms?: Room[] }) {
                 </div>
 
                 <div className="flex items-center justify-end gap-2">
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                            placeholder="Search rooms..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="h-8 w-48 pl-8 text-sm"
+                        />
+                    </div>
                     <RoomFilterSheet
                         filters={filters}
                         onFiltersChange={setFilters}
