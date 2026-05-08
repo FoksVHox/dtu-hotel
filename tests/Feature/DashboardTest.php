@@ -80,6 +80,37 @@ test('dashboard returns bookings with guests and rooms for the current week', fu
         );
 });
 
+test('dashboard excludes cancelled bookings from the calendar', function () {
+    $this->actingAs(User::factory()->create());
+
+    $room = Room::factory()->create();
+    $weekStart = now()->startOfWeek();
+
+    $activeBooking = Booking::factory()->create([
+        'start' => $weekStart->copy()->addDay()->setTime(14, 0),
+        'end' => $weekStart->copy()->addDays(3)->setTime(11, 0),
+        'status' => BookingStatus::Confirmed,
+    ]);
+    $activeBooking->rooms()->attach($room);
+
+    $cancelledBooking = Booking::factory()->create([
+        'start' => $weekStart->copy()->addDays(2)->setTime(14, 0),
+        'end' => $weekStart->copy()->addDays(4)->setTime(11, 0),
+        'status' => BookingStatus::Cancelled,
+    ]);
+    $cancelledBooking->rooms()->attach($room);
+
+    $this->get(route('dashboard'))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('dashboard')
+            ->has('bookings', 1, fn (AssertableInertia $b) => $b
+                ->where('id', $activeBooking->id)
+                ->etc()
+            )
+        );
+});
+
 test('dashboard booking dates are serialized as datetime strings', function () {
     $this->actingAs(User::factory()->create());
 

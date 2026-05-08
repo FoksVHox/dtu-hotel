@@ -311,3 +311,43 @@ test('updating a booking rejects rooms under maintenance from other bookings', f
         'status' => BookingStatus::Pending->value,
     ])->assertSessionHasErrors('room_ids');
 });
+
+test('updating only start with a value after existing end fails validation', function () {
+    $this->actingAs(User::factory()->create());
+
+    $room = Room::factory()->create();
+    $guest = Guest::factory()->create();
+
+    $booking = Booking::factory()->create([
+        'start' => now()->addDay()->setTime(14, 0),
+        'end' => now()->addDays(3)->setTime(11, 0),
+        'status' => BookingStatus::Pending,
+    ]);
+    $booking->rooms()->attach($room);
+    $booking->guests()->attach($guest);
+
+    $this->patch(route('bookings.update', $booking), [
+        'start' => now()->addDays(5)->setTime(14, 0)->toDateTimeString(),
+        'status' => BookingStatus::Pending->value,
+    ])->assertSessionHasErrors('start');
+});
+
+test('updating only end with a value before existing start fails validation', function () {
+    $this->actingAs(User::factory()->create());
+
+    $room = Room::factory()->create();
+    $guest = Guest::factory()->create();
+
+    $booking = Booking::factory()->create([
+        'start' => now()->addDays(5)->setTime(14, 0),
+        'end' => now()->addDays(7)->setTime(11, 0),
+        'status' => BookingStatus::Pending,
+    ]);
+    $booking->rooms()->attach($room);
+    $booking->guests()->attach($guest);
+
+    $this->patch(route('bookings.update', $booking), [
+        'end' => now()->addDay()->setTime(11, 0)->toDateTimeString(),
+        'status' => BookingStatus::Pending->value,
+    ])->assertSessionHasErrors('end');
+});

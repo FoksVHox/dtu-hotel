@@ -57,6 +57,10 @@ export default function Dashboard({
     const [editBooking, setEditBooking] = useState<CalendarBooking | null>(
         null,
     );
+    const [prefill, setPrefill] = useState<{
+        roomId: number;
+        date: Date;
+    } | null>(null);
     const [filters, setFilters] = useState<CalendarFilters>(
         DEFAULT_CALENDAR_FILTERS,
     );
@@ -118,6 +122,13 @@ export default function Dashboard({
 
     const handleEditBooking = useCallback((booking: CalendarBooking) => {
         setEditBooking(booking);
+        setPrefill(null);
+        setBookingDialogOpen(true);
+    }, []);
+
+    const handleEmptyCellClick = useCallback((roomId: number, date: Date) => {
+        setEditBooking(null);
+        setPrefill({ roomId, date });
         setBookingDialogOpen(true);
     }, []);
 
@@ -125,6 +136,7 @@ export default function Dashboard({
         setBookingDialogOpen(isOpen);
         if (!isOpen) {
             setEditBooking(null);
+            setPrefill(null);
         }
     }
 
@@ -175,6 +187,7 @@ export default function Dashboard({
                     isRefreshing={isRefreshing}
                     onCreateBooking={() => {
                         setEditBooking(null);
+                        setPrefill(null);
                         setBookingDialogOpen(true);
                     }}
                     filterSlot={
@@ -199,6 +212,7 @@ export default function Dashboard({
                     rooms={filteredRooms}
                     bookings={filteredBookings}
                     onEdit={handleEditBooking}
+                    onEmptyCell={handleEmptyCellClick}
                     hasActiveFilters={hasActiveFilters(filters)}
                 />
 
@@ -209,6 +223,7 @@ export default function Dashboard({
                     onOpenChange={handleBookingDialogOpenChange}
                     rooms={rooms}
                     booking={editBooking}
+                    prefill={prefill}
                 />
             </div>
         </AppLayout>

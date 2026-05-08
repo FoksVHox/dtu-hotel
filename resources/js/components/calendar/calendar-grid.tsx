@@ -16,6 +16,7 @@ interface CalendarGridProps {
     rooms: CalendarRoom[];
     bookings: CalendarBooking[];
     onEdit?: (booking: CalendarBooking) => void;
+    onEmptyCell?: (roomId: number, date: Date) => void;
     hasActiveFilters?: boolean;
 }
 
@@ -68,6 +69,7 @@ export function CalendarGrid({
     rooms,
     bookings,
     onEdit,
+    onEmptyCell,
     hasActiveFilters = false,
 }: CalendarGridProps) {
     const days = eachDayOfInterval({
@@ -117,6 +119,17 @@ export function CalendarGrid({
                             weekStart,
                         );
 
+                        const coveredDays = new Set<number>();
+                        for (const { colStart, colSpan } of positioned) {
+                            for (
+                                let i = colStart;
+                                i < colStart + colSpan;
+                                i++
+                            ) {
+                                coveredDays.add(i);
+                            }
+                        }
+
                         return (
                             <tr key={room.id}>
                                 <td className="border-r border-b px-3 py-3 text-sm font-medium whitespace-nowrap">
@@ -126,12 +139,54 @@ export function CalendarGrid({
 
                                 <td colSpan={7} className="border-b p-0">
                                     <div className="relative grid grid-cols-7">
-                                        {days.map((day, i) => (
-                                            <div
-                                                key={format(day, 'yyyy-MM-dd')}
-                                                className={`h-14 ${i < 6 ? 'border-r border-dashed' : ''}`}
-                                            />
-                                        ))}
+                                        {days.map((day, i) => {
+                                            const baseClass = `h-14 ${i < 6 ? 'border-r border-dashed' : ''}`;
+
+                                            if (
+                                                !onEmptyCell ||
+                                                coveredDays.has(i)
+                                            ) {
+                                                return (
+                                                    <div
+                                                        key={format(
+                                                            day,
+                                                            'yyyy-MM-dd',
+                                                        )}
+                                                        className={baseClass}
+                                                    />
+                                                );
+                                            }
+
+                                            return (
+                                                <div
+                                                    key={format(
+                                                        day,
+                                                        'yyyy-MM-dd',
+                                                    )}
+                                                    role="button"
+                                                    tabIndex={0}
+                                                    onClick={() =>
+                                                        onEmptyCell(
+                                                            room.id,
+                                                            day,
+                                                        )
+                                                    }
+                                                    onKeyDown={(e) => {
+                                                        if (
+                                                            e.key === 'Enter' ||
+                                                            e.key === ' '
+                                                        ) {
+                                                            e.preventDefault();
+                                                            onEmptyCell(
+                                                                room.id,
+                                                                day,
+                                                            );
+                                                        }
+                                                    }}
+                                                    className={`${baseClass} cursor-pointer rounded-md transition-colors hover:bg-muted/40 hover:ring-2 hover:ring-foreground hover:ring-inset focus:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-inset dark:hover:ring-primary/40 dark:focus-visible:ring-primary/60`}
+                                                />
+                                            );
+                                        })}
 
                                         {positioned.map(
                                             ({

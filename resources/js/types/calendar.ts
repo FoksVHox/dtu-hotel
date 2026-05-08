@@ -61,6 +61,7 @@ export interface BookingStatusConfig {
     border: string;
     text: string;
     secondary: string;
+    dot: string;
 }
 
 export function getBookingStatusConfig(booking: {
@@ -97,44 +98,50 @@ export function hasActiveFilters(filters: CalendarFilters): boolean {
 export const BOOKING_STATUSES: Record<BookingStatus, BookingStatusConfig> = {
     [BookingStatus.Pending]: {
         label: 'Pending',
-        bg: '#1e2a4a',
-        border: '#3a5296',
-        text: '#7aa0f0',
-        secondary: '#5070c0',
+        bg: 'var(--booking-pending-bg)',
+        border: 'var(--booking-pending-border)',
+        text: 'var(--booking-pending-text)',
+        secondary: 'var(--booking-pending-secondary)',
+        dot: 'var(--booking-pending-dot)',
     },
     [BookingStatus.Confirmed]: {
         label: 'Confirmed',
-        bg: '#0f2a2a',
-        border: '#1a6666',
-        text: '#00d4d4',
-        secondary: '#008888',
+        bg: 'var(--booking-confirmed-bg)',
+        border: 'var(--booking-confirmed-border)',
+        text: 'var(--booking-confirmed-text)',
+        secondary: 'var(--booking-confirmed-secondary)',
+        dot: 'var(--booking-confirmed-dot)',
     },
     [BookingStatus.CheckedIn]: {
         label: 'Checked In',
-        bg: '#0f2a1a',
-        border: '#1a6b35',
-        text: '#00e065',
-        secondary: '#00994a',
+        bg: 'var(--booking-checked-in-bg)',
+        border: 'var(--booking-checked-in-border)',
+        text: 'var(--booking-checked-in-text)',
+        secondary: 'var(--booking-checked-in-secondary)',
+        dot: 'var(--booking-checked-in-dot)',
     },
     [BookingStatus.CheckedOut]: {
         label: 'Checked Out',
-        bg: '#1a1a1a',
-        border: '#444444',
-        text: '#888888',
-        secondary: '#555555',
+        bg: 'var(--booking-checked-out-bg)',
+        border: 'var(--booking-checked-out-border)',
+        text: 'var(--booking-checked-out-text)',
+        secondary: 'var(--booking-checked-out-secondary)',
+        dot: 'var(--booking-checked-out-dot)',
     },
     [BookingStatus.Cancelled]: {
         label: 'Cancelled',
-        bg: '#2a0f1a',
-        border: '#7a1a3a',
-        text: '#ff4d88',
-        secondary: '#cc1a55',
+        bg: 'var(--booking-cancelled-bg)',
+        border: 'var(--booking-cancelled-border)',
+        text: 'var(--booking-cancelled-text)',
+        secondary: 'var(--booking-cancelled-secondary)',
+        dot: 'var(--booking-cancelled-dot)',
     },
     [BookingStatus.Maintenance]: {
         label: 'Maintenance',
-        bg: '#2a1a00',
-        border: '#8a5500',
-        text: '#ffaa00',
-        secondary: '#cc8800',
+        bg: 'var(--booking-maintenance-bg)',
+        border: 'var(--booking-maintenance-border)',
+        text: 'var(--booking-maintenance-text)',
+        secondary: 'var(--booking-maintenance-secondary)',
+        dot: 'var(--booking-maintenance-dot)',
     },
 };

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Dashboard\BuildBookingPipeline;
 use App\Actions\Dashboard\BuildRoomStatus;
 use App\Actions\Dashboard\BuildTodayActivity;
+use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\Room;
 use Carbon\Carbon;
@@ -28,6 +29,7 @@ class DashboardController extends Controller
             ->whereHas('rooms', fn ($query) => $query->whereIn('rooms.id', $rooms->pluck('id')))
             ->where('end', '>=', $weekStart)
             ->where('start', '<=', $weekEnd)
+            ->where('status', '!=', BookingStatus::Cancelled->value)
             ->get();
 
         return Inertia::render('dashboard', [
