@@ -95,6 +95,42 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.87 0 0);
+
+    --booking-pending-bg: #cad6f3;
+    --booking-pending-border: #8aa5e0;
+    --booking-pending-text: #2c4080;
+    --booking-pending-secondary: #4060a8;
+    --booking-pending-dot: #7aa0f0;
+
+    --booking-confirmed-bg: #bee5e2;
+    --booking-confirmed-border: #5fb3b1;
+    --booking-confirmed-text: #064848;
+    --booking-confirmed-secondary: #0a6868;
+    --booking-confirmed-dot: #00d4d4;
+
+    --booking-checked-in-bg: #bfe4cc;
+    --booking-checked-in-border: #5cb98e;
+    --booking-checked-in-text: #074a23;
+    --booking-checked-in-secondary: #0a6f38;
+    --booking-checked-in-dot: #00e065;
+
+    --booking-checked-out-bg: #dadada;
+    --booking-checked-out-border: #a0a0a0;
+    --booking-checked-out-text: #383838;
+    --booking-checked-out-secondary: #555555;
+    --booking-checked-out-dot: #888888;
+
+    --booking-cancelled-bg: #f6c4d6;
+    --booking-cancelled-border: #e87aa3;
+    --booking-cancelled-text: #66132f;
+    --booking-cancelled-secondary: #92143e;
+    --booking-cancelled-dot: #ff4d88;
+
+    --booking-maintenance-bg: #f8dfb3;
+    --booking-maintenance-border: #e0a850;
+    --booking-maintenance-text: #663d00;
+    --booking-maintenance-secondary: #8a5500;
+    --booking-maintenance-dot: #ffaa00;
 }
 
 .dark {
@@ -130,6 +166,42 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(0.269 0 0);
     --sidebar-ring: oklch(0.439 0 0);
+
+    --booking-pending-bg: #1e2a4a;
+    --booking-pending-border: #3a5296;
+    --booking-pending-text: #7aa0f0;
+    --booking-pending-secondary: #5070c0;
+    --booking-pending-dot: #7aa0f0;
+
+    --booking-confirmed-bg: #0f2a2a;
+    --booking-confirmed-border: #1a6666;
+    --booking-confirmed-text: #00d4d4;
+    --booking-confirmed-secondary: #008888;
+    --booking-confirmed-dot: #00d4d4;
+
+    --booking-checked-in-bg: #0f2a1a;
+    --booking-checked-in-border: #1a6b35;
+    --booking-checked-in-text: #00e065;
+    --booking-checked-in-secondary: #00994a;
+    --booking-checked-in-dot: #00e065;
+
+    --booking-checked-out-bg: #1a1a1a;
+    --booking-checked-out-border: #444444;
+    --booking-checked-out-text: #888888;
+    --booking-checked-out-secondary: #555555;
+    --booking-checked-out-dot: #888888;
+
+    --booking-cancelled-bg: #2a0f1a;
+    --booking-cancelled-border: #7a1a3a;
+    --booking-cancelled-text: #ff4d88;
+    --booking-cancelled-secondary: #cc1a55;
+    --booking-cancelled-dot: #ff4d88;
+
+    --booking-maintenance-bg: #2a1a00;
+    --booking-maintenance-border: #8a5500;
+    --booking-maintenance-text: #ffaa00;
+    --booking-maintenance-secondary: #cc8800;
+    --booking-maintenance-dot: #ffaa00;
 }
 
 @layer base {

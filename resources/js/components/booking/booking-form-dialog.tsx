@@ -1,5 +1,5 @@
 import { useForm } from '@inertiajs/react';
-import { format, parseISO } from 'date-fns';
+import { addDays, format, parseISO, setHours, setMinutes } from 'date-fns';
 import {
     AlertCircle,
     CalendarPlus,
@@ -54,6 +54,7 @@ interface BookingFormDialogProps {
     onOpenChange: (open: boolean) => void;
     rooms: CalendarRoom[];
     booking?: CalendarBooking | null;
+    prefill?: { roomId: number; date: Date } | null;
 }
 
 export function BookingFormDialog({
@@ -61,6 +62,7 @@ export function BookingFormDialog({
     onOpenChange,
     rooms,
     booking,
+    prefill,
 }: BookingFormDialogProps) {
     const isEditing = !!booking;
 
@@ -118,6 +120,27 @@ export function BookingFormDialog({
             setNewGuests([]);
         }
     }, [open, booking]);
+
+    useEffect(() => {
+        if (open && prefill && !booking) {
+            const checkIn = setMinutes(setHours(prefill.date, 14), 0);
+            const checkOut = setMinutes(
+                setHours(addDays(prefill.date, 1), 11),
+                0,
+            );
+
+            setData({
+                room_ids: [prefill.roomId],
+                guest_ids: [],
+                new_guests: [],
+                start: format(checkIn, "yyyy-MM-dd'T'HH:mm"),
+                end: format(checkOut, "yyyy-MM-dd'T'HH:mm"),
+                status: BookingStatus.Pending,
+            });
+            setSelectedGuests([]);
+            setNewGuests([]);
+        }
+    }, [open, prefill, booking]);
 
     const filteredRooms = roomQuery.trim()
         ? rooms.filter((room) => {
