@@ -14,11 +14,11 @@ class RoomController extends Controller
 {
     public function index(): Response
     {
-        $rooms = Room::with(['building', 'floor', 'roomCategory'])
+        $rooms = Room::with(['floor', 'roomCategory'])
             ->get()
             ->map(fn (Room $room) => [
                 'id' => $room->id,
-                'code' => $room->building->code.'-'.$room->floor->name.'-'.$room->id,
+                'code' => $room->floor->name.'-'.$room->id,
                 'category' => $room->roomCategory->name,
                 'floor' => (int) filter_var($room->floor->name, FILTER_SANITIZE_NUMBER_INT),
                 'status' => $room->status->value,
