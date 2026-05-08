@@ -140,7 +140,7 @@ export default function RoomsIndex({ rooms }: { rooms?: Room[] }) {
                 <div className="flex justify-end">
                     <Button
                         type="button"
-                        className="bg-red-700 text-white shadow-sm hover:bg-red-800"
+                        size="sm"
                         onClick={() => setIsAddRoomOpen(true)}
                     >
                         <Plus className="h-4 w-4" />
