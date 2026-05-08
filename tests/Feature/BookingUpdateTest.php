@@ -351,4 +351,3 @@ test('updating only end with a value before existing start fails validation', fu
         'status' => BookingStatus::Pending->value,
     ])->assertSessionHasErrors('end');
 });
-

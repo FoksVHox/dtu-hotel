@@ -121,7 +121,11 @@ export function CalendarGrid({
 
                         const coveredDays = new Set<number>();
                         for (const { colStart, colSpan } of positioned) {
-                            for (let i = colStart; i < colStart + colSpan; i++) {
+                            for (
+                                let i = colStart;
+                                i < colStart + colSpan;
+                                i++
+                            ) {
                                 coveredDays.add(i);
                             }
                         }
@@ -138,7 +142,10 @@ export function CalendarGrid({
                                         {days.map((day, i) => {
                                             const baseClass = `h-14 ${i < 6 ? 'border-r border-dashed' : ''}`;
 
-                                            if (!onEmptyCell || coveredDays.has(i)) {
+                                            if (
+                                                !onEmptyCell ||
+                                                coveredDays.has(i)
+                                            ) {
                                                 return (
                                                     <div
                                                         key={format(
