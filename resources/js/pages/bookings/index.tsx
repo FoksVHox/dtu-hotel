@@ -46,7 +46,6 @@ import {
     SheetTrigger,
 } from '@/components/ui/sheet';
 import AppLayout from '@/layouts/app-layout';
-import bookingsRoute from '@/routes/bookings';
 import type { BreadcrumbItem } from '@/types';
 import type { Booking } from '@/types/booking';
 import {
@@ -57,6 +56,7 @@ import {
     type CalendarRoom,
     type CalendarRoomCategory,
 } from '@/types/calendar';
+import bookingsRoute from '@/routes/bookings';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Booking Management', href: bookingsRoute.index().url },
