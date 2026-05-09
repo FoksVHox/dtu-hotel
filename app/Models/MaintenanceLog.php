@@ -15,6 +15,7 @@ class MaintenanceLog extends Model
         'hotel_id',
         'room_id',
         'action',
+        'maintained_by',
         'performed_at',
     ];
 

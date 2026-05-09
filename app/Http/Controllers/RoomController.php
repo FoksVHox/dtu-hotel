@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\BookingStatus;
 use App\Enums\RoomStatus;
+use App\Http\Requests\StoreRoomRequest;
 use App\Http\Requests\UpdateRoomRequest;
+use App\Models\Booking;
+use App\Models\Floor;
 use App\Models\MaintenanceLog;
 use App\Models\Room;
+use App\Models\RoomCategory;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -14,27 +19,66 @@ class RoomController extends Controller
 {
     public function index(): Response
     {
-        $rooms = Room::with(['building', 'floor', 'roomCategory'])
-            ->get()
-            ->map(fn (Room $room) => [
-                'id' => $room->id,
-                'code' => $room->building->code.'-'.$room->floor->name.'-'.$room->id,
-                'category' => $room->roomCategory->name,
-                'floor' => (int) filter_var($room->floor->name, FILTER_SANITIZE_NUMBER_INT),
-                'status' => $room->status->value,
-                'scheduled_cleaning_at' => $room->scheduled_cleaning_at?->toIso8601String(),
+        $rooms = Room::with([
+            'floor.building',
+            'roomCategory',
+            'bookings' => fn ($q) => $q->with('guests')->latest('start')->limit(5),
+        ])->orderBy('id')->get();
+
+        $categories = RoomCategory::orderBy('name')->get(['id', 'name']);
+
+        $floors = Floor::with('building')->orderBy('building_id')->orderBy('name')->get()
+            ->map(fn (Floor $floor) => [
+                'id' => $floor->id,
+                'label' => $floor->building->name.' — '.$floor->name,
+                'building_name' => $floor->building->name,
             ]);
 
-        return Inertia::render('rooms/index', ['rooms' => $rooms]);
+        $totalBookings = Booking::count();
+
+        $roomStats = [
+            'checked_in' => Booking::where('status', BookingStatus::CheckedIn)->count(),
+            'confirmed' => Booking::where('status', BookingStatus::Confirmed)->count(),
+            'pending' => Booking::where('status', BookingStatus::Pending)->count(),
+            'cancelled' => Booking::where('status', BookingStatus::Cancelled)->count(),
+            'total_bookings' => $totalBookings,
+            'avg_bookings_per_room' => $rooms->count() > 0 ? round($totalBookings / $rooms->count(), 1) : 0,
+            'checkins_today' => Booking::whereDate('start', today())->count(),
+            'checkouts_today' => Booking::whereDate('end', today())->count(),
+            'checkins_this_week' => Booking::whereBetween('start', [now(), now()->addDays(7)])->count(),
+            'rooms_with_accessories' => Room::has('roomAccessories')->count(),
+        ];
+
+        return Inertia::render('rooms/index', [
+            'rooms' => $rooms,
+            'categories' => $categories,
+            'floors' => $floors,
+            'roomStats' => $roomStats,
+        ]);
     }
 
     public function create(): void {}
 
-    public function store(): void {}
+    public function store(StoreRoomRequest $request): RedirectResponse
+    {
+        $validated = $request->validated();
+        $floor = Floor::findOrFail($validated['floor_id']);
 
-    public function show(string $id): void {}
+        Room::create([
+            'hotel_id' => $floor->hotel_id,
+            'building_id' => $floor->building_id,
+            'floor_id' => $floor->id,
+            'room_category_id' => $validated['room_category_id'],
+            'code' => $validated['code'] ?? null,
+            'status' => isset($validated['status']) ? RoomStatus::from($validated['status']) : RoomStatus::Available,
+        ]);
 
-    public function edit(string $id): void {}
+        return to_route('rooms.index');
+    }
+
+    public function show(): void {}
+
+    public function edit(): void {}
 
     public function update(UpdateRoomRequest $request, Room $room): RedirectResponse
     {
@@ -58,8 +102,33 @@ class RoomController extends Controller
             $room->update(['scheduled_cleaning_at' => $validated['scheduled_cleaning_at']]);
         }
 
-        return redirect()->back();
+        if (isset($validated['room_category_id'])) {
+            $room->update(['room_category_id' => $validated['room_category_id']]);
+        }
+
+        if (isset($validated['floor_id'])) {
+            $floor = Floor::findOrFail($validated['floor_id']);
+            $room->update([
+                'floor_id' => $floor->id,
+                'building_id' => $floor->building_id,
+            ]);
+        }
+
+        if (array_key_exists('manual_status', $validated)) {
+            $room->update(['manual_status' => $validated['manual_status']]);
+        }
+
+        if (array_key_exists('code', $validated)) {
+            $room->update(['code' => $validated['code']]);
+        }
+
+        return to_route('rooms.index');
     }
 
-    public function destroy(string $id): void {}
+    public function destroy(Room $room): RedirectResponse
+    {
+        $room->delete();
+
+        return to_route('rooms.index');
+    }
 }

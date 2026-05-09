@@ -126,6 +126,7 @@ class OnboardingController extends Controller
                         'floor_id' => $floor->id,
                         'room_category_id' => $rule['category_id'],
                         'status' => RoomStatus::Available,
+                        'code' => (string) $n,
                     ]);
                 }
             }

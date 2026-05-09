@@ -5,6 +5,7 @@ import {
     CalendarDays,
     Folder,
     LayoutGrid,
+    PhoneCall,
     Settings,
     Wrench,
 } from 'lucide-react';
@@ -58,14 +59,9 @@ const mainNavItems: NavItem[] = [
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
+        title: 'Contact IT Dept.',
+        href: 'https://www.dtu.dk/english/about/organization/supportfunctions/it_service',
+        icon: PhoneCall,
     },
 ];
 

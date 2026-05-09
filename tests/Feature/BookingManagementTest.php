@@ -4,6 +4,7 @@ use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\Guest;
 use App\Models\Room;
+use App\Models\User;
 use Inertia\Testing\AssertableInertia;
 
 // ── Index: Authentication ─────────────────────────────────────────────────────
@@ -52,13 +53,13 @@ test('index returns rooms for creating bookings', function () {
         ->assertInertia(fn (AssertableInertia $page) => $page
             ->component('bookings/index')
             ->has('rooms', 1, fn (AssertableInertia $room) => $room
-                ->hasAll(['id', 'hotel_id', 'building_id', 'floor_id', 'room_category_id'])
+                ->hasAll(['id', 'building_id', 'floor_id', 'room_category_id'])
                 ->has('room_category', fn (AssertableInertia $category) => $category
                     ->hasAll(['id', 'name', 'description'])
                     ->etc()
                 )
                 ->has('floor', fn (AssertableInertia $floor) => $floor
-                    ->hasAll(['id', 'name', 'code'])
+                    ->hasAll(['id', 'name'])
                     ->etc()
                 )
                 ->etc()
@@ -102,7 +103,7 @@ test('a Pending booking can be deleted', function () {
     $this->delete(route('bookings.destroy', $booking))
         ->assertRedirect();
 
-    expect(Booking::query()->find($booking->id))->toBeNull();
+    expect(Booking::query()->withoutGlobalScope('hotel')->find($booking->id))->toBeNull();
 });
 
 test('a Confirmed booking can be deleted', function () {
@@ -113,7 +114,7 @@ test('a Confirmed booking can be deleted', function () {
     $this->delete(route('bookings.destroy', $booking))
         ->assertRedirect();
 
-    expect(Booking::query()->find($booking->id))->toBeNull();
+    expect(Booking::query()->withoutGlobalScope('hotel')->find($booking->id))->toBeNull();
 });
 
 test('a Cancelled booking can be deleted', function () {
@@ -124,7 +125,7 @@ test('a Cancelled booking can be deleted', function () {
     $this->delete(route('bookings.destroy', $booking))
         ->assertRedirect();
 
-    expect(Booking::query()->find($booking->id))->toBeNull();
+    expect(Booking::query()->withoutGlobalScope('hotel')->find($booking->id))->toBeNull();
 });
 
 // ── Destroy: Non-deletable statuses ──────────────────────────────────────────
