@@ -11,11 +11,33 @@ class OnboardingController extends Controller
 {
     public function show(Request $request): Response|RedirectResponse
     {
+        $user = $request->user();
+
+        $hotel = $user->hotel;
+        $buildings = $hotel
+            ? $hotel->buildings()->with('floors')->get()
+            : collect();
+        $rooms = $hotel
+            ? $hotel->rooms()->limit(1)->get()
+            : collect();
+
+        if ($user->hotel_id === null) {
+            $currentStep = 1;
+        } elseif ($buildings->isEmpty()) {
+            $currentStep = 2;
+        } elseif ($rooms->isEmpty()) {
+            $currentStep = 3;
+        } else {
+            $currentStep = 4;
+        }
+
+        $categories = \App\Models\RoomCategory::query()->get();
+
         return Inertia::render('onboarding/wizard', [
-            'currentStep' => 1,
-            'hotel' => null,
-            'buildings' => [],
-            'categories' => [],
+            'currentStep' => $currentStep,
+            'hotel' => $hotel,
+            'buildings' => $buildings,
+            'categories' => $categories,
         ]);
     }
 
