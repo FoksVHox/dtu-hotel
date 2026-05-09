@@ -20,13 +20,13 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import type { NavItem } from '@/types';
-import AppLogo from './app-logo';
 import { dashboard } from '@/routes';
 import bookings from '@/routes/bookings';
 import maintenance from '@/routes/maintenance';
 import profile from '@/routes/profile';
 import rooms from '@/routes/rooms';
+import type { NavItem } from '@/types';
+import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
     {

@@ -122,6 +122,7 @@ test('dashboard booking dates are serialized as datetime strings', function () {
         'hotel_id' => $user->hotel_id,
         'start' => now()->startOfWeek()->addDay()->setTime(14, 0),
         'end' => now()->startOfWeek()->addDays(3)->setTime(11, 0),
+        'status' => BookingStatus::Confirmed,
     ]);
     $booking->rooms()->attach($room);
 

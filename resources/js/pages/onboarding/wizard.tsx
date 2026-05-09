@@ -1,6 +1,6 @@
-import AppLogoIcon from '@/components/app-logo-icon';
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
+import AppLogoIcon from '@/components/app-logo-icon';
 import BuildingsStep from './steps/buildings-step';
 import HotelStep from './steps/hotel-step';
 import RoomsStep from './steps/rooms-step';

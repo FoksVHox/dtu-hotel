@@ -1,8 +1,7 @@
-import { useInView } from '@/hooks/use-in-view';
 import { useEffect, useState } from 'react';
+import { useInView } from '@/hooks/use-in-view';
 
-const STATUSES = ['available', 'occupied', 'cleaning', 'occupied', 'available', 'maintenance', 'available', 'occupied'] as const;
-type Status = (typeof STATUSES)[number];
+type Status = 'available' | 'occupied' | 'cleaning' | 'maintenance';
 
 const ROOM_GRID: Status[][] = [
     ['available', 'occupied', 'cleaning', 'occupied', 'available', 'maintenance', 'available', 'occupied'],

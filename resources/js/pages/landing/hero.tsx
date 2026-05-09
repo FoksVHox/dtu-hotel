@@ -1,7 +1,7 @@
-import AppLogoIcon from '@/components/app-logo-icon';
 import { Link } from '@inertiajs/react';
 import { ArrowDown, ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import AppLogoIcon from '@/components/app-logo-icon';
 import CalendarPreview from './calendar-preview';
 
 export default function Hero({ canRegister }: { canRegister: boolean }) {

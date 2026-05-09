@@ -1,5 +1,5 @@
 import { useForm } from '@inertiajs/react';
-import { FormEvent } from 'react';
+import type { FormEvent } from 'react';
 
 interface Hotel {
     id: number;

@@ -1,5 +1,5 @@
-import { useInView } from '@/hooks/use-in-view';
 import { CalendarDays, ClipboardList, Users2, Wrench } from 'lucide-react';
+import { useInView } from '@/hooks/use-in-view';
 
 const FEATURES = [
     {

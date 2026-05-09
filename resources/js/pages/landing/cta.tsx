@@ -1,6 +1,6 @@
-import { useInView } from '@/hooks/use-in-view';
 import { Link } from '@inertiajs/react';
 import { ArrowRight } from 'lucide-react';
+import { useInView } from '@/hooks/use-in-view';
 
 export default function Cta({ canRegister }: { canRegister: boolean }) {
     const { ref, inView } = useInView<HTMLDivElement>();

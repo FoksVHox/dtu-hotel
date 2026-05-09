@@ -1,6 +1,6 @@
 import { useForm } from '@inertiajs/react';
 import { Plus, X } from 'lucide-react';
-import { FormEvent } from 'react';
+import type { FormEvent } from 'react';
 
 interface Building {
     id: number;

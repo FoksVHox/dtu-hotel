@@ -1,6 +1,6 @@
 import { router, useForm } from '@inertiajs/react';
 import { Plus, X } from 'lucide-react';
-import { FormEvent } from 'react';
+import type { FormEvent } from 'react';
 
 interface Floor { id: number; name: string; code: string; }
 interface Building { id: number; name: string; floors: Floor[]; }
