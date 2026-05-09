@@ -52,6 +52,7 @@ import type { Booking } from '@/types/booking';
 import {
     BOOKING_STATUSES,
     BookingStatus,
+    type CalendarBooking,
     type CalendarFloor,
     type CalendarRoom,
     type CalendarRoomCategory,
@@ -411,6 +412,13 @@ export default function BookingsIndex({
     );
     const [detailOpen, setDetailOpen] = useState(false);
     const [bookingDialogOpen, setBookingDialogOpen] = useState(false);
+    const [editBooking, setEditBooking] = useState<CalendarBooking | null>(
+        null,
+    );
+    const [prefill, setPrefill] = useState<{
+        roomId: number;
+        date: Date;
+    } | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [filters, setFilters] = useState<BookingTableFilters>(
         DEFAULT_BOOKING_TABLE_FILTERS,
@@ -638,6 +646,16 @@ export default function BookingsIndex({
 
     function handleBookingDialogOpenChange(isOpen: boolean): void {
         setBookingDialogOpen(isOpen);
+        if (!isOpen) {
+            setEditBooking(null);
+            setPrefill(null);
+        }
+    }
+
+    function openNewBookingDialog(): void {
+        setEditBooking(null);
+        setPrefill(null);
+        setBookingDialogOpen(true);
     }
 
     return (
@@ -800,7 +818,7 @@ export default function BookingsIndex({
                         <Button
                             type="button"
                             size="sm"
-                            onClick={() => setBookingDialogOpen(true)}
+                            onClick={openNewBookingDialog}
                         >
                             <Plus className="size-4" />
                             New Booking
@@ -965,6 +983,8 @@ export default function BookingsIndex({
                 open={bookingDialogOpen}
                 onOpenChange={handleBookingDialogOpenChange}
                 rooms={rooms}
+                booking={editBooking}
+                prefill={prefill}
             />
         </AppLayout>
     );
