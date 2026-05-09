@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Onboarding\StoreOnboardingBuildingsRequest;
 use App\Http\Requests\Onboarding\StoreOnboardingHotelRequest;
+use App\Http\Requests\Onboarding\StoreOnboardingRoomsRequest;
 use App\Models\Building;
 use App\Models\Floor;
 use App\Models\Hotel;
+use App\Models\Room;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -98,8 +100,29 @@ class OnboardingController extends Controller
         return redirect()->route('onboarding.show');
     }
 
-    public function storeRooms(Request $request): RedirectResponse
+    public function storeRooms(StoreOnboardingRoomsRequest $request): RedirectResponse
     {
+        $user = $request->user();
+        $hotelId = $user->hotel_id;
+
+        DB::transaction(function () use ($request, $hotelId): void {
+            Room::where('hotel_id', $hotelId)->delete();
+
+            foreach ($request->validated('rules') as $rule) {
+                $floor = Floor::where('hotel_id', $hotelId)->findOrFail($rule['floor_id']);
+
+                for ($n = $rule['start_number']; $n <= $rule['end_number']; $n++) {
+                    Room::create([
+                        'hotel_id' => $hotelId,
+                        'building_id' => $floor->building_id,
+                        'floor_id' => $floor->id,
+                        'room_category_id' => $rule['category_id'],
+                        'status' => \App\Enums\RoomStatus::Available,
+                    ]);
+                }
+            }
+        });
+
         return redirect()->route('onboarding.show');
     }
 

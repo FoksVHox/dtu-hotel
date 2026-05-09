@@ -234,3 +234,127 @@ test('storeBuildings caps floors_count at 20', function () {
         ])
         ->assertSessionHasErrors(['buildings.0.floors_count']);
 });
+
+test('storeRooms expands rules into rooms', function () {
+    $hotel = Hotel::factory()->create();
+    $building = Building::factory()->create(['hotel_id' => $hotel->id]);
+    $floor = Floor::factory()->create([
+        'hotel_id' => $hotel->id,
+        'building_id' => $building->id,
+    ]);
+    $category = RoomCategory::factory()->create();
+
+    $user = User::factory()->create([
+        'hotel_id' => $hotel->id,
+        'onboarded_at' => null,
+    ]);
+
+    $this->actingAs($user)
+        ->post('/onboarding/rooms', [
+            'rules' => [
+                [
+                    'start_number' => 101,
+                    'end_number' => 110,
+                    'floor_id' => $floor->id,
+                    'category_id' => $category->id,
+                ],
+            ],
+        ])
+        ->assertRedirect('/onboarding');
+
+    expect($hotel->rooms()->count())->toBe(10);
+});
+
+test('storeRooms rejects ranges over 50', function () {
+    $hotel = Hotel::factory()->create();
+    $building = Building::factory()->create(['hotel_id' => $hotel->id]);
+    $floor = Floor::factory()->create([
+        'hotel_id' => $hotel->id,
+        'building_id' => $building->id,
+    ]);
+    $category = RoomCategory::factory()->create();
+
+    $user = User::factory()->create([
+        'hotel_id' => $hotel->id,
+        'onboarded_at' => null,
+    ]);
+
+    $this->actingAs($user)
+        ->post('/onboarding/rooms', [
+            'rules' => [
+                [
+                    'start_number' => 100,
+                    'end_number' => 200,
+                    'floor_id' => $floor->id,
+                    'category_id' => $category->id,
+                ],
+            ],
+        ])
+        ->assertSessionHasErrors(['rules.0.end_number']);
+});
+
+test('storeRooms rejects more than 10 rules', function () {
+    $hotel = Hotel::factory()->create();
+    $building = Building::factory()->create(['hotel_id' => $hotel->id]);
+    $floor = Floor::factory()->create([
+        'hotel_id' => $hotel->id,
+        'building_id' => $building->id,
+    ]);
+    $category = RoomCategory::factory()->create();
+
+    $user = User::factory()->create([
+        'hotel_id' => $hotel->id,
+        'onboarded_at' => null,
+    ]);
+
+    $rules = [];
+    for ($i = 0; $i < 11; $i++) {
+        $rules[] = [
+            'start_number' => 100 + $i * 10,
+            'end_number' => 100 + $i * 10 + 1,
+            'floor_id' => $floor->id,
+            'category_id' => $category->id,
+        ];
+    }
+
+    $this->actingAs($user)
+        ->post('/onboarding/rooms', ['rules' => $rules])
+        ->assertSessionHasErrors(['rules']);
+});
+
+test('storeRooms wipes and recreates if rooms already exist', function () {
+    $hotel = Hotel::factory()->create();
+    $building = Building::factory()->create(['hotel_id' => $hotel->id]);
+    $floor = Floor::factory()->create([
+        'hotel_id' => $hotel->id,
+        'building_id' => $building->id,
+    ]);
+    $category = RoomCategory::factory()->create();
+
+    Room::factory()->count(7)->create([
+        'hotel_id' => $hotel->id,
+        'building_id' => $building->id,
+        'floor_id' => $floor->id,
+        'room_category_id' => $category->id,
+    ]);
+
+    $user = User::factory()->create([
+        'hotel_id' => $hotel->id,
+        'onboarded_at' => null,
+    ]);
+
+    $this->actingAs($user)
+        ->post('/onboarding/rooms', [
+            'rules' => [
+                [
+                    'start_number' => 1,
+                    'end_number' => 3,
+                    'floor_id' => $floor->id,
+                    'category_id' => $category->id,
+                ],
+            ],
+        ])
+        ->assertRedirect('/onboarding');
+
+    expect($hotel->rooms()->count())->toBe(3);
+});
