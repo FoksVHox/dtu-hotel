@@ -96,7 +96,7 @@ export function BookingFormDialog({
     const [roomQuery, setRoomQuery] = useState('');
     const [formErrors, setFormErrors] = useState<string[]>([]);
 
-    const searchTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+    const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
         if (open && booking) {

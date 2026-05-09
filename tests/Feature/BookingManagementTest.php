@@ -5,6 +5,7 @@ use App\Models\Booking;
 use App\Models\Guest;
 use App\Models\Room;
 use App\Models\User;
+use Inertia\Testing\AssertableInertia;
 
 // ── Index: Authentication ─────────────────────────────────────────────────────
 
@@ -40,6 +41,30 @@ test('index returns bookings with rooms and guests', function () {
     expect($bookings)->toHaveCount(1)
         ->and($bookings[0]['rooms'])->toHaveCount(1)
         ->and($bookings[0]['guests'])->toHaveCount(1);
+});
+
+test('index returns rooms for creating bookings', function () {
+    $user = $this->actingAsHotelUser();
+
+    Room::factory()->create(['hotel_id' => $user->hotel_id]);
+
+    $this->get(route('bookings.index'))
+        ->assertSuccessful()
+        ->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('bookings/index')
+            ->has('rooms', 1, fn (AssertableInertia $room) => $room
+                ->hasAll(['id', 'hotel_id', 'building_id', 'floor_id', 'room_category_id'])
+                ->has('room_category', fn (AssertableInertia $category) => $category
+                    ->hasAll(['id', 'name', 'description'])
+                    ->etc()
+                )
+                ->has('floor', fn (AssertableInertia $floor) => $floor
+                    ->hasAll(['id', 'name', 'code'])
+                    ->etc()
+                )
+                ->etc()
+            )
+        );
 });
 
 test('response includes code key on rooms and first_name on guests', function () {

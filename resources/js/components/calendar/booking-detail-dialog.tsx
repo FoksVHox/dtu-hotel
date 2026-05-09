@@ -32,7 +32,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
-import { getBookingStatusConfig } from '@/types/calendar';
+import { getBookingStatusConfig, type CalendarBooking } from '@/types/calendar';
 import { destroy } from '@/actions/App/Http/Controllers/BookingController';
 
 interface BookingDetailRoom {
@@ -90,7 +90,7 @@ export function BookingDetailDialog({
 
     function handleEdit() {
         onOpenChange(false);
-        onEdit?.(booking!);
+        onEdit?.(booking as CalendarBooking);
     }
 
     function handleDelete() {
