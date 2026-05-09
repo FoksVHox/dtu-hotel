@@ -12,7 +12,6 @@ import { RoomStatusCard } from '@/components/dashboard/room-status-card';
 import { StatCardSkeleton } from '@/components/dashboard/stat-card-skeleton';
 import { TodayActivityCard } from '@/components/dashboard/today-activity-card';
 import AppLayout from '@/layouts/app-layout';
-import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
 import type {
     CalendarBooking,
@@ -25,6 +24,7 @@ import type {
     RoomStatus,
     TodayActivity,
 } from '@/types/dashboard';
+import { dashboard } from '@/routes';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

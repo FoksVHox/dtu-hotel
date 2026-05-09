@@ -2,12 +2,12 @@ import { Head, router } from '@inertiajs/react';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { CheckCheck } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { update } from '@/actions/App/Http/Controllers/RoomController';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import maintenance from '@/routes/maintenance';
 import type { BreadcrumbItem } from '@/types';
+import { update } from '@/actions/App/Http/Controllers/RoomController';
+import maintenance from '@/routes/maintenance';
 
 type HousekeepingRoom = {
     id: number;

@@ -2,10 +2,6 @@ import { Head, router } from '@inertiajs/react';
 import { format, parseISO } from 'date-fns';
 import { Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import {
-    update,
-    destroy,
-} from '@/actions/App/Http/Controllers/BookingController';
 import { BookingStatusBadge } from '@/components/booking-status-badge';
 import { BookingDetailDialog } from '@/components/calendar/booking-detail-dialog';
 import { Button } from '@/components/ui/button';
@@ -26,10 +22,14 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
-import bookingsRoute from '@/routes/bookings';
 import type { BreadcrumbItem } from '@/types';
 import type { Booking } from '@/types/booking';
 import { BookingStatus } from '@/types/calendar';
+import {
+    update,
+    destroy,
+} from '@/actions/App/Http/Controllers/BookingController';
+import bookingsRoute from '@/routes/bookings';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Booking Management', href: bookingsRoute.index().url },

@@ -56,7 +56,6 @@ test('show returns step 3 when user has buildings but no rooms', function () {
         );
 });
 
-
 test('show passes hotel, buildings with floors, and categories to props', function () {
     $hotel = Hotel::factory()->create();
     $building = Building::factory()->create(['hotel_id' => $hotel->id]);

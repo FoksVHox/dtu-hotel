@@ -51,8 +51,18 @@ function RoomOpsSample() {
     return (
         <div className="grid grid-cols-6 gap-1.5">
             {Array.from({ length: 18 }).map((_, i) => {
-                const status = i % 4 === 0 ? 'bg-neutral-900' : i % 5 === 0 ? 'bg-neutral-300' : 'bg-white border border-neutral-300';
-                return <div key={i} className={['h-5 rounded', status].join(' ')} />;
+                const status =
+                    i % 4 === 0
+                        ? 'bg-neutral-900'
+                        : i % 5 === 0
+                          ? 'bg-neutral-300'
+                          : 'bg-white border border-neutral-300';
+                return (
+                    <div
+                        key={i}
+                        className={['h-5 rounded', status].join(' ')}
+                    />
+                );
             })}
         </div>
     );
@@ -104,17 +114,20 @@ export default function Features() {
                 <div
                     className={[
                         'flex max-w-3xl flex-col gap-3 transition-all duration-700 ease-out',
-                        inView ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
+                        inView
+                            ? 'translate-y-0 opacity-100'
+                            : 'translate-y-4 opacity-0',
                     ].join(' ')}
                 >
-                    <span className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-500">
+                    <span className="text-xs font-medium tracking-[0.18em] text-neutral-500 uppercase">
                         Features
                     </span>
                     <h2 className="text-4xl font-semibold tracking-tight md:text-5xl">
                         Everything a small hotel actually needs.
                     </h2>
                     <p className="mt-2 max-w-xl text-neutral-600">
-                        No bloat, no enterprise checkboxes. Four modules that cover the day-to-day of running rooms.
+                        No bloat, no enterprise checkboxes. Four modules that
+                        cover the day-to-day of running rooms.
                     </p>
                 </div>
 
@@ -126,17 +139,27 @@ export default function Features() {
                                 key={f.title}
                                 className={[
                                     'group flex flex-col gap-5 bg-white p-8 transition-all duration-700 ease-out hover:bg-neutral-50',
-                                    inView ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
+                                    inView
+                                        ? 'translate-y-0 opacity-100'
+                                        : 'translate-y-4 opacity-0',
                                 ].join(' ')}
-                                style={{ transitionDelay: inView ? `${idx * 100}ms` : '0ms' }}
+                                style={{
+                                    transitionDelay: inView
+                                        ? `${idx * 100}ms`
+                                        : '0ms',
+                                }}
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="flex size-9 items-center justify-center rounded-md bg-black text-white transition-transform group-hover:scale-105">
                                         <Icon className="size-4" />
                                     </div>
-                                    <h3 className="text-lg font-semibold tracking-tight">{f.title}</h3>
+                                    <h3 className="text-lg font-semibold tracking-tight">
+                                        {f.title}
+                                    </h3>
                                 </div>
-                                <p className="text-sm leading-relaxed text-neutral-600">{f.body}</p>
+                                <p className="text-sm leading-relaxed text-neutral-600">
+                                    {f.body}
+                                </p>
                                 <div className="mt-2 rounded-lg border border-neutral-100 bg-neutral-50 p-4">
                                     {f.sample}
                                 </div>

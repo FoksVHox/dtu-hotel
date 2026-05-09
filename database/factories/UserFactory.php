@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Hotel;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -65,7 +66,7 @@ class UserFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'hotel_id' => \App\Models\Hotel::factory(),
+                'hotel_id' => Hotel::factory(),
                 'onboarded_at' => now(),
             ];
         });

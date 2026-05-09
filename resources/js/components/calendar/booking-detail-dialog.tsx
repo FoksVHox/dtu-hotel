@@ -12,7 +12,6 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { destroy } from '@/actions/App/Http/Controllers/BookingController';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -34,6 +33,7 @@ import {
 } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { getBookingStatusConfig } from '@/types/calendar';
+import { destroy } from '@/actions/App/Http/Controllers/BookingController';
 
 interface BookingDetailRoom {
     id: number;
