@@ -14,7 +14,7 @@ test('guests are redirected to the login page', function () {
 });
 
 test('authenticated users can visit the dashboard', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAsHotelUser();
 
     $response = $this->get(route('dashboard'));
     $response->assertOk();
@@ -210,7 +210,7 @@ test('dashboard booking rooms include room category and floor', function () {
 });
 
 test('dashboard defaults to the current week when no week_start param is given', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAsHotelUser();
 
     $this->get(route('dashboard'))
         ->assertOk()
@@ -252,7 +252,7 @@ test('dashboard refresh returns updated bookings', function () {
 });
 
 test('dashboard deferred props are not in the initial response', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAsHotelUser();
 
     $this->get(route('dashboard'))
         ->assertOk()

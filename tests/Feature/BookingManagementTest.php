@@ -16,7 +16,7 @@ test('unauthenticated user cannot access bookings index', function () {
 // ── Index: Access & Props ─────────────────────────────────────────────────────
 
 test('authenticated user can access bookings index', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAsHotelUser();
 
     $this->get(route('bookings.index'))
         ->assertSuccessful();
