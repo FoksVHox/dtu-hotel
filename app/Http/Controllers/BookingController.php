@@ -18,6 +18,8 @@ class BookingController extends Controller
 {
     public function index(): Response
     {
+        $rooms = Room::with(['roomCategory', 'floor'])->get();
+
         $bookings = Booking::with(['guests', 'rooms.building', 'rooms.floor', 'rooms.roomCategory'])
             ->latest()
             ->get()
@@ -36,12 +38,21 @@ class BookingController extends Controller
                 'rooms' => $booking->rooms->map(fn (Room $room) => [
                     'id' => $room->id,
                     'code' => $room->building->code.'-'.$room->floor->name.'-'.$room->id,
-                    'room_category' => ['name' => $room->roomCategory?->name ?? ''],
-                    'floor' => ['code' => $room->floor->code],
+                    'room_category' => [
+                        'id' => $room->roomCategory?->id,
+                        'name' => $room->roomCategory?->name ?? '',
+                    ],
+                    'floor' => [
+                        'id' => $room->floor->id,
+                        'code' => $room->floor->code,
+                    ],
                 ]),
             ]);
 
-        return Inertia::render('bookings/index', ['bookings' => $bookings]);
+        return Inertia::render('bookings/index', [
+            'bookings' => $bookings,
+            'rooms' => $rooms,
+        ]);
     }
 
     public function create(): void {}
