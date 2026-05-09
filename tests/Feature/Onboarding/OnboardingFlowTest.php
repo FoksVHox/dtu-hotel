@@ -163,3 +163,74 @@ test('storeHotel rejects invalid currency', function () {
         ])
         ->assertSessionHasErrors(['currency']);
 });
+
+test('storeBuildings creates buildings and auto-numbered floors', function () {
+    $hotel = Hotel::factory()->create();
+    $user = User::factory()->create([
+        'hotel_id' => $hotel->id,
+        'onboarded_at' => null,
+    ]);
+
+    $this->actingAs($user)
+        ->post('/onboarding/buildings', [
+            'buildings' => [
+                ['name' => 'Main', 'floors_count' => 3],
+                ['name' => 'Annex', 'floors_count' => 1],
+            ],
+        ])
+        ->assertRedirect('/onboarding');
+
+    expect($hotel->buildings()->count())->toBe(2);
+
+    $main = $hotel->buildings()->where('name', 'Main')->first();
+    expect($main->floors()->count())->toBe(3);
+
+    $annex = $hotel->buildings()->where('name', 'Annex')->first();
+    expect($annex->floors()->count())->toBe(1);
+});
+
+test('storeBuildings wipes and recreates if buildings already exist', function () {
+    $hotel = Hotel::factory()->create();
+    Building::factory()->count(5)->create(['hotel_id' => $hotel->id]);
+
+    $user = User::factory()->create([
+        'hotel_id' => $hotel->id,
+        'onboarded_at' => null,
+    ]);
+
+    $this->actingAs($user)
+        ->post('/onboarding/buildings', [
+            'buildings' => [
+                ['name' => 'Only', 'floors_count' => 1],
+            ],
+        ])
+        ->assertRedirect('/onboarding');
+
+    expect($hotel->buildings()->count())->toBe(1);
+});
+
+test('storeBuildings rejects empty buildings array', function () {
+    $hotel = Hotel::factory()->create();
+    $user = User::factory()->create([
+        'hotel_id' => $hotel->id,
+        'onboarded_at' => null,
+    ]);
+
+    $this->actingAs($user)
+        ->post('/onboarding/buildings', ['buildings' => []])
+        ->assertSessionHasErrors(['buildings']);
+});
+
+test('storeBuildings caps floors_count at 20', function () {
+    $hotel = Hotel::factory()->create();
+    $user = User::factory()->create([
+        'hotel_id' => $hotel->id,
+        'onboarded_at' => null,
+    ]);
+
+    $this->actingAs($user)
+        ->post('/onboarding/buildings', [
+            'buildings' => [['name' => 'X', 'floors_count' => 21]],
+        ])
+        ->assertSessionHasErrors(['buildings.0.floors_count']);
+});
