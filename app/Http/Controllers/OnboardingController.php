@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Onboarding\StoreOnboardingHotelRequest;
+use App\Models\Hotel;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -41,8 +43,20 @@ class OnboardingController extends Controller
         ]);
     }
 
-    public function storeHotel(Request $request): RedirectResponse
+    public function storeHotel(StoreOnboardingHotelRequest $request): RedirectResponse
     {
+        $hotel = Hotel::create([
+            'name' => $request->string('name'),
+            'email' => $request->string('email'),
+            'phone' => $request->string('phone'),
+            'cvr' => $request->string('cvr'),
+            'address' => $request->string('address'),
+            'currency' => $request->string('currency'),
+            'domain' => '',
+        ]);
+
+        $request->user()->update(['hotel_id' => $hotel->id]);
+
         return redirect()->route('onboarding.show');
     }
 

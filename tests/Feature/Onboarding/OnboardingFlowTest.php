@@ -109,3 +109,57 @@ test('show passes hotel, buildings with floors, and categories to props', functi
             ->has('categories')
         );
 });
+
+test('storeHotel creates a hotel and links it to the user', function () {
+    $user = User::factory()->create([
+        'hotel_id' => null,
+        'onboarded_at' => null,
+    ]);
+
+    $this->actingAs($user)
+        ->post('/onboarding/hotel', [
+            'name' => 'Aurora Stay',
+            'email' => 'hello@aurora.test',
+            'phone' => '+45 12 34 56 78',
+            'cvr' => 'DK12345678',
+            'address' => 'Hovedgaden 1, Copenhagen',
+            'currency' => 'DKK',
+        ])
+        ->assertRedirect('/onboarding');
+
+    $user->refresh();
+
+    expect($user->hotel_id)->not->toBeNull();
+    expect($user->onboarded_at)->toBeNull();
+    expect($user->hotel->name)->toBe('Aurora Stay');
+    expect($user->hotel->currency)->toBe('DKK');
+});
+
+test('storeHotel rejects missing fields', function () {
+    $user = User::factory()->create([
+        'hotel_id' => null,
+        'onboarded_at' => null,
+    ]);
+
+    $this->actingAs($user)
+        ->post('/onboarding/hotel', [])
+        ->assertSessionHasErrors(['name', 'email', 'phone', 'cvr', 'address', 'currency']);
+});
+
+test('storeHotel rejects invalid currency', function () {
+    $user = User::factory()->create([
+        'hotel_id' => null,
+        'onboarded_at' => null,
+    ]);
+
+    $this->actingAs($user)
+        ->post('/onboarding/hotel', [
+            'name' => 'Test',
+            'email' => 'a@b.test',
+            'phone' => '12345',
+            'cvr' => 'X',
+            'address' => 'Y',
+            'currency' => 'BTC',
+        ])
+        ->assertSessionHasErrors(['currency']);
+});
