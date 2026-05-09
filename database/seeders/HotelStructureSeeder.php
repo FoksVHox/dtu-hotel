@@ -76,7 +76,6 @@ class HotelStructureSeeder extends Seeder
                             'building_id' => $building->id,
                             'floor_id' => $floor->id,
                             'room_category_id' => $categories->random()->id,
-                            'code' => $f * 100 + $r,
                         ]);
 
                         // Pivot accessories (1-4 accessories pr. rum)

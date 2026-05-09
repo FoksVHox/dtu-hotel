@@ -25,7 +25,6 @@ class RoomFactory extends Factory
             'building_id' => Building::factory(),
             'floor_id' => Floor::factory(),
             'room_category_id' => RoomCategory::factory(),
-            'code' => fake()->unique()->numerify('###'),
             'status' => RoomStatus::Available,
         ];
     }

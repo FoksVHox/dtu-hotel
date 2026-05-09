@@ -4,10 +4,6 @@ use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\Guest;
 use App\Models\Room;
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 test('unauthenticated users cannot update bookings', function () {
     $booking = Booking::factory()->create();
@@ -17,12 +13,13 @@ test('unauthenticated users cannot update bookings', function () {
 });
 
 test('a booking can be updated with new dates and status', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $room = Room::factory()->create();
-    $guest = Guest::factory()->create();
+    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
 
     $booking = Booking::factory()->create([
+        'hotel_id' => $user->hotel_id,
         'start' => now()->addDay()->setTime(14, 0),
         'end' => now()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Pending,
@@ -50,12 +47,13 @@ test('a booking can be updated with new dates and status', function () {
 });
 
 test('updating a booking syncs rooms', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $rooms = Room::factory()->count(3)->create();
-    $guest = Guest::factory()->create();
+    $rooms = Room::factory()->count(3)->create(['hotel_id' => $user->hotel_id]);
+    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
 
     $booking = Booking::factory()->create([
+        'hotel_id' => $user->hotel_id,
         'start' => now()->addDay()->setTime(14, 0),
         'end' => now()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Confirmed,
@@ -63,7 +61,7 @@ test('updating a booking syncs rooms', function () {
     $booking->rooms()->attach($rooms->pluck('id'));
     $booking->guests()->attach($guest);
 
-    $newRooms = Room::factory()->count(2)->create();
+    $newRooms = Room::factory()->count(2)->create(['hotel_id' => $user->hotel_id]);
 
     $this->put(route('bookings.update', $booking), [
         'room_ids' => $newRooms->pluck('id')->toArray(),
@@ -82,13 +80,14 @@ test('updating a booking syncs rooms', function () {
 });
 
 test('updating a booking syncs existing guests', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $room = Room::factory()->create();
-    $originalGuest = Guest::factory()->create();
-    $newGuest = Guest::factory()->create();
+    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $originalGuest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
+    $newGuest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
 
     $booking = Booking::factory()->create([
+        'hotel_id' => $user->hotel_id,
         'start' => now()->addDay()->setTime(14, 0),
         'end' => now()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Confirmed,
@@ -112,12 +111,13 @@ test('updating a booking syncs existing guests', function () {
 });
 
 test('updating a booking can add inline new guests', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $room = Room::factory()->create();
-    $guest = Guest::factory()->create();
+    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
 
     $booking = Booking::factory()->create([
+        'hotel_id' => $user->hotel_id,
         'start' => now()->addDay()->setTime(14, 0),
         'end' => now()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Pending,
@@ -151,12 +151,13 @@ test('updating a booking can add inline new guests', function () {
 });
 
 test('updating a booking excludes itself from overlap validation', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $room = Room::factory()->create();
-    $guest = Guest::factory()->create();
+    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
 
     $booking = Booking::factory()->create([
+        'hotel_id' => $user->hotel_id,
         'start' => now()->addDay()->setTime(14, 0),
         'end' => now()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Confirmed,
@@ -179,12 +180,13 @@ test('updating a booking excludes itself from overlap validation', function () {
 });
 
 test('updating a booking rejects overlapping room bookings from other bookings', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $room = Room::factory()->create();
-    $guest = Guest::factory()->create();
+    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
 
     $otherBooking = Booking::factory()->create([
+        'hotel_id' => $user->hotel_id,
         'start' => now()->addDays(5)->setTime(14, 0),
         'end' => now()->addDays(7)->setTime(11, 0),
         'status' => BookingStatus::Confirmed,
@@ -192,6 +194,7 @@ test('updating a booking rejects overlapping room bookings from other bookings',
     $otherBooking->rooms()->attach($room);
 
     $booking = Booking::factory()->create([
+        'hotel_id' => $user->hotel_id,
         'start' => now()->addDay()->setTime(14, 0),
         'end' => now()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Pending,
@@ -210,12 +213,13 @@ test('updating a booking rejects overlapping room bookings from other bookings',
 });
 
 test('update requires at least one room', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $room = Room::factory()->create();
-    $guest = Guest::factory()->create();
+    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
 
     $booking = Booking::factory()->create([
+        'hotel_id' => $user->hotel_id,
         'start' => now()->addDay()->setTime(14, 0),
         'end' => now()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Pending,
@@ -234,12 +238,13 @@ test('update requires at least one room', function () {
 });
 
 test('update requires at least one guest', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $room = Room::factory()->create();
-    $guest = Guest::factory()->create();
+    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
 
     $booking = Booking::factory()->create([
+        'hotel_id' => $user->hotel_id,
         'start' => now()->addDay()->setTime(14, 0),
         'end' => now()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Pending,
@@ -258,12 +263,13 @@ test('update requires at least one guest', function () {
 });
 
 test('update end date must be after start date', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $room = Room::factory()->create();
-    $guest = Guest::factory()->create();
+    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
 
     $booking = Booking::factory()->create([
+        'hotel_id' => $user->hotel_id,
         'start' => now()->addDay()->setTime(14, 0),
         'end' => now()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Pending,
@@ -282,12 +288,13 @@ test('update end date must be after start date', function () {
 });
 
 test('updating a booking rejects rooms under maintenance from other bookings', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $room = Room::factory()->create();
-    $guest = Guest::factory()->create();
+    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
 
     $maintenance = Booking::factory()->create([
+        'hotel_id' => $user->hotel_id,
         'start' => now()->addDays(5)->setTime(0, 0),
         'end' => now()->addDays(10)->setTime(23, 59),
         'status' => BookingStatus::Maintenance,
@@ -295,6 +302,7 @@ test('updating a booking rejects rooms under maintenance from other bookings', f
     $maintenance->rooms()->attach($room);
 
     $booking = Booking::factory()->create([
+        'hotel_id' => $user->hotel_id,
         'start' => now()->addDay()->setTime(14, 0),
         'end' => now()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Pending,
@@ -313,12 +321,13 @@ test('updating a booking rejects rooms under maintenance from other bookings', f
 });
 
 test('updating only start with a value after existing end fails validation', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $room = Room::factory()->create();
-    $guest = Guest::factory()->create();
+    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
 
     $booking = Booking::factory()->create([
+        'hotel_id' => $user->hotel_id,
         'start' => now()->addDay()->setTime(14, 0),
         'end' => now()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Pending,
@@ -333,12 +342,13 @@ test('updating only start with a value after existing end fails validation', fun
 });
 
 test('updating only end with a value before existing start fails validation', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $room = Room::factory()->create();
-    $guest = Guest::factory()->create();
+    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
 
     $booking = Booking::factory()->create([
+        'hotel_id' => $user->hotel_id,
         'start' => now()->addDays(5)->setTime(14, 0),
         'end' => now()->addDays(7)->setTime(11, 0),
         'status' => BookingStatus::Pending,
