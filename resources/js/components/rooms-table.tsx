@@ -1,135 +1,157 @@
-import { useMemo, useState } from 'react'
-import { Pencil, Trash2, Wrench } from 'lucide-react'
-import { RoomStatusBadge } from '@/components/room-status-badge'
+import { Pencil, Trash2, Wrench } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { RoomStatusBadge } from '@/components/room-status-badge';
 
 export type Room = {
-  id: number
-  code: string
-  category: string
-  floor: number
-  status: number
-  booking_status: number | null
-  manual_status: number | null
-  room_category_id: number
-  floor_id: number
+    id: number;
+    code: string;
+    category: string;
+    floor: number;
+    status: number;
+    booking_status: number | null;
+    manual_status: number | null;
+    room_category_id: number;
+    floor_id: number;
+};
+
+type SortKey = 'code' | 'category' | 'floor' | 'status';
+
+type SortHeaderProps = {
+    label: string;
+    sortKey: SortKey;
+    activeKey: SortKey;
+    direction: 'asc' | 'desc';
+    onToggle: (key: SortKey) => void;
+};
+
+function SortHeader({ label, sortKey, activeKey, direction, onToggle }: SortHeaderProps) {
+    return (
+        <button
+            type="button"
+            onClick={() => onToggle(sortKey)}
+            className="flex items-center gap-2 transition-colors hover:text-foreground"
+        >
+            {label}
+            {activeKey === sortKey ? (
+                <span className="text-muted-foreground">{direction === 'asc' ? '↑' : '↓'}</span>
+            ) : null}
+        </button>
+    );
 }
 
-type SortKey = 'code' | 'category' | 'floor' | 'status'
+export function RoomsTable({
+    rooms,
+    onEdit,
+    onDelete,
+}: {
+    rooms: Room[];
+    onEdit?: (room: Room) => void;
+    onDelete?: (id: number) => void;
+}) {
+    const [sortKey, setSortKey] = useState<SortKey>('code');
+    const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
-export function RoomsTable({ rooms, onEdit, onDelete }: { rooms: Room[]; onEdit?: (room: Room) => void; onDelete?: (id: number) => void }) {
-  const [sortKey, setSortKey] = useState<SortKey>('code')
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
+    const sortedRooms = useMemo(() => {
+        const copy = [...rooms];
 
-  const sortedRooms = useMemo(() => {
-    const copy = [...rooms]
+        copy.sort((a, b) => {
+            const aVal = a[sortKey];
+            const bVal = b[sortKey];
 
-    copy.sort((a, b) => {
-      const aVal = a[sortKey]
-      const bVal = b[sortKey]
+            if (typeof aVal === 'number' && typeof bVal === 'number') {
+                return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
+            }
 
-      if (typeof aVal === 'number' && typeof bVal === 'number') {
-        return sortDir === 'asc' ? aVal - bVal : bVal - aVal
-      }
+            return sortDir === 'asc'
+                ? String(aVal).localeCompare(String(bVal))
+                : String(bVal).localeCompare(String(aVal));
+        });
 
-      return sortDir === 'asc'
-        ? String(aVal).localeCompare(String(bVal))
-        : String(bVal).localeCompare(String(aVal))
-    })
+        return copy;
+    }, [rooms, sortKey, sortDir]);
 
-    return copy
-  }, [rooms, sortKey, sortDir])
-
-  function toggleSort(key: SortKey) {
-    if (sortKey === key) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
-    else {
-      setSortKey(key)
-      setSortDir('asc')
+    function toggleSort(key: SortKey) {
+        if (sortKey === key) {
+            setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+        } else {
+            setSortKey(key);
+            setSortDir('asc');
+        }
     }
-  }
 
-  if (!rooms.length) {
+    if (!rooms.length) {
+        return (
+            <div className="rounded-xl border border-white/10 p-6 text-sm text-white/60">
+                No rooms exist yet
+            </div>
+        );
+    }
+
     return (
-      <div className="rounded-xl border border-white/10 p-6 text-sm text-white/60">
-        No rooms exist yet
-      </div>
-    )
-  }
+        <div className="overflow-hidden rounded-xl border border-white/10">
+            <table className="w-full text-sm">
+                <thead className="bg-muted/50 text-muted-foreground">
+                    <tr>
+                        <th className="px-4 py-3 text-left">
+                            <SortHeader label="Room Code" sortKey="code" activeKey={sortKey} direction={sortDir} onToggle={toggleSort} />
+                        </th>
+                        <th className="px-4 py-3 text-left">
+                            <SortHeader label="Category" sortKey="category" activeKey={sortKey} direction={sortDir} onToggle={toggleSort} />
+                        </th>
+                        <th className="px-4 py-3 text-left">
+                            <SortHeader label="Floor" sortKey="floor" activeKey={sortKey} direction={sortDir} onToggle={toggleSort} />
+                        </th>
+                        <th className="px-4 py-3 text-left">
+                            <SortHeader label="Status" sortKey="status" activeKey={sortKey} direction={sortDir} onToggle={toggleSort} />
+                        </th>
+                        <th className="px-4 py-3 text-right">Actions</th>
+                    </tr>
+                </thead>
 
-  const Th = ({ label, k }: { label: string; k: SortKey }) => (
-    <button
-      type="button"
-      onClick={() => toggleSort(k)}
-      className="flex items-center gap-2 transition-colors hover:text-foreground" // Added hover effect to header ###DM
-    >
-      {label}
-      {sortKey === k ? (
-        <span className="text-muted-foreground">{sortDir === 'asc' ? '↑' : '↓'}</span> // Added sort direction indicator ###DM
-      ) : null}
-    </button>
-  )
+                <tbody className="divide-y divide-white/10">
+                    {sortedRooms.map((room) => (
+                        <tr key={room.id} className="hover:bg-white/5">
+                            <td className="px-4 py-3 font-medium">{room.code}</td>
+                            <td className="px-4 py-3">{room.category}</td>
+                            <td className="px-4 py-3">{room.floor}</td>
+                            <td className="px-4 py-3">
+                                <RoomStatusBadge
+                                    status={room.booking_status}
+                                    manualStatus={room.manual_status}
+                                    fallbackStatus={room.status}
+                                />
+                            </td>
+                            <td className="px-4 py-3">
+                                <div className="flex justify-end gap-2">
+                                    <button
+                                        className="rounded-md border border-white/10 p-2 hover:bg-white/5"
+                                        title="Edit"
+                                        onClick={() => onEdit?.(room)}
+                                    >
+                                        <Pencil className="h-4 w-4" />
+                                    </button>
 
-  return (
-    <div className="overflow-hidden rounded-xl border border-white/10">
-      <table className="w-full text-sm">
-        {/* DM: Added background color to the header */}
-        <thead className="bg-muted/50 text-muted-foreground">
-          <tr>
-            <th className="px-4 py-3 text-left">
-              <Th label="Room Code" k="code" />
-            </th>
-            <th className="px-4 py-3 text-left">
-              <Th label="Category" k="category" />
-            </th>
-            <th className="px-4 py-3 text-left">
-              <Th label="Status" k="status" />
-            </th>
-            <th className="px-4 py-3 text-right">Actions</th>
-          </tr>
-        </thead>
+                                    <button
+                                        className="rounded-md border border-white/10 p-2 hover:bg-white/5"
+                                        title="Maintenance"
+                                        onClick={() => console.log('maintenance', room.id)}
+                                    >
+                                        <Wrench className="h-4 w-4" />
+                                    </button>
 
-        <tbody className="divide-y divide-white/10">
-          {sortedRooms.map((room) => (
-            <tr key={room.id} className="hover:bg-white/5">
-              <td className="px-4 py-3 font-medium">{room.code}</td>
-              <td className="px-4 py-3">{room.category}</td>
-              <td className="px-4 py-3">
-                <RoomStatusBadge status={room.booking_status} manualStatus={room.manual_status} fallbackStatus={room.status} />
-                {/* <div className="flex items-center gap-2">*/}
-                  {/* <span className="text-xs text-muted-foreground">({room.status})</span> */}
-                {/* </div> */}
-              </td>
-
-              <td className="px-4 py-3">
-                <div className="flex justify-end gap-2">
-                  <button
-                    className="rounded-md border border-white/10 p-2 hover:bg-white/5"
-                    title="Edit"
-                    onClick={() => onEdit?.(room)}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </button>
-
-                  <button
-                    className="rounded-md border border-white/10 p-2 hover:bg-white/5"
-                    title="Maintenance"
-                    onClick={() => console.log('maintenance', room.id)}
-                  >
-                    <Wrench className="h-4 w-4" />
-                  </button>
-
-                  <button
-                    className="rounded-md border border-white/10 p-2 hover:bg-white/5"
-                    title="Delete"
-                    onClick={() => onDelete?.(room.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
+                                    <button
+                                        className="rounded-md border border-white/10 p-2 hover:bg-white/5"
+                                        title="Delete"
+                                        onClick={() => onDelete?.(room.id)}
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
 }
