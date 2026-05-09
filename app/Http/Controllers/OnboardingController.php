@@ -21,6 +21,14 @@ class OnboardingController extends Controller
     {
         $user = $request->user();
 
+        // Ensure default categories exist (idempotent)
+        foreach (['Single', 'Double', 'Suite', 'Family'] as $name) {
+            \App\Models\RoomCategory::firstOrCreate(
+                ['name' => $name],
+                ['description' => "{$name} room"]
+            );
+        }
+
         $hotel = $user->hotel;
         $buildings = $hotel
             ? $hotel->buildings()->with('floors')->get()
