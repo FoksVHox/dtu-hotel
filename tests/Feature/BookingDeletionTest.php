@@ -4,7 +4,6 @@ use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\Guest;
 use App\Models\Room;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -17,12 +16,13 @@ test('unauthenticated users cannot delete bookings', function () {
 });
 
 test('a booking can be deleted', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $room = Room::factory()->create();
-    $guest = Guest::factory()->create();
+    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
 
     $booking = Booking::factory()->create([
+        'hotel_id' => $user->hotel_id,
         'start' => now()->addDay()->setTime(14, 0),
         'end' => now()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Confirmed,
@@ -37,12 +37,13 @@ test('a booking can be deleted', function () {
 });
 
 test('deleting a booking removes pivot records', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $rooms = Room::factory()->count(2)->create();
-    $guests = Guest::factory()->count(2)->create();
+    $rooms = Room::factory()->count(2)->create(['hotel_id' => $user->hotel_id]);
+    $guests = Guest::factory()->count(2)->create(['hotel_id' => $user->hotel_id]);
 
     $booking = Booking::factory()->create([
+        'hotel_id' => $user->hotel_id,
         'start' => now()->addDay()->setTime(14, 0),
         'end' => now()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Confirmed,
@@ -58,12 +59,13 @@ test('deleting a booking removes pivot records', function () {
 });
 
 test('deleting a booking does not remove the guests themselves', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $room = Room::factory()->create();
-    $guest = Guest::factory()->create();
+    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
 
     $booking = Booking::factory()->create([
+        'hotel_id' => $user->hotel_id,
         'start' => now()->addDay()->setTime(14, 0),
         'end' => now()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Confirmed,
@@ -78,12 +80,13 @@ test('deleting a booking does not remove the guests themselves', function () {
 });
 
 test('deleting a booking does not remove the rooms themselves', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $room = Room::factory()->create();
-    $guest = Guest::factory()->create();
+    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
 
     $booking = Booking::factory()->create([
+        'hotel_id' => $user->hotel_id,
         'start' => now()->addDay()->setTime(14, 0),
         'end' => now()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Confirmed,
