@@ -14,7 +14,7 @@ export type Room = {
     floor_id: number;
 };
 
-type SortKey = 'code' | 'category' | 'floor' | 'status';
+type SortKey = 'code' | 'category' | 'status';
 
 type SortHeaderProps = {
     label: string;
@@ -99,9 +99,6 @@ export function RoomsTable({
                             <SortHeader label="Category" sortKey="category" activeKey={sortKey} direction={sortDir} onToggle={toggleSort} />
                         </th>
                         <th className="px-4 py-3 text-left">
-                            <SortHeader label="Floor" sortKey="floor" activeKey={sortKey} direction={sortDir} onToggle={toggleSort} />
-                        </th>
-                        <th className="px-4 py-3 text-left">
                             <SortHeader label="Status" sortKey="status" activeKey={sortKey} direction={sortDir} onToggle={toggleSort} />
                         </th>
                         <th className="px-4 py-3 text-right">Actions</th>
@@ -113,7 +110,6 @@ export function RoomsTable({
                         <tr key={room.id} className="hover:bg-white/5">
                             <td className="px-4 py-3 font-medium">{room.code}</td>
                             <td className="px-4 py-3">{room.category}</td>
-                            <td className="px-4 py-3">{room.floor}</td>
                             <td className="px-4 py-3">
                                 <RoomStatusBadge
                                     status={room.booking_status}
