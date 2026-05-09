@@ -4,7 +4,6 @@ use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\Guest;
 use App\Models\Room;
-use App\Models\User;
 use Carbon\Carbon;
 use Inertia\Testing\AssertableInertia;
 

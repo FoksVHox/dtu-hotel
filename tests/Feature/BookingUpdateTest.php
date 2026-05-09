@@ -4,9 +4,6 @@ use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\Guest;
 use App\Models\Room;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 test('unauthenticated users cannot update bookings', function () {
     $booking = Booking::factory()->create();

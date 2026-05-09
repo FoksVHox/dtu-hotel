@@ -4,6 +4,7 @@ namespace App\Http\Requests\Onboarding;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreOnboardingRoomsRequest extends FormRequest
 {
@@ -14,11 +15,13 @@ class StoreOnboardingRoomsRequest extends FormRequest
 
     public function rules(): array
     {
+        $hotelId = $this->user()->hotel_id;
+
         return [
             'rules' => ['required', 'array', 'min:1', 'max:10'],
             'rules.*.start_number' => ['required', 'integer', 'min:1'],
             'rules.*.end_number' => ['required', 'integer', 'gte:rules.*.start_number'],
-            'rules.*.floor_id' => ['required', 'integer', 'exists:floors,id'],
+            'rules.*.floor_id' => ['required', 'integer', Rule::exists('floors', 'id')->where('hotel_id', $hotelId)],
             'rules.*.category_id' => ['required', 'integer', 'exists:room_categories,id'],
         ];
     }

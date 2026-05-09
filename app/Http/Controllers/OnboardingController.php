@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\RoomStatus;
 use App\Http\Requests\Onboarding\StoreOnboardingBuildingsRequest;
 use App\Http\Requests\Onboarding\StoreOnboardingHotelRequest;
 use App\Http\Requests\Onboarding\StoreOnboardingRoomsRequest;
@@ -9,6 +10,7 @@ use App\Models\Building;
 use App\Models\Floor;
 use App\Models\Hotel;
 use App\Models\Room;
+use App\Models\RoomCategory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,7 +25,7 @@ class OnboardingController extends Controller
 
         // Ensure default categories exist (idempotent)
         foreach (['Single', 'Double', 'Suite', 'Family'] as $name) {
-            \App\Models\RoomCategory::firstOrCreate(
+            RoomCategory::firstOrCreate(
                 ['name' => $name],
                 ['description' => "{$name} room"]
             );
@@ -45,7 +47,7 @@ class OnboardingController extends Controller
             $currentStep = 3;
         }
 
-        $categories = \App\Models\RoomCategory::query()->get();
+        $categories = RoomCategory::all();
 
         return Inertia::render('onboarding/wizard', [
             'currentStep' => $currentStep,
@@ -123,7 +125,7 @@ class OnboardingController extends Controller
                         'building_id' => $floor->building_id,
                         'floor_id' => $floor->id,
                         'room_category_id' => $rule['category_id'],
-                        'status' => \App\Enums\RoomStatus::Available,
+                        'status' => RoomStatus::Available,
                     ]);
                 }
             }
@@ -134,7 +136,16 @@ class OnboardingController extends Controller
 
     public function complete(Request $request): RedirectResponse
     {
-        $request->user()->update(['onboarded_at' => now()]);
+        $user = $request->user();
+
+        // Guard: a user must own a hotel with at least one room before being
+        // marked onboarded. Without this, a direct POST to /onboarding/complete
+        // could leave a user "onboarded" with no hotel — which the global
+        // tenancy scope would then deny-all on, but better to refuse upfront.
+        abort_if($user->hotel_id === null, 422, 'You must create a hotel before completing onboarding.');
+        abort_unless($user->hotel->rooms()->exists(), 422, 'You must add at least one room before completing onboarding.');
+
+        $user->update(['onboarded_at' => now()]);
 
         return redirect()->route('dashboard')->with('status', 'Welcome to DTU Hotel — your hotel is ready.');
     }

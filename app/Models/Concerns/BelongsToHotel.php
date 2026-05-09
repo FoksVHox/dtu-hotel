@@ -16,13 +16,19 @@ trait BelongsToHotel
                 return;
             }
 
+            $column = $query->getModel()->qualifyColumn('hotel_id');
             $hotelId = auth()->user()->hotel_id ?? null;
 
+            // Authenticated user with no hotel sees nothing (deny-by-default).
+            // Use whereRaw('0=1') so the scope produces no rows even for
+            // aggregates and relationship queries.
             if ($hotelId === null) {
+                $query->whereRaw('0 = 1');
+
                 return;
             }
 
-            $query->where($query->getModel()->qualifyColumn('hotel_id'), $hotelId);
+            $query->where($column, $hotelId);
         });
 
         static::creating(function (Model $model): void {
