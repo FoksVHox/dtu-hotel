@@ -21,11 +21,24 @@ const ROOM_STATUS_CONFIG: Record<number, { label: string; className: string }> =
 
 export function RoomStatusBadge({
     status,
+    manualStatus,
     fallbackStatus,
 }: {
     status: number | null | undefined;
+    manualStatus?: number | null;
     fallbackStatus?: number;
 }) {
+    if (manualStatus != null) {
+        const cfg = BOOKING_STATUSES[manualStatus as keyof typeof BOOKING_STATUSES];
+        const className = BOOKING_STATUS_CLASSES[manualStatus];
+
+        if (!cfg || !className) {
+            return <Badge variant="outline" className="border-border text-muted-foreground">Unknown</Badge>;
+        }
+
+        return <Badge variant="outline" className={className}>{cfg.label}</Badge>;
+    }
+
     if (status != null) {
         const cfg = BOOKING_STATUSES[status as keyof typeof BOOKING_STATUSES];
         const className = BOOKING_STATUS_CLASSES[status];

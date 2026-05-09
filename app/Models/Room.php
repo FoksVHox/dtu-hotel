@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\BookingStatus;
 use App\Enums\RoomStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +20,7 @@ class Room extends Model
         'floor_id',
         'room_category_id',
         'status',
+        'manual_status',
         'scheduled_cleaning_at',
     ];
 
@@ -62,6 +64,7 @@ class Room extends Model
     {
         return [
             'status' => RoomStatus::class,
+            'manual_status' => BookingStatus::class,
             'scheduled_cleaning_at' => 'datetime',
         ];
     }

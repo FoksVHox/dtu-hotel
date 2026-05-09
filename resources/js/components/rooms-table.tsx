@@ -9,11 +9,14 @@ export type Room = {
   floor: number
   status: number
   booking_status: number | null
+  manual_status: number | null
+  room_category_id: number
+  floor_id: number
 }
 
 type SortKey = 'code' | 'category' | 'floor' | 'status'
 
-export function RoomsTable({ rooms, onDelete }: { rooms: Room[]; onDelete?: (id: number) => void }) {
+export function RoomsTable({ rooms, onEdit, onDelete }: { rooms: Room[]; onEdit?: (room: Room) => void; onDelete?: (id: number) => void }) {
   const [sortKey, setSortKey] = useState<SortKey>('code')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
 
@@ -90,7 +93,7 @@ export function RoomsTable({ rooms, onDelete }: { rooms: Room[]; onDelete?: (id:
               <td className="px-4 py-3 font-medium">{room.code}</td>
               <td className="px-4 py-3">{room.category}</td>
               <td className="px-4 py-3">
-                <RoomStatusBadge status={room.booking_status} fallbackStatus={room.status} />
+                <RoomStatusBadge status={room.booking_status} manualStatus={room.manual_status} fallbackStatus={room.status} />
                 {/* <div className="flex items-center gap-2">*/}
                   {/* <span className="text-xs text-muted-foreground">({room.status})</span> */}
                 {/* </div> */}
@@ -101,7 +104,7 @@ export function RoomsTable({ rooms, onDelete }: { rooms: Room[]; onDelete?: (id:
                   <button
                     className="rounded-md border border-white/10 p-2 hover:bg-white/5"
                     title="Edit"
-                    onClick={() => console.log('edit', room.id)}
+                    onClick={() => onEdit?.(room)}
                   >
                     <Pencil className="h-4 w-4" />
                   </button>
