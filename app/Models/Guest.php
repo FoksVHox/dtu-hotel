@@ -2,17 +2,15 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToHotel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Guest extends Model
 {
-    use BelongsToHotel, HasFactory;
+    use HasFactory;
 
     protected $fillable = [
-        'hotel_id',
         'first_name',
         'last_name',
         'phone',

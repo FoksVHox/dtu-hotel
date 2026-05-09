@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Hotel;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -57,18 +56,5 @@ class UserFactory extends Factory
             'two_factor_recovery_codes' => encrypt(json_encode(['recovery-code-1'])),
             'two_factor_confirmed_at' => now(),
         ]);
-    }
-
-    /**
-     * Indicate the user has finished onboarding and owns a hotel.
-     */
-    public function onboarded(): static
-    {
-        return $this->state(function (array $attributes) {
-            return [
-                'hotel_id' => Hotel::factory(),
-                'onboarded_at' => now(),
-            ];
-        });
     }
 }

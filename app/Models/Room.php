@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\BookingStatus;
 use App\Enums\RoomStatus;
-use App\Models\Concerns\BelongsToHotel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Room extends Model
 {
-    use BelongsToHotel, HasFactory;
+    use HasFactory;
 
     protected $fillable = [
         'hotel_id',
@@ -25,6 +24,11 @@ class Room extends Model
         'manual_status',
         'scheduled_cleaning_at',
     ];
+
+    public function hotel(): BelongsTo
+    {
+        return $this->belongsTo(Hotel::class);
+    }
 
     public function building(): BelongsTo
     {

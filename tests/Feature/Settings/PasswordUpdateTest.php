@@ -1,19 +1,23 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
 test('password update page is displayed', function () {
-    $this->actingAsHotelUser();
+    $user = User::factory()->create();
 
-    $response = $this->get(route('user-password.edit'));
+    $response = $this
+        ->actingAs($user)
+        ->get(route('user-password.edit'));
 
     $response->assertOk();
 });
 
 test('password can be updated', function () {
-    $user = $this->actingAsHotelUser();
+    $user = User::factory()->create();
 
     $response = $this
+        ->actingAs($user)
         ->from(route('user-password.edit'))
         ->put(route('user-password.update'), [
             'current_password' => 'password',
@@ -29,9 +33,10 @@ test('password can be updated', function () {
 });
 
 test('correct password must be provided to update password', function () {
-    $this->actingAsHotelUser();
+    $user = User::factory()->create();
 
     $response = $this
+        ->actingAs($user)
         ->from(route('user-password.edit'))
         ->put(route('user-password.update'), [
             'current_password' => 'wrong-password',

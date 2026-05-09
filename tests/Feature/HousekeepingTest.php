@@ -5,6 +5,7 @@ use App\Enums\RoomStatus;
 use App\Models\Booking;
 use App\Models\MaintenanceLog;
 use App\Models\Room;
+use App\Models\User;
 
 // ── Authentication ────────────────────────────────────────────────────────────
 
@@ -25,10 +26,10 @@ test('unauthenticated users cannot update a room', function () {
 // ── Issue #48: Auto-trigger Cleaning on checkout ──────────────────────────────
 
 test('checking out a booking sets attached rooms to Cleaning', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $rooms = Room::factory()->count(2)->create(['hotel_id' => $user->hotel_id, 'status' => RoomStatus::Occupied]);
-    $booking = Booking::factory()->create(['hotel_id' => $user->hotel_id, 'status' => BookingStatus::CheckedIn]);
+    $rooms = Room::factory()->count(2)->create(['status' => RoomStatus::Occupied]);
+    $booking = Booking::factory()->create(['status' => BookingStatus::CheckedIn]);
     $booking->rooms()->attach($rooms->pluck('id'));
 
     $this->patch(route('bookings.update', $booking), [
@@ -41,10 +42,10 @@ test('checking out a booking sets attached rooms to Cleaning', function () {
 });
 
 test('checking in a booking sets attached rooms to Occupied', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $rooms = Room::factory()->count(2)->create(['hotel_id' => $user->hotel_id, 'status' => RoomStatus::Available]);
-    $booking = Booking::factory()->create(['hotel_id' => $user->hotel_id, 'status' => BookingStatus::Confirmed]);
+    $rooms = Room::factory()->count(2)->create(['status' => RoomStatus::Available]);
+    $booking = Booking::factory()->create(['status' => BookingStatus::Confirmed]);
     $booking->rooms()->attach($rooms->pluck('id'));
 
     $this->patch(route('bookings.update', $booking), [
@@ -57,10 +58,10 @@ test('checking in a booking sets attached rooms to Occupied', function () {
 });
 
 test('cancelling a booking sets attached rooms to Available', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $rooms = Room::factory()->count(2)->create(['hotel_id' => $user->hotel_id, 'status' => RoomStatus::Occupied]);
-    $booking = Booking::factory()->create(['hotel_id' => $user->hotel_id, 'status' => BookingStatus::Confirmed]);
+    $rooms = Room::factory()->count(2)->create(['status' => RoomStatus::Occupied]);
+    $booking = Booking::factory()->create(['status' => BookingStatus::Confirmed]);
     $booking->rooms()->attach($rooms->pluck('id'));
 
     $this->patch(route('bookings.update', $booking), [
@@ -73,10 +74,10 @@ test('cancelling a booking sets attached rooms to Available', function () {
 });
 
 test('booking statuses without room transitions do not change room status', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id, 'status' => RoomStatus::Available]);
-    $booking = Booking::factory()->create(['hotel_id' => $user->hotel_id, 'status' => BookingStatus::Pending]);
+    $room = Room::factory()->create(['status' => RoomStatus::Available]);
+    $booking = Booking::factory()->create(['status' => BookingStatus::Pending]);
     $booking->rooms()->attach($room);
 
     $this->patch(route('bookings.update', $booking), [
@@ -89,9 +90,9 @@ test('booking statuses without room transitions do not change room status', func
 // ── Issue #49: Mark room as cleaned ──────────────────────────────────────────
 
 test('marking a cleaning room as clean sets status to Available', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id, 'status' => RoomStatus::Cleaning]);
+    $room = Room::factory()->create(['status' => RoomStatus::Cleaning]);
 
     $this->patch(route('rooms.update', $room), [
         'status' => RoomStatus::Available->value,
@@ -101,9 +102,9 @@ test('marking a cleaning room as clean sets status to Available', function () {
 });
 
 test('marking a cleaning room as clean creates a MaintenanceLog record', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id, 'status' => RoomStatus::Cleaning]);
+    $room = Room::factory()->create(['status' => RoomStatus::Cleaning]);
 
     $this->patch(route('rooms.update', $room), [
         'status' => RoomStatus::Available->value,
@@ -117,9 +118,9 @@ test('marking a cleaning room as clean creates a MaintenanceLog record', functio
 });
 
 test('marking a non-cleaning room as available does not create a MaintenanceLog', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id, 'status' => RoomStatus::Available]);
+    $room = Room::factory()->create(['status' => RoomStatus::Available]);
 
     $this->patch(route('rooms.update', $room), [
         'status' => RoomStatus::Available->value,
@@ -131,9 +132,9 @@ test('marking a non-cleaning room as available does not create a MaintenanceLog'
 // ── Issue #50: Schedule cleaning time ────────────────────────────────────────
 
 test('assigning a scheduled_cleaning_at persists to the room', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id, 'status' => RoomStatus::Cleaning]);
+    $room = Room::factory()->create(['status' => RoomStatus::Cleaning]);
     $scheduledAt = now()->addHours(2)->toDateTimeString();
 
     $this->patch(route('rooms.update', $room), [
@@ -146,11 +147,11 @@ test('assigning a scheduled_cleaning_at persists to the room', function () {
 // ── Issue #47: Maintenance page ───────────────────────────────────────────────
 
 test('maintenance page returns only rooms with Cleaning status', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $cleaningRoom = Room::factory()->create(['hotel_id' => $user->hotel_id, 'status' => RoomStatus::Cleaning]);
-    Room::factory()->create(['hotel_id' => $user->hotel_id, 'status' => RoomStatus::Available]);
-    Room::factory()->create(['hotel_id' => $user->hotel_id, 'status' => RoomStatus::Occupied]);
+    $cleaningRoom = Room::factory()->create(['status' => RoomStatus::Cleaning]);
+    Room::factory()->create(['status' => RoomStatus::Available]);
+    Room::factory()->create(['status' => RoomStatus::Occupied]);
 
     $response = $this->get(route('maintenance.index'));
 
@@ -163,9 +164,9 @@ test('maintenance page returns only rooms with Cleaning status', function () {
 });
 
 test('maintenance page returns empty when no rooms are cleaning', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    Room::factory()->create(['hotel_id' => $user->hotel_id, 'status' => RoomStatus::Available]);
+    Room::factory()->create(['status' => RoomStatus::Available]);
 
     $response = $this->get(route('maintenance.index'));
 

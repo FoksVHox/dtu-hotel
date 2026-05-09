@@ -4,6 +4,7 @@ use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\Guest;
 use App\Models\Room;
+use App\Models\User;
 
 test('unauthenticated users cannot create bookings', function () {
     $this->post(route('bookings.store'))
@@ -11,10 +12,10 @@ test('unauthenticated users cannot create bookings', function () {
 });
 
 test('a booking can be created with rooms and existing guests', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $rooms = Room::factory()->count(2)->create(['hotel_id' => $user->hotel_id]);
-    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
+    $rooms = Room::factory()->count(2)->create();
+    $guest = Guest::factory()->create();
 
     $this->post(route('bookings.store'), [
         'room_ids' => $rooms->pluck('id')->toArray(),
@@ -35,9 +36,9 @@ test('a booking can be created with rooms and existing guests', function () {
 });
 
 test('a booking can be created with inline new guests', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
 
     $this->post(route('bookings.store'), [
         'room_ids' => [$room->id],
@@ -67,10 +68,10 @@ test('a booking can be created with inline new guests', function () {
 });
 
 test('a booking can have both existing and new guests', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
-    $existingGuest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
+    $existingGuest = Guest::factory()->create();
 
     $this->post(route('bookings.store'), [
         'room_ids' => [$room->id],
@@ -94,10 +95,10 @@ test('a booking can have both existing and new guests', function () {
 });
 
 test('a booking can have multiple rooms', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $rooms = Room::factory()->count(3)->create(['hotel_id' => $user->hotel_id]);
-    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
+    $rooms = Room::factory()->count(3)->create();
+    $guest = Guest::factory()->create();
 
     $this->post(route('bookings.store'), [
         'room_ids' => $rooms->pluck('id')->toArray(),
@@ -114,7 +115,7 @@ test('a booking can have multiple rooms', function () {
 });
 
 test('booking creation requires at least one room', function () {
-    $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
     $this->post(route('bookings.store'), [
         'room_ids' => [],
@@ -127,9 +128,9 @@ test('booking creation requires at least one room', function () {
 });
 
 test('booking creation requires start and end dates', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
 
     $this->post(route('bookings.store'), [
         'room_ids' => [$room->id],
@@ -142,9 +143,9 @@ test('booking creation requires start and end dates', function () {
 });
 
 test('booking end date must be after start date', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
 
     $this->post(route('bookings.store'), [
         'room_ids' => [$room->id],
@@ -157,9 +158,9 @@ test('booking end date must be after start date', function () {
 });
 
 test('booking creation requires a valid status', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
 
     $this->post(route('bookings.store'), [
         'room_ids' => [$room->id],
@@ -172,7 +173,7 @@ test('booking creation requires a valid status', function () {
 });
 
 test('booking creation validates room ids exist', function () {
-    $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
     $this->post(route('bookings.store'), [
         'room_ids' => [99999],
@@ -185,9 +186,9 @@ test('booking creation validates room ids exist', function () {
 });
 
 test('booking creation validates guest ids exist', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
 
     $this->post(route('bookings.store'), [
         'room_ids' => [$room->id],
@@ -200,9 +201,9 @@ test('booking creation validates guest ids exist', function () {
 });
 
 test('booking creation requires at least one guest', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
 
     $this->post(route('bookings.store'), [
         'room_ids' => [$room->id],
@@ -215,13 +216,12 @@ test('booking creation requires at least one guest', function () {
 });
 
 test('booking creation rejects overlapping room bookings', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
-    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
+    $guest = Guest::factory()->create();
 
     $existing = Booking::factory()->create([
-        'hotel_id' => $user->hotel_id,
         'start' => now()->addDay()->setTime(14, 0),
         'end' => now()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Confirmed,
@@ -239,13 +239,12 @@ test('booking creation rejects overlapping room bookings', function () {
 });
 
 test('booking creation allows non-overlapping dates for the same room', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
-    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
+    $guest = Guest::factory()->create();
 
     $existing = Booking::factory()->create([
-        'hotel_id' => $user->hotel_id,
         'start' => now()->addDay()->setTime(14, 0),
         'end' => now()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Confirmed,
@@ -265,13 +264,12 @@ test('booking creation allows non-overlapping dates for the same room', function
 });
 
 test('booking creation ignores cancelled bookings for overlap check', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
-    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
+    $guest = Guest::factory()->create();
 
     $cancelled = Booking::factory()->create([
-        'hotel_id' => $user->hotel_id,
         'start' => now()->addDay()->setTime(14, 0),
         'end' => now()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Cancelled,
@@ -291,13 +289,12 @@ test('booking creation ignores cancelled bookings for overlap check', function (
 });
 
 test('booking creation rejects rooms under maintenance', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
-    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
+    $guest = Guest::factory()->create();
 
     $maintenance = Booking::factory()->create([
-        'hotel_id' => $user->hotel_id,
         'start' => now()->addDay()->setTime(0, 0),
         'end' => now()->addDays(5)->setTime(23, 59),
         'status' => BookingStatus::Maintenance,
@@ -322,10 +319,10 @@ test('unauthenticated users cannot search guests', function () {
 });
 
 test('guest search returns matching guests by name', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    Guest::factory()->create(['hotel_id' => $user->hotel_id, 'first_name' => 'Alice', 'last_name' => 'Johnson']);
-    Guest::factory()->create(['hotel_id' => $user->hotel_id, 'first_name' => 'Bob', 'last_name' => 'Smith']);
+    Guest::factory()->create(['first_name' => 'Alice', 'last_name' => 'Johnson']);
+    Guest::factory()->create(['first_name' => 'Bob', 'last_name' => 'Smith']);
 
     $response = $this->get(route('guests.search', ['q' => 'Alice']));
 
@@ -337,10 +334,10 @@ test('guest search returns matching guests by name', function () {
 });
 
 test('guest search returns matching guests by email', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    Guest::factory()->create(['hotel_id' => $user->hotel_id, 'email' => 'unique-test@example.com']);
-    Guest::factory()->create(['hotel_id' => $user->hotel_id, 'email' => 'other@example.com']);
+    Guest::factory()->create(['email' => 'unique-test@example.com']);
+    Guest::factory()->create(['email' => 'other@example.com']);
 
     $response = $this->get(route('guests.search', ['q' => 'unique-test']));
 
@@ -352,9 +349,9 @@ test('guest search returns matching guests by email', function () {
 });
 
 test('guest search returns empty for empty query', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    Guest::factory()->create(['hotel_id' => $user->hotel_id, 'first_name' => 'Alice']);
+    Guest::factory()->create(['first_name' => 'Alice']);
 
     $response = $this->get(route('guests.search', ['q' => '']));
 
@@ -363,10 +360,10 @@ test('guest search returns empty for empty query', function () {
 });
 
 test('guest search returns results for single character query', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    Guest::factory()->create(['hotel_id' => $user->hotel_id, 'first_name' => 'Zoe', 'last_name' => 'Zenith', 'email' => 'zoe@test.com']);
-    Guest::factory()->create(['hotel_id' => $user->hotel_id, 'first_name' => 'Bob', 'last_name' => 'Smith', 'email' => 'bob@test.com']);
+    Guest::factory()->create(['first_name' => 'Zoe', 'last_name' => 'Zenith', 'email' => 'zoe@test.com']);
+    Guest::factory()->create(['first_name' => 'Bob', 'last_name' => 'Smith', 'email' => 'bob@test.com']);
 
     $response = $this->get(route('guests.search', ['q' => 'Z']));
 
@@ -378,10 +375,10 @@ test('guest search returns results for single character query', function () {
 });
 
 test('guest search is case-insensitive', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    Guest::factory()->create(['hotel_id' => $user->hotel_id, 'first_name' => 'Harley', 'last_name' => 'Walker', 'email' => 'harley@example.com']);
-    Guest::factory()->create(['hotel_id' => $user->hotel_id, 'first_name' => 'Yasmine', 'last_name' => 'Dicki', 'email' => 'yasmine@example.com']);
+    Guest::factory()->create(['first_name' => 'Harley', 'last_name' => 'Walker', 'email' => 'harley@example.com']);
+    Guest::factory()->create(['first_name' => 'Yasmine', 'last_name' => 'Dicki', 'email' => 'yasmine@example.com']);
 
     $response = $this->get(route('guests.search', ['q' => 'h']));
     $results = $response->json();
@@ -398,9 +395,9 @@ test('guest search is case-insensitive', function () {
 });
 
 test('guest search returns all matching results', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    Guest::factory()->count(15)->create(['hotel_id' => $user->hotel_id, 'first_name' => 'TestName']);
+    Guest::factory()->count(15)->create(['first_name' => 'TestName']);
 
     $response = $this->get(route('guests.search', ['q' => 'TestName']));
 
@@ -409,10 +406,10 @@ test('guest search returns all matching results', function () {
 });
 
 test('guest search prioritises names starting with query over names containing it', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    Guest::factory()->create(['hotel_id' => $user->hotel_id, 'first_name' => 'Alfredo', 'last_name' => 'Kuvalis', 'email' => 'alfredo@example.com']);
-    Guest::factory()->create(['hotel_id' => $user->hotel_id, 'first_name' => 'Rebecca', 'last_name' => 'Taylor', 'email' => 'rebecca@example.com']);
+    Guest::factory()->create(['first_name' => 'Alfredo', 'last_name' => 'Kuvalis', 'email' => 'alfredo@example.com']);
+    Guest::factory()->create(['first_name' => 'Rebecca', 'last_name' => 'Taylor', 'email' => 'rebecca@example.com']);
 
     $response = $this->get(route('guests.search', ['q' => 're']));
 

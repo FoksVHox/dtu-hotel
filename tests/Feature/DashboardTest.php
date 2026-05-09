@@ -4,6 +4,7 @@ use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\Guest;
 use App\Models\Room;
+use App\Models\User;
 use Carbon\Carbon;
 use Inertia\Testing\AssertableInertia;
 
@@ -13,16 +14,16 @@ test('guests are redirected to the login page', function () {
 });
 
 test('authenticated users can visit the dashboard', function () {
-    $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
     $response = $this->get(route('dashboard'));
     $response->assertOk();
 });
 
 test('dashboard returns rooms with room category and floor', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
 
     $this->get(route('dashboard'))
         ->assertOk()
@@ -44,15 +45,14 @@ test('dashboard returns rooms with room category and floor', function () {
 });
 
 test('dashboard returns bookings with guests and rooms for the current week', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
-    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
+    $guest = Guest::factory()->create();
 
     $weekStart = now()->startOfWeek();
 
     $booking = Booking::factory()->create([
-        'hotel_id' => $user->hotel_id,
         'start' => $weekStart->copy()->addDay()->setTime(14, 0),
         'end' => $weekStart->copy()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Confirmed,
@@ -81,13 +81,12 @@ test('dashboard returns bookings with guests and rooms for the current week', fu
 });
 
 test('dashboard excludes cancelled bookings from the calendar', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
     $weekStart = now()->startOfWeek();
 
     $activeBooking = Booking::factory()->create([
-        'hotel_id' => $user->hotel_id,
         'start' => $weekStart->copy()->addDay()->setTime(14, 0),
         'end' => $weekStart->copy()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Confirmed,
@@ -95,7 +94,6 @@ test('dashboard excludes cancelled bookings from the calendar', function () {
     $activeBooking->rooms()->attach($room);
 
     $cancelledBooking = Booking::factory()->create([
-        'hotel_id' => $user->hotel_id,
         'start' => $weekStart->copy()->addDays(2)->setTime(14, 0),
         'end' => $weekStart->copy()->addDays(4)->setTime(11, 0),
         'status' => BookingStatus::Cancelled,
@@ -114,15 +112,13 @@ test('dashboard excludes cancelled bookings from the calendar', function () {
 });
 
 test('dashboard booking dates are serialized as datetime strings', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
 
     $booking = Booking::factory()->create([
-        'hotel_id' => $user->hotel_id,
         'start' => now()->startOfWeek()->addDay()->setTime(14, 0),
         'end' => now()->startOfWeek()->addDays(3)->setTime(11, 0),
-        'status' => BookingStatus::Confirmed,
     ]);
     $booking->rooms()->attach($room);
 
@@ -139,14 +135,13 @@ test('dashboard booking dates are serialized as datetime strings', function () {
 });
 
 test('dashboard filters bookings to the requested week', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
 
     $targetWeek = Carbon::parse('2026-03-09')->startOfWeek();
 
     $inRangeBooking = Booking::factory()->create([
-        'hotel_id' => $user->hotel_id,
         'start' => $targetWeek->copy()->addDay()->setTime(14, 0),
         'end' => $targetWeek->copy()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Confirmed,
@@ -154,7 +149,6 @@ test('dashboard filters bookings to the requested week', function () {
     $inRangeBooking->rooms()->attach($room);
 
     $outOfRangeBooking = Booking::factory()->create([
-        'hotel_id' => $user->hotel_id,
         'start' => $targetWeek->copy()->addWeeks(3)->setTime(14, 0),
         'end' => $targetWeek->copy()->addWeeks(3)->addDays(2)->setTime(11, 0),
         'status' => BookingStatus::Confirmed,
@@ -171,15 +165,14 @@ test('dashboard filters bookings to the requested week', function () {
 });
 
 test('dashboard booking rooms include room category and floor', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
-    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
+    $guest = Guest::factory()->create();
 
     $weekStart = now()->startOfWeek();
 
     $booking = Booking::factory()->create([
-        'hotel_id' => $user->hotel_id,
         'start' => $weekStart->copy()->addDay()->setTime(14, 0),
         'end' => $weekStart->copy()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Confirmed,
@@ -210,7 +203,7 @@ test('dashboard booking rooms include room category and floor', function () {
 });
 
 test('dashboard defaults to the current week when no week_start param is given', function () {
-    $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
     $this->get(route('dashboard'))
         ->assertOk()
@@ -221,10 +214,10 @@ test('dashboard defaults to the current week when no week_start param is given',
 });
 
 test('dashboard refresh returns updated bookings', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
-    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
+    $guest = Guest::factory()->create();
 
     $this->get(route('dashboard'))
         ->assertOk()
@@ -234,7 +227,6 @@ test('dashboard refresh returns updated bookings', function () {
         );
 
     $booking = Booking::factory()->create([
-        'hotel_id' => $user->hotel_id,
         'start' => now()->startOfWeek()->addDay()->setTime(14, 0),
         'end' => now()->startOfWeek()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Confirmed,
@@ -252,7 +244,7 @@ test('dashboard refresh returns updated bookings', function () {
 });
 
 test('dashboard deferred props are not in the initial response', function () {
-    $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
     $this->get(route('dashboard'))
         ->assertOk()
@@ -265,12 +257,11 @@ test('dashboard deferred props are not in the initial response', function () {
 });
 
 test('today activity counts check-ins starting today', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
 
     $booking = Booking::factory()->create([
-        'hotel_id' => $user->hotel_id,
         'start' => now()->setTime(14, 0),
         'end' => now()->addDays(2)->setTime(11, 0),
         'status' => BookingStatus::Confirmed,
@@ -292,12 +283,11 @@ test('today activity counts check-ins starting today', function () {
 });
 
 test('today activity counts check-outs ending today', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
 
     $booking = Booking::factory()->create([
-        'hotel_id' => $user->hotel_id,
         'start' => now()->subDays(2)->setTime(14, 0),
         'end' => now()->setTime(11, 0),
         'status' => BookingStatus::CheckedOut,
@@ -318,12 +308,11 @@ test('today activity counts check-outs ending today', function () {
 });
 
 test('today activity counts currently checked in guests', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
 
     $booking = Booking::factory()->create([
-        'hotel_id' => $user->hotel_id,
         'start' => now()->subDay()->setTime(14, 0),
         'end' => now()->addDay()->setTime(11, 0),
         'status' => BookingStatus::CheckedIn,
@@ -343,11 +332,11 @@ test('today activity counts currently checked in guests', function () {
 });
 
 test('today activity counts pending confirmations', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    Booking::factory()->create(['hotel_id' => $user->hotel_id, 'status' => BookingStatus::Pending]);
-    Booking::factory()->create(['hotel_id' => $user->hotel_id, 'status' => BookingStatus::Pending]);
-    Booking::factory()->create(['hotel_id' => $user->hotel_id, 'status' => BookingStatus::Confirmed]);
+    Booking::factory()->create(['status' => BookingStatus::Pending]);
+    Booking::factory()->create(['status' => BookingStatus::Pending]);
+    Booking::factory()->create(['status' => BookingStatus::Confirmed]);
 
     $this->get(route('dashboard'))
         ->assertOk()
@@ -362,12 +351,11 @@ test('today activity counts pending confirmations', function () {
 });
 
 test('room status counts occupied and available rooms', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $rooms = Room::factory()->count(3)->create(['hotel_id' => $user->hotel_id]);
+    $rooms = Room::factory()->count(3)->create();
 
     $booking = Booking::factory()->create([
-        'hotel_id' => $user->hotel_id,
         'start' => now()->subDay()->setTime(14, 0),
         'end' => now()->addDay()->setTime(11, 0),
         'status' => BookingStatus::CheckedIn,
@@ -391,12 +379,11 @@ test('room status counts occupied and available rooms', function () {
 });
 
 test('room status counts maintenance rooms', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $rooms = Room::factory()->count(4)->create(['hotel_id' => $user->hotel_id]);
+    $rooms = Room::factory()->count(4)->create();
 
     $maintenanceBooking = Booking::factory()->create([
-        'hotel_id' => $user->hotel_id,
         'start' => now()->subDay(),
         'end' => now()->addDay(),
         'status' => BookingStatus::Maintenance,
@@ -419,12 +406,11 @@ test('room status counts maintenance rooms', function () {
 });
 
 test('booking pipeline counts bookings this week and next week', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
 
     $thisWeekBooking = Booking::factory()->create([
-        'hotel_id' => $user->hotel_id,
         'start' => now()->startOfWeek()->addDay()->setTime(14, 0),
         'end' => now()->startOfWeek()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Confirmed,
@@ -432,7 +418,6 @@ test('booking pipeline counts bookings this week and next week', function () {
     $thisWeekBooking->rooms()->attach($room);
 
     $nextWeekBooking = Booking::factory()->create([
-        'hotel_id' => $user->hotel_id,
         'start' => now()->startOfWeek()->addWeek()->addDay()->setTime(14, 0),
         'end' => now()->startOfWeek()->addWeek()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Confirmed,
@@ -453,12 +438,11 @@ test('booking pipeline counts bookings this week and next week', function () {
 });
 
 test('booking pipeline excludes cancelled bookings from counts', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
 
     $activeBooking = Booking::factory()->create([
-        'hotel_id' => $user->hotel_id,
         'start' => now()->startOfWeek()->addDay()->setTime(14, 0),
         'end' => now()->startOfWeek()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Confirmed,
@@ -466,7 +450,6 @@ test('booking pipeline excludes cancelled bookings from counts', function () {
     $activeBooking->rooms()->attach($room);
 
     $cancelledBooking = Booking::factory()->create([
-        'hotel_id' => $user->hotel_id,
         'start' => now()->startOfWeek()->addDays(2)->setTime(14, 0),
         'end' => now()->startOfWeek()->addDays(4)->setTime(11, 0),
         'status' => BookingStatus::Cancelled,
@@ -487,12 +470,11 @@ test('booking pipeline excludes cancelled bookings from counts', function () {
 });
 
 test('booking pipeline shows occupancy trend between this and last week', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $room = Room::factory()->create();
 
     $lastWeekBooking = Booking::factory()->create([
-        'hotel_id' => $user->hotel_id,
         'start' => now()->startOfWeek()->subWeek()->addDay()->setTime(14, 0),
         'end' => now()->startOfWeek()->subWeek()->addDays(3)->setTime(11, 0),
         'status' => BookingStatus::Confirmed,
@@ -513,9 +495,9 @@ test('booking pipeline shows occupancy trend between this and last week', functi
 });
 
 test('statistics return zeros when no bookings exist', function () {
-    $user = $this->actingAsHotelUser();
+    $this->actingAs(User::factory()->create());
 
-    Room::factory()->count(2)->create(['hotel_id' => $user->hotel_id]);
+    Room::factory()->count(2)->create();
 
     $this->get(route('dashboard'))
         ->assertOk()
