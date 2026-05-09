@@ -25,12 +25,14 @@ class StoreBookingRequest extends FormRequest
      */
     public function rules(): array
     {
+        $hotelId = $this->user()?->hotel_id;
+
         return [
             'room_ids' => ['required', 'array', 'min:1'],
-            'room_ids.*' => ['required', 'integer', Rule::exists('rooms', 'id')],
+            'room_ids.*' => ['required', 'integer', Rule::exists('rooms', 'id')->where('hotel_id', $hotelId)],
 
             'guest_ids' => ['nullable', 'array'],
-            'guest_ids.*' => ['required', 'integer', Rule::exists('guests', 'id')],
+            'guest_ids.*' => ['required', 'integer', Rule::exists('guests', 'id')->where('hotel_id', $hotelId)],
 
             'new_guests' => ['nullable', 'array'],
             'new_guests.*.first_name' => ['required_with:new_guests', 'string', 'max:255'],

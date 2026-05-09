@@ -3,15 +3,17 @@
 namespace App\Models;
 
 use App\Enums\BookingStatus;
+use App\Models\Concerns\BelongsToHotel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Booking extends Model
 {
-    use HasFactory;
+    use BelongsToHotel, HasFactory;
 
     protected $fillable = [
+        'hotel_id',
         'start',
         'end',
         'status',
