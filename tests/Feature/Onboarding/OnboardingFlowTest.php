@@ -56,31 +56,6 @@ test('show returns step 3 when user has buildings but no rooms', function () {
         );
 });
 
-test('show returns step 4 when user has rooms but is not yet onboarded', function () {
-    $hotel = Hotel::factory()->create();
-    $building = Building::factory()->create(['hotel_id' => $hotel->id]);
-    $floor = Floor::factory()->create([
-        'hotel_id' => $hotel->id,
-        'building_id' => $building->id,
-    ]);
-    Room::factory()->create([
-        'hotel_id' => $hotel->id,
-        'building_id' => $building->id,
-        'floor_id' => $floor->id,
-    ]);
-    $user = User::factory()->create([
-        'hotel_id' => $hotel->id,
-        'onboarded_at' => null,
-    ]);
-
-    $this->actingAs($user)
-        ->get('/onboarding')
-        ->assertOk()
-        ->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('onboarding/wizard')
-            ->where('currentStep', 4)
-        );
-});
 
 test('show passes hotel, buildings with floors, and categories to props', function () {
     $hotel = Hotel::factory()->create();
@@ -119,7 +94,6 @@ test('storeHotel creates a hotel and links it to the user', function () {
     $this->actingAs($user)
         ->post('/onboarding/hotel', [
             'name' => 'Aurora Stay',
-            'email' => 'hello@aurora.test',
             'phone' => '+45 12 34 56 78',
             'cvr' => 'DK12345678',
             'address' => 'Hovedgaden 1, Copenhagen',
@@ -133,6 +107,7 @@ test('storeHotel creates a hotel and links it to the user', function () {
     expect($user->onboarded_at)->toBeNull();
     expect($user->hotel->name)->toBe('Aurora Stay');
     expect($user->hotel->currency)->toBe('DKK');
+    expect($user->hotel->email)->toBe($user->email);
 });
 
 test('storeHotel rejects missing fields', function () {
@@ -143,7 +118,7 @@ test('storeHotel rejects missing fields', function () {
 
     $this->actingAs($user)
         ->post('/onboarding/hotel', [])
-        ->assertSessionHasErrors(['name', 'email', 'phone', 'cvr', 'address', 'currency']);
+        ->assertSessionHasErrors(['name', 'phone', 'cvr', 'address', 'currency']);
 });
 
 test('storeHotel rejects invalid currency', function () {
@@ -155,7 +130,6 @@ test('storeHotel rejects invalid currency', function () {
     $this->actingAs($user)
         ->post('/onboarding/hotel', [
             'name' => 'Test',
-            'email' => 'a@b.test',
             'phone' => '12345',
             'cvr' => 'X',
             'address' => 'Y',

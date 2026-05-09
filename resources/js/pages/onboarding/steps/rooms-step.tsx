@@ -1,4 +1,4 @@
-import { useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import { Plus, X } from 'lucide-react';
 import { FormEvent } from 'react';
 
@@ -15,11 +15,10 @@ interface Rule {
 interface RoomsStepProps {
     buildings: Building[];
     categories: Category[];
-    onAdvance: () => void;
     onBack: () => void;
 }
 
-export default function RoomsStep({ buildings, categories, onAdvance, onBack }: RoomsStepProps) {
+export default function RoomsStep({ buildings, categories, onBack }: RoomsStepProps) {
     const firstFloor = buildings[0]?.floors[0]?.id ?? 0;
     const firstCategory = categories[0]?.id ?? 0;
 
@@ -43,7 +42,7 @@ export default function RoomsStep({ buildings, categories, onAdvance, onBack }: 
         e.preventDefault();
         form.post('/onboarding/rooms', {
             preserveScroll: true,
-            onSuccess: () => onAdvance(),
+            onSuccess: () => router.post('/onboarding/complete'),
         });
     };
 
@@ -92,7 +91,7 @@ export default function RoomsStep({ buildings, categories, onAdvance, onBack }: 
 
             <div className="flex items-center justify-between">
                 <button type="button" onClick={onBack} className="text-sm text-neutral-500 hover:text-black">Back</button>
-                <button type="submit" disabled={form.processing} className="h-11 rounded bg-black px-6 text-sm font-medium text-white hover:bg-neutral-800 disabled:opacity-50">Continue</button>
+                <button type="submit" disabled={form.processing} className="h-11 rounded bg-black px-6 text-sm font-medium text-white hover:bg-neutral-800 disabled:opacity-50">Finish setup</button>
             </div>
         </form>
     );

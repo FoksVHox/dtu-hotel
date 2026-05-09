@@ -15,7 +15,6 @@ class StoreOnboardingHotelRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
             'phone' => ['required', 'string', 'max:64'],
             'cvr' => ['required', 'string', 'max:64'],
             'address' => ['required', 'string', 'max:512'],

@@ -3,7 +3,6 @@ import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
 import BuildingsStep from './steps/buildings-step';
 import HotelStep from './steps/hotel-step';
-import InviteStep from './steps/invite-step';
 import RoomsStep from './steps/rooms-step';
 import WizardStepper from './wizard-stepper';
 
@@ -59,8 +58,7 @@ export default function Wizard({ currentStep: initialStep, hotel, buildings, cat
 
                     {step === 1 && <HotelStep hotel={hotel} onAdvance={() => setStep(2)} />}
                     {step === 2 && <BuildingsStep buildings={buildings} onAdvance={() => setStep(3)} onBack={() => setStep(1)} />}
-                    {step === 3 && <RoomsStep buildings={buildings} categories={categories} onAdvance={() => setStep(4)} onBack={() => setStep(2)} />}
-                    {step === 4 && <InviteStep onBack={() => setStep(3)} />}
+                    {step === 3 && <RoomsStep buildings={buildings} categories={categories} onBack={() => setStep(2)} />}
                 </main>
             </div>
         </>

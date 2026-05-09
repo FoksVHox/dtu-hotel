@@ -4,7 +4,6 @@ const STEPS = [
     { id: 1, label: 'Hotel' },
     { id: 2, label: 'Buildings' },
     { id: 3, label: 'Rooms' },
-    { id: 4, label: 'Invite' },
 ];
 
 export default function WizardStepper({ currentStep }: { currentStep: number }) {

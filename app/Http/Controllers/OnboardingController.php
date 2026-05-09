@@ -41,10 +41,8 @@ class OnboardingController extends Controller
             $currentStep = 1;
         } elseif ($buildings->isEmpty()) {
             $currentStep = 2;
-        } elseif ($rooms->isEmpty()) {
-            $currentStep = 3;
         } else {
-            $currentStep = 4;
+            $currentStep = 3;
         }
 
         $categories = \App\Models\RoomCategory::query()->get();
@@ -61,7 +59,7 @@ class OnboardingController extends Controller
     {
         $hotel = Hotel::create([
             'name' => $request->string('name'),
-            'email' => $request->string('email'),
+            'email' => $request->user()->email,
             'phone' => $request->string('phone'),
             'cvr' => $request->string('cvr'),
             'address' => $request->string('address'),

@@ -4,7 +4,6 @@ import { FormEvent } from 'react';
 interface Hotel {
     id: number;
     name: string;
-    email: string;
     phone: string;
     cvr: string;
     address: string;
@@ -19,7 +18,6 @@ interface HotelStepProps {
 export default function HotelStep({ hotel, onAdvance }: HotelStepProps) {
     const form = useForm({
         name: hotel?.name ?? '',
-        email: hotel?.email ?? '',
         phone: hotel?.phone ?? '',
         cvr: hotel?.cvr ?? '',
         address: hotel?.address ?? '',
@@ -44,9 +42,6 @@ export default function HotelStep({ hotel, onAdvance }: HotelStepProps) {
             <div className="grid grid-cols-1 gap-4">
                 <Field label="Hotel name" error={form.errors.name}>
                     <input type="text" value={form.data.name} onChange={(e) => form.setData('name', e.target.value)} className="h-11 rounded border border-neutral-300 px-3 focus:border-black focus:outline-none focus:ring-1 focus:ring-black" />
-                </Field>
-                <Field label="Contact email" error={form.errors.email}>
-                    <input type="email" value={form.data.email} onChange={(e) => form.setData('email', e.target.value)} className="h-11 rounded border border-neutral-300 px-3 focus:border-black focus:outline-none focus:ring-1 focus:ring-black" />
                 </Field>
                 <Field label="Phone" error={form.errors.phone}>
                     <input type="tel" value={form.data.phone} onChange={(e) => form.setData('phone', e.target.value)} className="h-11 rounded border border-neutral-300 px-3 focus:border-black focus:outline-none focus:ring-1 focus:ring-black" />
