@@ -1,4 +1,5 @@
 import { Head } from '@inertiajs/react';
+import Features from './landing/features';
 import Hero from './landing/hero';
 
 interface WelcomeProps {
@@ -11,6 +12,7 @@ export default function Welcome({ canRegister }: WelcomeProps) {
             <Head title="DTU Hotel" />
             <main className="min-h-screen bg-white text-black">
                 <Hero canRegister={canRegister} />
+                <Features />
             </main>
         </>
     );
