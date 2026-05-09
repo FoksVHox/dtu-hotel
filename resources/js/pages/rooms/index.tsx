@@ -1,6 +1,7 @@
 import { Head, router } from '@inertiajs/react';
 import { AlertTriangle, Building2, CalendarDays, CheckCircle, DoorOpen, Layers, Plus, Search, Sparkles, Wrench } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 import { destroy as destroyRoom, store as storeRoom, update as updateRoom } from '@/actions/App/Http/Controllers/RoomController';
 import { ROOM_STATUS_CONFIG, STATUS_CONFIG } from '@/components/room-status-badge';
 import { RoomsTable, type Room } from '@/components/rooms-table';
@@ -210,14 +211,21 @@ export default function RoomsIndex({
                 onSuccess: () => {
                     setEditRoom(null);
                     setIsEditSaving(false);
+                    toast.success('Room updated successfully.');
                 },
-                onError: () => setIsEditSaving(false),
+                onError: () => {
+                    setIsEditSaving(false);
+                    toast.error('Failed to update room.');
+                },
             },
         );
     }
 
     function handleDeleteRoom(roomId: number): void {
-        router.delete(destroyRoom({ room: roomId }).url);
+        router.delete(destroyRoom({ room: roomId }).url, {
+            onSuccess: () => toast.success('Room deleted.'),
+            onError: () => toast.error('Failed to delete room.'),
+        });
     }
 
     const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
@@ -253,9 +261,14 @@ export default function RoomsIndex({
 
     function handleToggleMaintenance(room: Room): void {
         const nextStatus = room.status === 3 ? 0 : 3;
+        const message = nextStatus === 3 ? 'Room marked as out of order.' : 'Room marked as available.';
         router.patch(
             updateRoom({ room: room.id }).url,
             { status: nextStatus, manual_status: null },
+            {
+                onSuccess: () => toast.success(message),
+                onError: () => toast.error('Failed to update room status.'),
+            },
         );
     }
 
@@ -278,7 +291,9 @@ export default function RoomsIndex({
                 onSuccess: () => {
                     setIsAddRoomOpen(false);
                     resetForm();
+                    toast.success('Room added successfully.');
                 },
+                onError: () => toast.error('Failed to add room.'),
             },
         );
     }
