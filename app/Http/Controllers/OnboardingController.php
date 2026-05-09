@@ -128,6 +128,8 @@ class OnboardingController extends Controller
 
     public function complete(Request $request): RedirectResponse
     {
-        return redirect()->route('dashboard');
+        $request->user()->update(['onboarded_at' => now()]);
+
+        return redirect()->route('dashboard')->with('status', 'Welcome to DTU Hotel — your hotel is ready.');
     }
 }

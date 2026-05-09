@@ -358,3 +358,29 @@ test('storeRooms wipes and recreates if rooms already exist', function () {
 
     expect($hotel->rooms()->count())->toBe(3);
 });
+
+test('complete sets onboarded_at and redirects to dashboard', function () {
+    $hotel = Hotel::factory()->create();
+    $building = Building::factory()->create(['hotel_id' => $hotel->id]);
+    $floor = Floor::factory()->create([
+        'hotel_id' => $hotel->id,
+        'building_id' => $building->id,
+    ]);
+    Room::factory()->create([
+        'hotel_id' => $hotel->id,
+        'building_id' => $building->id,
+        'floor_id' => $floor->id,
+    ]);
+
+    $user = User::factory()->create([
+        'hotel_id' => $hotel->id,
+        'onboarded_at' => null,
+    ]);
+
+    $this->actingAs($user)
+        ->post('/onboarding/complete')
+        ->assertRedirect('/dashboard');
+
+    $user->refresh();
+    expect($user->onboarded_at)->not->toBeNull();
+});
