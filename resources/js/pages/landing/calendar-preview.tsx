@@ -46,7 +46,9 @@ export default function CalendarPreview() {
                             <div className="size-2 rounded-full bg-neutral-300" />
                             <div className="size-2 rounded-full bg-neutral-300" />
                         </div>
-                        <span className="ml-2 text-xs text-neutral-400">Week of 11 May</span>
+                        <span className="ml-2 text-xs text-neutral-400">
+                            Week of 11 May
+                        </span>
                     </div>
                     <div className="text-xs text-neutral-400">
                         {visibleCount} of {BOOKINGS.length} bookings
@@ -55,7 +57,10 @@ export default function CalendarPreview() {
                 <div className="grid grid-cols-[3rem_repeat(7,minmax(0,1fr))] gap-1 p-3 text-xs">
                     <div />
                     {DAYS.map((d) => (
-                        <div key={d} className="pb-2 text-center font-medium text-neutral-400">
+                        <div
+                            key={d}
+                            className="pb-2 text-center font-medium text-neutral-400"
+                        >
                             {d}
                         </div>
                     ))}
@@ -73,14 +78,18 @@ export default function CalendarPreview() {
 
                         let dayIdx = 0;
                         while (dayIdx < 7) {
-                            const booking = bookings.find((b) => b.start === dayIdx);
+                            const booking = bookings.find(
+                                (b) => b.start === dayIdx,
+                            );
                             if (booking) {
                                 const idx = BOOKINGS.indexOf(booking);
                                 const visible = idx < visibleCount;
                                 cells.push(
                                     <div
                                         key={`b-${r}-${dayIdx}`}
-                                        style={{ gridColumn: `span ${booking.length}` }}
+                                        style={{
+                                            gridColumn: `span ${booking.length}`,
+                                        }}
                                         className={[
                                             'relative m-0.5 flex h-6 items-center overflow-hidden rounded px-2 text-[10px] font-medium transition-all duration-500 ease-out',
                                             visible
@@ -88,13 +97,18 @@ export default function CalendarPreview() {
                                                 : '-translate-y-1 bg-neutral-200 opacity-0',
                                         ].join(' ')}
                                     >
-                                        <span className="truncate">{booking.guest}</span>
+                                        <span className="truncate">
+                                            {booking.guest}
+                                        </span>
                                     </div>,
                                 );
                                 dayIdx += booking.length;
                             } else {
                                 cells.push(
-                                    <div key={`e-${r}-${dayIdx}`} className="m-0.5 h-6 rounded bg-neutral-50" />,
+                                    <div
+                                        key={`e-${r}-${dayIdx}`}
+                                        className="m-0.5 h-6 rounded bg-neutral-50"
+                                    />,
                                 );
                                 dayIdx += 1;
                             }

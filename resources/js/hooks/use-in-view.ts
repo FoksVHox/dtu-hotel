@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 
-export function useInView<T extends HTMLElement = HTMLDivElement>(options?: IntersectionObserverInit) {
+export function useInView<T extends HTMLElement = HTMLDivElement>(
+    options?: IntersectionObserverInit,
+) {
     const ref = useRef<T | null>(null);
     const [inView, setInView] = useState(false);
 

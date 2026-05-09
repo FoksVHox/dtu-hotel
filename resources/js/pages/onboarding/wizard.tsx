@@ -36,7 +36,12 @@ interface WizardProps {
     categories: Category[];
 }
 
-export default function Wizard({ currentStep: initialStep, hotel, buildings, categories }: WizardProps) {
+export default function Wizard({
+    currentStep: initialStep,
+    hotel,
+    buildings,
+    categories,
+}: WizardProps) {
     const [step, setStep] = useState(initialStep);
 
     return (
@@ -48,7 +53,12 @@ export default function Wizard({ currentStep: initialStep, hotel, buildings, cat
                         <AppLogoIcon className="size-6 fill-current" />
                         <span className="text-sm font-semibold">DTU Hotel</span>
                     </div>
-                    <Link href="/logout" method="post" as="button" className="text-sm text-neutral-500 hover:text-black">
+                    <Link
+                        href="/logout"
+                        method="post"
+                        as="button"
+                        className="text-sm text-neutral-500 hover:text-black"
+                    >
                         Sign out
                     </Link>
                 </header>
@@ -56,9 +66,23 @@ export default function Wizard({ currentStep: initialStep, hotel, buildings, cat
                 <main className="mx-auto flex max-w-2xl flex-col gap-10 px-6 py-12">
                     <WizardStepper currentStep={step} />
 
-                    {step === 1 && <HotelStep hotel={hotel} onAdvance={() => setStep(2)} />}
-                    {step === 2 && <BuildingsStep buildings={buildings} onAdvance={() => setStep(3)} onBack={() => setStep(1)} />}
-                    {step === 3 && <RoomsStep buildings={buildings} categories={categories} onBack={() => setStep(2)} />}
+                    {step === 1 && (
+                        <HotelStep hotel={hotel} onAdvance={() => setStep(2)} />
+                    )}
+                    {step === 2 && (
+                        <BuildingsStep
+                            buildings={buildings}
+                            onAdvance={() => setStep(3)}
+                            onBack={() => setStep(1)}
+                        />
+                    )}
+                    {step === 3 && (
+                        <RoomsStep
+                            buildings={buildings}
+                            categories={categories}
+                            onBack={() => setStep(2)}
+                        />
+                    )}
                 </main>
             </div>
         </>

@@ -4,10 +4,46 @@ import { useInView } from '@/hooks/use-in-view';
 type Status = 'available' | 'occupied' | 'cleaning' | 'maintenance';
 
 const ROOM_GRID: Status[][] = [
-    ['available', 'occupied', 'cleaning', 'occupied', 'available', 'maintenance', 'available', 'occupied'],
-    ['occupied', 'available', 'available', 'cleaning', 'occupied', 'available', 'occupied', 'cleaning'],
-    ['available', 'cleaning', 'occupied', 'occupied', 'available', 'occupied', 'maintenance', 'available'],
-    ['occupied', 'occupied', 'available', 'available', 'cleaning', 'occupied', 'available', 'occupied'],
+    [
+        'available',
+        'occupied',
+        'cleaning',
+        'occupied',
+        'available',
+        'maintenance',
+        'available',
+        'occupied',
+    ],
+    [
+        'occupied',
+        'available',
+        'available',
+        'cleaning',
+        'occupied',
+        'available',
+        'occupied',
+        'cleaning',
+    ],
+    [
+        'available',
+        'cleaning',
+        'occupied',
+        'occupied',
+        'available',
+        'occupied',
+        'maintenance',
+        'available',
+    ],
+    [
+        'occupied',
+        'occupied',
+        'available',
+        'available',
+        'cleaning',
+        'occupied',
+        'available',
+        'occupied',
+    ],
 ];
 
 const STATUS_STYLES: Record<Status, string> = {
@@ -39,24 +75,30 @@ export default function ProductShowcase() {
                 <div
                     className={[
                         'flex max-w-3xl flex-col gap-3 transition-all duration-700 ease-out',
-                        inView ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
+                        inView
+                            ? 'translate-y-0 opacity-100'
+                            : 'translate-y-4 opacity-0',
                     ].join(' ')}
                 >
-                    <span className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-500">
+                    <span className="text-xs font-medium tracking-[0.18em] text-neutral-500 uppercase">
                         At a glance
                     </span>
                     <h2 className="text-4xl font-semibold tracking-tight md:text-5xl">
-                        Every room, every guest, every detail — in one calm view.
+                        Every room, every guest, every detail — in one calm
+                        view.
                     </h2>
                     <p className="mt-2 max-w-xl text-neutral-600">
-                        Live housekeeping status, maintenance flags, and tomorrow's check-ins. No tabs, no spreadsheets.
+                        Live housekeeping status, maintenance flags, and
+                        tomorrow's check-ins. No tabs, no spreadsheets.
                     </p>
                 </div>
 
                 <div
                     className={[
                         'mt-14 transition-all duration-1000 ease-out',
-                        inView ? 'translate-y-0 opacity-100 delay-150' : 'translate-y-8 opacity-0',
+                        inView
+                            ? 'translate-y-0 opacity-100 delay-150'
+                            : 'translate-y-8 opacity-0',
                     ].join(' ')}
                 >
                     <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-[0_30px_80px_-30px_rgba(0,0,0,0.25)]">
@@ -91,7 +133,9 @@ export default function ProductShowcase() {
                                         key={it.label}
                                         className={[
                                             'rounded px-2 py-1.5 text-sm',
-                                            it.active ? 'bg-neutral-100 font-medium text-black' : 'text-neutral-500',
+                                            it.active
+                                                ? 'bg-neutral-100 font-medium text-black'
+                                                : 'text-neutral-500',
                                         ].join(' ')}
                                     >
                                         {it.label}
@@ -112,12 +156,22 @@ export default function ProductShowcase() {
                                             key={s.l}
                                             className={[
                                                 'rounded-lg border border-neutral-200 bg-white p-4 transition-all duration-700',
-                                                inView ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0',
+                                                inView
+                                                    ? 'translate-y-0 opacity-100'
+                                                    : 'translate-y-2 opacity-0',
                                             ].join(' ')}
-                                            style={{ transitionDelay: inView ? `${300 + i * 80}ms` : '0ms' }}
+                                            style={{
+                                                transitionDelay: inView
+                                                    ? `${300 + i * 80}ms`
+                                                    : '0ms',
+                                            }}
                                         >
-                                            <div className="text-2xl font-semibold tabular-nums tracking-tight">{s.v}</div>
-                                            <div className="mt-1 text-xs text-neutral-500">{s.l}</div>
+                                            <div className="text-2xl font-semibold tracking-tight tabular-nums">
+                                                {s.v}
+                                            </div>
+                                            <div className="mt-1 text-xs text-neutral-500">
+                                                {s.l}
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -125,11 +179,22 @@ export default function ProductShowcase() {
                                 {/* rooms grid */}
                                 <div className="mt-8">
                                     <div className="mb-3 flex items-center justify-between">
-                                        <span className="text-sm font-medium">Rooms · Floor 1</span>
+                                        <span className="text-sm font-medium">
+                                            Rooms · Floor 1
+                                        </span>
                                         <div className="flex items-center gap-3 text-[11px] text-neutral-500">
-                                            <Legend dot="bg-white border border-neutral-300" label="Available" />
-                                            <Legend dot="bg-neutral-900" label="Occupied" />
-                                            <Legend dot="bg-neutral-300" label="Cleaning" />
+                                            <Legend
+                                                dot="bg-white border border-neutral-300"
+                                                label="Available"
+                                            />
+                                            <Legend
+                                                dot="bg-neutral-900"
+                                                label="Occupied"
+                                            />
+                                            <Legend
+                                                dot="bg-neutral-300"
+                                                label="Cleaning"
+                                            />
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-8 gap-2">
@@ -138,7 +203,11 @@ export default function ProductShowcase() {
                                                 // gently rotate "cleaning" through cells over time
                                                 const idx = rowIdx * 8 + colIdx;
                                                 const animatedStatus: Status =
-                                                    idx === tick % (ROOM_GRID.length * 8) && status === 'available'
+                                                    idx ===
+                                                        tick %
+                                                            (ROOM_GRID.length *
+                                                                8) &&
+                                                    status === 'available'
                                                         ? 'cleaning'
                                                         : status;
                                                 return (
@@ -146,13 +215,25 @@ export default function ProductShowcase() {
                                                         key={`${rowIdx}-${colIdx}`}
                                                         className={[
                                                             'flex h-14 flex-col justify-between rounded-md border p-2 text-[10px] font-medium transition-colors duration-500',
-                                                            STATUS_STYLES[animatedStatus],
+                                                            STATUS_STYLES[
+                                                                animatedStatus
+                                                            ],
                                                         ].join(' ')}
                                                     >
                                                         <span className="tabular-nums opacity-70">
-                                                            {100 + rowIdx * 100 + colIdx + 1}
+                                                            {100 +
+                                                                rowIdx * 100 +
+                                                                colIdx +
+                                                                1}
                                                         </span>
-                                                        <div className={['size-1.5 rounded-full', STATUS_DOT[animatedStatus]].join(' ')} />
+                                                        <div
+                                                            className={[
+                                                                'size-1.5 rounded-full',
+                                                                STATUS_DOT[
+                                                                    animatedStatus
+                                                                ],
+                                                            ].join(' ')}
+                                                        />
                                                     </div>
                                                 );
                                             }),

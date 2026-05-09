@@ -18,7 +18,8 @@ export default function Hero({ canRegister }: { canRegister: boolean }) {
             <div
                 className="pointer-events-none absolute inset-0 opacity-[0.04]"
                 style={{
-                    backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1px)',
+                    backgroundImage:
+                        'radial-gradient(circle, #000 1px, transparent 1px)',
                     backgroundSize: '24px 24px',
                 }}
                 aria-hidden
@@ -27,22 +28,33 @@ export default function Hero({ canRegister }: { canRegister: boolean }) {
             <nav className="relative mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
                 <div className="flex items-center gap-2">
                     <AppLogoIcon className="size-6 fill-current" />
-                    <span className="text-sm font-semibold tracking-tight">DTU Hotel</span>
+                    <span className="text-sm font-semibold tracking-tight">
+                        DTU Hotel
+                    </span>
                 </div>
                 <div className="flex items-center gap-5">
-                    <a href="#features" className="hidden text-sm text-neutral-600 hover:text-black sm:inline">
+                    <a
+                        href="#features"
+                        className="hidden text-sm text-neutral-600 hover:text-black sm:inline"
+                    >
                         Features
                     </a>
-                    <a href="#how" className="hidden text-sm text-neutral-600 hover:text-black sm:inline">
+                    <a
+                        href="#how"
+                        className="hidden text-sm text-neutral-600 hover:text-black sm:inline"
+                    >
                         How it works
                     </a>
-                    <Link href="/login" className="text-sm text-neutral-600 hover:text-black">
+                    <Link
+                        href="/login"
+                        className="text-sm text-neutral-600 hover:text-black"
+                    >
                         Sign in
                     </Link>
                     {canRegister && (
                         <Link
                             href="/register"
-                            className="h-9 rounded-md bg-black px-4 text-sm font-medium leading-9 text-white transition hover:bg-neutral-800"
+                            className="h-9 rounded-md bg-black px-4 text-sm leading-9 font-medium text-white transition hover:bg-neutral-800"
                         >
                             Get started
                         </Link>
@@ -54,28 +66,37 @@ export default function Hero({ canRegister }: { canRegister: boolean }) {
                 <div className="md:col-span-3">
                     <h1
                         className={[
-                            'text-5xl font-semibold leading-[1.02] tracking-tight transition-all duration-700 ease-out md:text-7xl',
-                            mounted ? 'translate-y-0 opacity-100 delay-100' : 'translate-y-4 opacity-0',
+                            'text-5xl leading-[1.02] font-semibold tracking-tight transition-all duration-700 ease-out md:text-7xl',
+                            mounted
+                                ? 'translate-y-0 opacity-100 delay-100'
+                                : 'translate-y-4 opacity-0',
                         ].join(' ')}
                     >
                         Run your hotel,
                         <br />
-                        not your <span className="italic font-serif">spreadsheet.</span>
+                        not your{' '}
+                        <span className="font-serif italic">spreadsheet.</span>
                     </h1>
 
                     <p
                         className={[
                             'mt-6 max-w-xl text-lg text-neutral-600 transition-all duration-700 ease-out',
-                            mounted ? 'translate-y-0 opacity-100 delay-200' : 'translate-y-4 opacity-0',
+                            mounted
+                                ? 'translate-y-0 opacity-100 delay-200'
+                                : 'translate-y-4 opacity-0',
                         ].join(' ')}
                     >
-                        DTU Hotel brings your bookings, rooms, guests, and maintenance into one place — fast to set up, easy to use.
+                        DTU Hotel brings your bookings, rooms, guests, and
+                        maintenance into one place — fast to set up, easy to
+                        use.
                     </p>
 
                     <div
                         className={[
                             'mt-10 flex flex-wrap items-center gap-5 transition-all duration-700 ease-out',
-                            mounted ? 'translate-y-0 opacity-100 delay-300' : 'translate-y-4 opacity-0',
+                            mounted
+                                ? 'translate-y-0 opacity-100 delay-300'
+                                : 'translate-y-4 opacity-0',
                         ].join(' ')}
                     >
                         {canRegister && (
@@ -110,8 +131,10 @@ export default function Hero({ canRegister }: { canRegister: boolean }) {
                 </div>
                 <div
                     className={[
-                        'md:col-span-2 transition-all duration-1000 ease-out',
-                        mounted ? 'translate-y-0 opacity-100 delay-200' : 'translate-y-6 opacity-0',
+                        'transition-all duration-1000 ease-out md:col-span-2',
+                        mounted
+                            ? 'translate-y-0 opacity-100 delay-200'
+                            : 'translate-y-6 opacity-0',
                     ].join(' ')}
                 >
                     <CalendarPreview />
@@ -124,7 +147,7 @@ export default function Hero({ canRegister }: { canRegister: boolean }) {
                     className="group flex flex-col items-center gap-2 text-xs text-neutral-400 hover:text-black"
                     aria-label="Scroll to how it works"
                 >
-                    <span className="uppercase tracking-widest">Scroll</span>
+                    <span className="tracking-widest uppercase">Scroll</span>
                     <ArrowDown className="size-4 animate-bounce" />
                 </a>
             </div>

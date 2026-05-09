@@ -1,11 +1,16 @@
 <?php
 
+use App\Enums\BookingStatus;
 use App\Models\Booking;
+use App\Models\Building;
+use App\Models\Floor;
 use App\Models\Guest;
 use App\Models\Hotel;
 use App\Models\MaintenanceLog;
 use App\Models\Room;
+use App\Models\RoomCategory;
 use App\Models\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 test('users only see bookings from their own hotel', function () {
     $hotelA = Hotel::factory()->create();
@@ -119,7 +124,7 @@ test('findOrFail of an out-of-tenant booking id raises 404', function () {
     $this->actingAs($userA);
 
     expect(fn () => Booking::findOrFail($bookingB->id))
-        ->toThrow(Illuminate\Database\Eloquent\ModelNotFoundException::class);
+        ->toThrow(ModelNotFoundException::class);
 });
 
 test('booking creation rejects rooms that belong to another hotel', function () {
@@ -140,7 +145,7 @@ test('booking creation rejects rooms that belong to another hotel', function () 
             'guest_ids' => [$hotelAGuest->id],
             'start' => now()->addDay()->toDateTimeString(),
             'end' => now()->addDays(3)->toDateTimeString(),
-            'status' => App\Enums\BookingStatus::Confirmed->value,
+            'status' => BookingStatus::Confirmed->value,
         ])
         ->assertSessionHasErrors(['room_ids.0']);
 });
@@ -163,7 +168,7 @@ test('booking creation rejects guests that belong to another hotel', function ()
             'guest_ids' => [$hotelBGuest->id],
             'start' => now()->addDay()->toDateTimeString(),
             'end' => now()->addDays(3)->toDateTimeString(),
-            'status' => App\Enums\BookingStatus::Confirmed->value,
+            'status' => BookingStatus::Confirmed->value,
         ])
         ->assertSessionHasErrors(['guest_ids.0']);
 });
@@ -171,12 +176,12 @@ test('booking creation rejects guests that belong to another hotel', function ()
 test('onboarding rooms step rejects floor_id from another hotel', function () {
     $hotelA = Hotel::factory()->create();
     $hotelB = Hotel::factory()->create();
-    $hotelBBuilding = App\Models\Building::factory()->create(['hotel_id' => $hotelB->id]);
-    $hotelBFloor = App\Models\Floor::factory()->create([
+    $hotelBBuilding = Building::factory()->create(['hotel_id' => $hotelB->id]);
+    $hotelBFloor = Floor::factory()->create([
         'hotel_id' => $hotelB->id,
         'building_id' => $hotelBBuilding->id,
     ]);
-    $category = App\Models\RoomCategory::factory()->create();
+    $category = RoomCategory::factory()->create();
 
     $userA = User::factory()->create([
         'hotel_id' => $hotelA->id,

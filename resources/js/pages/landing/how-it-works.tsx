@@ -27,10 +27,12 @@ export default function HowItWorks() {
                 <div
                     className={[
                         'flex flex-col gap-3 transition-all duration-700 ease-out',
-                        inView ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
+                        inView
+                            ? 'translate-y-0 opacity-100'
+                            : 'translate-y-4 opacity-0',
                     ].join(' ')}
                 >
-                    <span className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-500">
+                    <span className="text-xs font-medium tracking-[0.18em] text-neutral-500 uppercase">
                         How it works
                     </span>
                     <h2 className="max-w-3xl text-4xl font-semibold tracking-tight md:text-5xl">
@@ -44,16 +46,28 @@ export default function HowItWorks() {
                             key={step.n}
                             className={[
                                 'flex flex-col gap-4 transition-all duration-700 ease-out',
-                                inView ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0',
+                                inView
+                                    ? 'translate-y-0 opacity-100'
+                                    : 'translate-y-4 opacity-0',
                             ].join(' ')}
-                            style={{ transitionDelay: inView ? `${150 + idx * 120}ms` : '0ms' }}
+                            style={{
+                                transitionDelay: inView
+                                    ? `${150 + idx * 120}ms`
+                                    : '0ms',
+                            }}
                         >
                             <div className="flex items-baseline gap-3">
-                                <span className="text-5xl font-semibold tracking-tight">{step.n}</span>
+                                <span className="text-5xl font-semibold tracking-tight">
+                                    {step.n}
+                                </span>
                                 <span className="h-px flex-1 bg-neutral-200" />
                             </div>
-                            <h3 className="text-xl font-semibold tracking-tight">{step.title}</h3>
-                            <p className="text-sm leading-relaxed text-neutral-600">{step.body}</p>
+                            <h3 className="text-xl font-semibold tracking-tight">
+                                {step.title}
+                            </h3>
+                            <p className="text-sm leading-relaxed text-neutral-600">
+                                {step.body}
+                            </p>
                         </article>
                     ))}
                 </div>
