@@ -17,32 +17,9 @@ class RoomController extends Controller
 {
     public function index(): Response
     {
-        $today = now();
-
-        $rooms = Room::with([
-            'floor',
-            'roomCategory',
-            'bookings' => fn ($q) => $q->orderBy('start'),
-        ])
-            ->get()
-            ->map(function (Room $room) use ($today) {
-                $booking = $room->bookings->first(fn ($b) => $b->start <= $today && $b->end >= $today)
-                    ?? $room->bookings->first(fn ($b) => $b->start > $today)
-                    ?? $room->bookings->last();
-
-                return [
-                    'id' => $room->id,
-                    'code' => $room->floor->name.'-'.$room->id,
-                    'category' => $room->roomCategory->name,
-                    'floor' => (int) filter_var($room->floor->name, FILTER_SANITIZE_NUMBER_INT),
-                    'status' => $room->status->value,
-                    'booking_status' => $booking?->status->value,
-                    'room_category_id' => $room->room_category_id,
-                    'floor_id' => $room->floor_id,
-                    'manual_status' => $room->manual_status?->value,
-                    'scheduled_cleaning_at' => $room->scheduled_cleaning_at?->toIso8601String(),
-                ];
-            });
+        $rooms = Room::with(['floor.building', 'roomCategory'])
+            ->orderBy('id')
+            ->get();
 
         $categories = RoomCategory::orderBy('name')->get(['id', 'name']);
 
@@ -50,6 +27,7 @@ class RoomController extends Controller
             ->map(fn (Floor $floor) => [
                 'id' => $floor->id,
                 'label' => $floor->building->name.' — '.$floor->name,
+                'building_name' => $floor->building->name,
             ]);
 
         return Inertia::render('rooms/index', [
@@ -71,11 +49,11 @@ class RoomController extends Controller
             'building_id' => $floor->building_id,
             'floor_id' => $floor->id,
             'room_category_id' => $validated['room_category_id'],
-            'status' => RoomStatus::Available,
-            'manual_status' => $validated['manual_status'] ?? null,
+            'code' => $validated['code'] ?? null,
+            'status' => isset($validated['status']) ? RoomStatus::from($validated['status']) : RoomStatus::Available,
         ]);
 
-        return redirect()->back();
+        return to_route('rooms.index');
     }
 
     public function show(string $id): void {}
@@ -109,14 +87,22 @@ class RoomController extends Controller
         }
 
         if (isset($validated['floor_id'])) {
-            $room->update(['floor_id' => $validated['floor_id']]);
+            $floor = Floor::findOrFail($validated['floor_id']);
+            $room->update([
+                'floor_id' => $floor->id,
+                'building_id' => $floor->building_id,
+            ]);
         }
 
         if (array_key_exists('manual_status', $validated)) {
             $room->update(['manual_status' => $validated['manual_status']]);
         }
 
-        return redirect()->back();
+        if (array_key_exists('code', $validated)) {
+            $room->update(['code' => $validated['code']]);
+        }
+
+        return to_route('rooms.index');
     }
 
     public function destroy(string $id): void {}

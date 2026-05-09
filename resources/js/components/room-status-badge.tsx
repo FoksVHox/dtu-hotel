@@ -12,7 +12,7 @@ const BOOKING_STATUS_CLASSES: Record<number, string> = {
     6: 'border-amber-500/40 text-amber-400',
 };
 
-const ROOM_STATUS_CONFIG: Record<number, { label: string; className: string }> = {
+export const ROOM_STATUS_CONFIG: Record<number, { label: string; className: string }> = {
     0: { label: 'Available',    className: 'border-green-500/40 text-green-400' },
     1: { label: 'Occupied',     className: 'border-blue-500/40 text-blue-400'   },
     2: { label: 'Cleaning',     className: 'border-amber-500/40 text-amber-400' },

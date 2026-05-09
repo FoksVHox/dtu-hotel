@@ -1,7 +1,7 @@
 import { X } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { STATUS_CONFIG } from '@/components/room-status-badge'
+import { ROOM_STATUS_CONFIG } from '@/components/room-status-badge'
 import {
     DEFAULT_ROOM_FILTERS,
     hasActiveRoomFilters,
@@ -20,6 +20,42 @@ export function RoomFilterBar({ filters, onFiltersChange }: RoomFilterBarProps) 
 
     return (
         <div className="flex flex-wrap items-center justify-end gap-2">
+            {filters.buildings.map((b) => (
+                <Badge key={`building-${b}`} variant="secondary">
+                    {b}
+                    <button
+                        onClick={() =>
+                            onFiltersChange({
+                                ...filters,
+                                buildings: filters.buildings.filter((v) => v !== b),
+                            })
+                        }
+                        className="ml-1 rounded-full hover:bg-muted"
+                        aria-label={`Remove ${b} filter`}
+                    >
+                        <X className="size-3" />
+                    </button>
+                </Badge>
+            ))}
+
+            {filters.floors.map((f) => (
+                <Badge key={`floor-${f}`} variant="secondary">
+                    {f}
+                    <button
+                        onClick={() =>
+                            onFiltersChange({
+                                ...filters,
+                                floors: filters.floors.filter((v) => v !== f),
+                            })
+                        }
+                        className="ml-1 rounded-full hover:bg-muted"
+                        aria-label={`Remove ${f} filter`}
+                    >
+                        <X className="size-3" />
+                    </button>
+                </Badge>
+            ))}
+
             {filters.categories.map((cat) => (
                 <Badge key={`cat-${cat}`} variant="secondary">
                     {cat}
@@ -38,27 +74,9 @@ export function RoomFilterBar({ filters, onFiltersChange }: RoomFilterBarProps) 
                 </Badge>
             ))}
 
-            {filters.floors.map((floor) => (
-                <Badge key={`floor-${floor}`} variant="secondary">
-                    Floor {floor}
-                    <button
-                        onClick={() =>
-                            onFiltersChange({
-                                ...filters,
-                                floors: filters.floors.filter((f) => f !== floor),
-                            })
-                        }
-                        className="ml-1 rounded-full hover:bg-muted"
-                        aria-label={`Remove floor ${floor} filter`}
-                    >
-                        <X className="size-3" />
-                    </button>
-                </Badge>
-            ))}
-
             {filters.statuses.map((status) => (
                 <Badge key={`status-${status}`} variant="secondary">
-                    {STATUS_CONFIG[status]?.label ?? `Status ${status}`}
+                    {ROOM_STATUS_CONFIG[status]?.label ?? `Status ${status}`}
                     <button
                         onClick={() =>
                             onFiltersChange({
@@ -67,7 +85,7 @@ export function RoomFilterBar({ filters, onFiltersChange }: RoomFilterBarProps) 
                             })
                         }
                         className="ml-1 rounded-full hover:bg-muted"
-                        aria-label={`Remove status filter`}
+                        aria-label="Remove status filter"
                     >
                         <X className="size-3" />
                     </button>

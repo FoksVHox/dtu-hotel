@@ -2,6 +2,7 @@ import { Head, router } from '@inertiajs/react';
 import { Plus, Search } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { store as storeRoom, update as updateRoom } from '@/actions/App/Http/Controllers/RoomController';
+import { ROOM_STATUS_CONFIG, STATUS_CONFIG } from '@/components/room-status-badge';
 import { RoomsTable, type Room } from '@/components/rooms-table';
 import { RoomFilterBar } from '@/components/rooms/room-filter-bar';
 import {
@@ -37,22 +38,24 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 type CategoryOption = { id: number; name: string };
-type FloorOption = { id: number; label: string };
+type FloorOption = { id: number; label: string; building_name: string };
 
 type RoomForm = {
+    code: string;
     room_category_id: string;
     floor_id: string;
-    manual_status: string;
+    status: string;
 };
 
 type EditForm = {
+    code: string;
     room_category_id: string;
     floor_id: string;
-    manual_status: string;
+    status: string;
 };
 
-const initialForm: RoomForm = { room_category_id: '', floor_id: '', manual_status: '' };
-const initialEditForm: EditForm = { room_category_id: '', floor_id: '', manual_status: '' };
+const initialForm: RoomForm = { code: '', room_category_id: '', floor_id: '', status: '' };
+const initialEditForm: EditForm = { code: '', room_category_id: '', floor_id: '', status: '' };
 
 export default function RoomsIndex({
     rooms,
@@ -73,65 +76,74 @@ export default function RoomsIndex({
 
     const [isAddRoomOpen, setIsAddRoomOpen] = useState(false);
     const [form, setForm] = useState<RoomForm>(initialForm);
+    const [addBuilding, setAddBuilding] = useState('');
+
+    const addFloorOptions = useMemo(() =>
+        addBuilding ? floors.filter((f) => f.building_name === addBuilding) : floors,
+    [floors, addBuilding]);
     const [filters, setFilters] = useState<RoomFilters>(DEFAULT_ROOM_FILTERS);
     const [search, setSearch] = useState('');
 
     const [editRoom, setEditRoom] = useState<Room | null>(null);
     const [editForm, setEditForm] = useState<EditForm>(initialEditForm);
+    const [editBuilding, setEditBuilding] = useState('');
     const [isEditSaving, setIsEditSaving] = useState(false);
 
-    const counts = useMemo(
-        () =>
-            localRooms.reduce(
-                (acc, room) => {
-                    acc.total += 1;
-                    if (room.status === 0) acc.available += 1;
-                    if (room.status === 1) acc.occupied += 1;
-                    if (room.status === 3) acc.outOfOrder += 1;
-                    return acc;
-                },
-                { total: 0, available: 0, occupied: 0, outOfOrder: 0 },
-            ),
-        [localRooms],
-    );
+    const buildingsFromFloors = useMemo(() =>
+        Array.from(new Set(floors.map((f) => f.building_name))).sort(),
+    [floors]);
 
-    const categoryOptions = useMemo(() => {
-        const unique = Array.from(new Set(localRooms.map((room) => room.category)));
-        return unique.length ? unique : ['Single', 'Double', 'Suite'];
-    }, [localRooms]);
+    const editFloorOptions = useMemo(() =>
+        editBuilding ? floors.filter((f) => f.building_name === editBuilding) : floors,
+    [floors, editBuilding]);
 
-    const floorOptions = useMemo(() => {
-        const unique = Array.from(new Set(localRooms.map((room) => room.floor))).sort(
-            (a, b) => a - b,
-        );
-        return unique.length ? unique : [1, 2, 3];
-    }, [localRooms]);
+    const categoryOptions = useMemo(() =>
+        Array.from(new Set(localRooms.map((r) => r.room_category.name))).sort(),
+    [localRooms]);
+
+    const floorOptions = useMemo(() =>
+        Array.from(new Set(localRooms.map((r) => r.floor.name))).sort(),
+    [localRooms]);
+
+    const buildingOptions = useMemo(() =>
+        Array.from(new Set(localRooms.map((r) => r.floor.building.name))).sort(),
+    [localRooms]);
 
     const filteredRooms = useMemo(() => {
         let result = localRooms;
 
-        if (filters.categories.length > 0) {
-            result = result.filter((r) => filters.categories.includes(r.category));
+        if (filters.buildings.length > 0) {
+            result = result.filter((r) => filters.buildings.includes(r.floor.building.name));
         }
 
         if (filters.floors.length > 0) {
-            result = result.filter((r) => filters.floors.includes(r.floor));
+            result = result.filter((r) => filters.floors.includes(r.floor.name));
+        }
+
+        if (filters.categories.length > 0) {
+            result = result.filter((r) => filters.categories.includes(r.room_category.name));
         }
 
         if (filters.statuses.length > 0) {
-            result = result.filter(
-                (r) => r.booking_status !== null && filters.statuses.includes(r.booking_status),
-            );
+            result = result.filter((r) => filters.statuses.includes(r.status));
         }
 
         if (search.trim()) {
             const q = search.trim().toLowerCase();
-            result = result.filter(
-                (r) =>
-                    r.code.toLowerCase().includes(q) ||
-                    r.category.toLowerCase().includes(q) ||
-                    String(r.floor).includes(q),
-            );
+            result = result.filter((r) => {
+                const statusLabel = (
+                    r.manual_status != null
+                        ? STATUS_CONFIG[r.manual_status as keyof typeof STATUS_CONFIG]?.label
+                        : ROOM_STATUS_CONFIG[r.status]?.label
+                )?.toLowerCase() ?? '';
+                return (
+                    (r.code ?? '').toLowerCase().includes(q) ||
+                    r.room_category.name.toLowerCase().includes(q) ||
+                    r.floor.name.toLowerCase().includes(q) ||
+                    r.floor.building.name.toLowerCase().includes(q) ||
+                    statusLabel.includes(q)
+                );
+            });
         }
 
         return result;
@@ -146,11 +158,14 @@ export default function RoomsIndex({
         editForm.floor_id.length > 0;
 
     function handleOpenEdit(room: Room): void {
+        const currentFloor = floors.find((f) => f.id === room.floor_id);
+        setEditBuilding(currentFloor?.building_name ?? '');
         setEditRoom(room);
         setEditForm({
+            code: room.code ?? '',
             room_category_id: String(room.room_category_id),
             floor_id: String(room.floor_id),
-            manual_status: room.manual_status != null ? String(room.manual_status) : '',
+            status: String(room.status),
         });
     }
 
@@ -160,12 +175,13 @@ export default function RoomsIndex({
         router.patch(
             updateRoom({ room: editRoom.id }).url,
             {
+                code: editForm.code !== '' ? editForm.code : null,
                 room_category_id: Number(editForm.room_category_id),
                 floor_id: Number(editForm.floor_id),
-                manual_status: editForm.manual_status !== '' ? Number(editForm.manual_status) : null,
+                status: editForm.status !== '' ? Number(editForm.status) : null,
+                manual_status: null,
             },
             {
-                preserveScroll: true,
                 onSuccess: () => {
                     setEditRoom(null);
                     setIsEditSaving(false);
@@ -181,6 +197,7 @@ export default function RoomsIndex({
 
     function resetForm(): void {
         setForm(initialForm);
+        setAddBuilding('');
     }
 
     function handleAddRoom(): void {
@@ -188,12 +205,12 @@ export default function RoomsIndex({
         router.post(
             storeRoom().url,
             {
+                code: form.code !== '' ? form.code : null,
                 room_category_id: Number(form.room_category_id),
                 floor_id: Number(form.floor_id),
-                manual_status: form.manual_status !== '' ? Number(form.manual_status) : null,
+                status: form.status !== '' ? Number(form.status) : null,
             },
             {
-                preserveScroll: true,
                 onSuccess: () => {
                     setIsAddRoomOpen(false);
                     resetForm();
@@ -223,6 +240,58 @@ export default function RoomsIndex({
 
                         <div className="grid gap-4 py-2 md:grid-cols-2">
                             <div className="grid gap-2">
+                                <Label>Building</Label>
+                                <Select
+                                    value={addBuilding}
+                                    onValueChange={(value) => {
+                                        setAddBuilding(value);
+                                        setForm((prev) => ({ ...prev, floor_id: '' }));
+                                    }}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select building" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {buildingsFromFloors.map((b) => (
+                                            <SelectItem key={b} value={b}>{b}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label>Floor</Label>
+                                <Select
+                                    value={form.floor_id}
+                                    onValueChange={(value) =>
+                                        setForm((prev) => ({ ...prev, floor_id: value }))
+                                    }
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select floor" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {addFloorOptions.map((floor) => (
+                                            <SelectItem key={floor.id} value={String(floor.id)}>
+                                                {floor.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label>Room Code</Label>
+                                <Input
+                                    value={form.code}
+                                    onChange={(e) =>
+                                        setForm((prev) => ({ ...prev, code: e.target.value }))
+                                    }
+                                    placeholder="e.g. 101"
+                                />
+                            </div>
+
+                            <div className="grid gap-2">
                                 <Label>Category</Label>
                                 <Select
                                     value={form.room_category_id}
@@ -244,44 +313,21 @@ export default function RoomsIndex({
                             </div>
 
                             <div className="grid gap-2">
-                                <Label>Floor</Label>
-                                <Select
-                                    value={form.floor_id}
-                                    onValueChange={(value) =>
-                                        setForm((prev) => ({ ...prev, floor_id: value }))
-                                    }
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select floor" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {floors.map((floor) => (
-                                            <SelectItem key={floor.id} value={String(floor.id)}>
-                                                {floor.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            <div className="grid gap-2">
                                 <Label>Status</Label>
                                 <Select
-                                    value={form.manual_status}
+                                    value={form.status}
                                     onValueChange={(value) =>
-                                        setForm((prev) => ({ ...prev, manual_status: value }))
+                                        setForm((prev) => ({ ...prev, status: value }))
                                     }
                                 >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select status" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="1">Pending</SelectItem>
-                                        <SelectItem value="2">Confirmed</SelectItem>
-                                        <SelectItem value="3">Checked In</SelectItem>
-                                        <SelectItem value="4">Checked Out</SelectItem>
-                                        <SelectItem value="5">Cancelled</SelectItem>
-                                        <SelectItem value="6">Maintenance</SelectItem>
+                                        <SelectItem value="0">Available</SelectItem>
+                                        <SelectItem value="1">Occupied</SelectItem>
+                                        <SelectItem value="2">Cleaning</SelectItem>
+                                        <SelectItem value="3">Out of Order</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -311,6 +357,58 @@ export default function RoomsIndex({
 
                         <div className="grid gap-4 py-2 md:grid-cols-2">
                             <div className="grid gap-2">
+                                <Label>Building</Label>
+                                <Select
+                                    value={editBuilding}
+                                    onValueChange={(value) => {
+                                        setEditBuilding(value);
+                                        setEditForm((prev) => ({ ...prev, floor_id: '' }));
+                                    }}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select building" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {buildingsFromFloors.map((b) => (
+                                            <SelectItem key={b} value={b}>{b}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label>Floor</Label>
+                                <Select
+                                    value={editForm.floor_id}
+                                    onValueChange={(value) =>
+                                        setEditForm((prev) => ({ ...prev, floor_id: value }))
+                                    }
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select floor" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {editFloorOptions.map((floor) => (
+                                            <SelectItem key={floor.id} value={String(floor.id)}>
+                                                {floor.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="grid gap-2">
+                                <Label>Room Code</Label>
+                                <Input
+                                    value={editForm.code}
+                                    onChange={(e) =>
+                                        setEditForm((prev) => ({ ...prev, code: e.target.value }))
+                                    }
+                                    placeholder="e.g. 101"
+                                />
+                            </div>
+
+                            <div className="grid gap-2">
                                 <Label>Category</Label>
                                 <Select
                                     value={editForm.room_category_id}
@@ -332,44 +430,21 @@ export default function RoomsIndex({
                             </div>
 
                             <div className="grid gap-2">
-                                <Label>Floor</Label>
-                                <Select
-                                    value={editForm.floor_id}
-                                    onValueChange={(value) =>
-                                        setEditForm((prev) => ({ ...prev, floor_id: value }))
-                                    }
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select floor" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {floors.map((floor) => (
-                                            <SelectItem key={floor.id} value={String(floor.id)}>
-                                                {floor.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            <div className="grid gap-2">
                                 <Label>Status</Label>
                                 <Select
-                                    value={editForm.manual_status}
+                                    value={editForm.status}
                                     onValueChange={(value) =>
-                                        setEditForm((prev) => ({ ...prev, manual_status: value }))
+                                        setEditForm((prev) => ({ ...prev, status: value }))
                                     }
                                 >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select status" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="1">Pending</SelectItem>
-                                        <SelectItem value="2">Confirmed</SelectItem>
-                                        <SelectItem value="3">Checked In</SelectItem>
-                                        <SelectItem value="4">Checked Out</SelectItem>
-                                        <SelectItem value="5">Cancelled</SelectItem>
-                                        <SelectItem value="6">Maintenance</SelectItem>
+                                        <SelectItem value="0">Available</SelectItem>
+                                        <SelectItem value="1">Occupied</SelectItem>
+                                        <SelectItem value="2">Cleaning</SelectItem>
+                                        <SelectItem value="3">Out of Order</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -392,38 +467,42 @@ export default function RoomsIndex({
 
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                     <Card>
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm text-muted-foreground">Total Rooms</CardTitle>
+                        <CardHeader className="pb-1">
+                            <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground">—</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-2xl font-semibold">{counts.total}</p>
+                            <p className="text-3xl font-bold">—</p>
+                            <p className="mt-1 text-xs text-muted-foreground">Coming soon</p>
                         </CardContent>
                     </Card>
 
                     <Card>
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm text-muted-foreground">Available</CardTitle>
+                        <CardHeader className="pb-1">
+                            <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground">—</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-2xl font-semibold">{counts.available}</p>
+                            <p className="text-3xl font-bold">—</p>
+                            <p className="mt-1 text-xs text-muted-foreground">Coming soon</p>
                         </CardContent>
                     </Card>
 
                     <Card>
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm text-muted-foreground">Occupied</CardTitle>
+                        <CardHeader className="pb-1">
+                            <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground">—</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-2xl font-semibold">{counts.occupied}</p>
+                            <p className="text-3xl font-bold">—</p>
+                            <p className="mt-1 text-xs text-muted-foreground">Coming soon</p>
                         </CardContent>
                     </Card>
 
                     <Card>
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-sm text-muted-foreground">Out of Order</CardTitle>
+                        <CardHeader className="pb-1">
+                            <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground">—</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-2xl font-semibold">{counts.outOfOrder}</p>
+                            <p className="text-3xl font-bold">—</p>
+                            <p className="mt-1 text-xs text-muted-foreground">Coming soon</p>
                         </CardContent>
                     </Card>
                 </div>
@@ -443,6 +522,7 @@ export default function RoomsIndex({
                         onFiltersChange={setFilters}
                         categories={categoryOptions}
                         floors={floorOptions}
+                        buildings={buildingOptions}
                     />
                     <Button type="button" size="sm" onClick={() => setIsAddRoomOpen(true)}>
                         <Plus className="h-4 w-4" />

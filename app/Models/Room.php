@@ -19,6 +19,7 @@ class Room extends Model
         'building_id',
         'floor_id',
         'room_category_id',
+        'code',
         'status',
         'manual_status',
         'scheduled_cleaning_at',

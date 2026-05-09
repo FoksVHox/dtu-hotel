@@ -21,6 +21,7 @@ class UpdateRoomRequest extends FormRequest
             'room_category_id' => ['nullable', 'integer', 'exists:room_categories,id'],
             'floor_id' => ['nullable', 'integer', 'exists:floors,id'],
             'manual_status' => ['nullable', 'integer', Rule::in(array_column(BookingStatus::cases(), 'value'))],
+            'code' => ['nullable', 'string', 'max:20'],
         ];
     }
 }

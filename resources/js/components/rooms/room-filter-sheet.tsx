@@ -13,17 +13,19 @@ import {
     SheetTitle,
     SheetTrigger,
 } from '@/components/ui/sheet'
-import { STATUS_CONFIG } from '@/components/room-status-badge'
+import { ROOM_STATUS_CONFIG } from '@/components/room-status-badge'
 
 export type RoomFilters = {
     categories: string[]
-    floors: number[]
+    floors: string[]
+    buildings: string[]
     statuses: number[]
 }
 
 export const DEFAULT_ROOM_FILTERS: RoomFilters = {
     categories: [],
     floors: [],
+    buildings: [],
     statuses: [],
 }
 
@@ -31,6 +33,7 @@ export function hasActiveRoomFilters(filters: RoomFilters): boolean {
     return (
         filters.categories.length > 0 ||
         filters.floors.length > 0 ||
+        filters.buildings.length > 0 ||
         filters.statuses.length > 0
     )
 }
@@ -39,7 +42,8 @@ interface RoomFilterSheetProps {
     filters: RoomFilters
     onFiltersChange: (filters: RoomFilters) => void
     categories: string[]
-    floors: number[]
+    floors: string[]
+    buildings: string[]
 }
 
 export function RoomFilterSheet({
@@ -47,29 +51,17 @@ export function RoomFilterSheet({
     onFiltersChange,
     categories,
     floors,
+    buildings,
 }: RoomFilterSheetProps) {
     const activeCount =
-        filters.categories.length + filters.floors.length + filters.statuses.length
+        filters.categories.length + filters.floors.length + filters.buildings.length + filters.statuses.length
 
-    function toggleCategory(cat: string) {
-        const next = filters.categories.includes(cat)
-            ? filters.categories.filter((c) => c !== cat)
-            : [...filters.categories, cat]
-        onFiltersChange({ ...filters, categories: next })
-    }
-
-    function toggleFloor(floor: number) {
-        const next = filters.floors.includes(floor)
-            ? filters.floors.filter((f) => f !== floor)
-            : [...filters.floors, floor]
-        onFiltersChange({ ...filters, floors: next })
-    }
-
-    function toggleStatus(status: number) {
-        const next = filters.statuses.includes(status)
-            ? filters.statuses.filter((s) => s !== status)
-            : [...filters.statuses, status]
-        onFiltersChange({ ...filters, statuses: next })
+    function toggle<T>(key: keyof RoomFilters, value: T) {
+        const current = filters[key] as T[]
+        const next = current.includes(value)
+            ? current.filter((v) => v !== value)
+            : [...current, value]
+        onFiltersChange({ ...filters, [key]: next })
     }
 
     return (
@@ -89,76 +81,75 @@ export function RoomFilterSheet({
                 <SheetHeader>
                     <SheetTitle>Filters</SheetTitle>
                     <SheetDescription>
-                        Filter rooms by category, floor, or status.
+                        Filter rooms by building, floor, category, or status.
                     </SheetDescription>
                 </SheetHeader>
 
-                <div className="grid flex-1 grid-cols-2 gap-6 overflow-y-auto px-4 pb-4">
-                    <div className="flex flex-col gap-4">
-                        <div className="flex flex-col gap-2">
-                            <span className="text-xs font-medium text-muted-foreground">
-                                Category
-                            </span>
-                            {categories.map((cat) => (
-                                <div key={cat} className="flex items-center gap-2">
-                                    <Checkbox
-                                        id={`cat-${cat}`}
-                                        checked={filters.categories.includes(cat)}
-                                        onCheckedChange={() => toggleCategory(cat)}
-                                    />
-                                    <Label
-                                        htmlFor={`cat-${cat}`}
-                                        className="cursor-pointer text-sm font-normal"
-                                    >
-                                        {cat}
-                                    </Label>
-                                </div>
-                            ))}
-                        </div>
-
-                        <Separator />
-
-                        <div className="flex flex-col gap-2">
-                            <span className="text-xs font-medium text-muted-foreground">
-                                Floor
-                            </span>
-                            {floors.map((floor) => (
-                                <div key={floor} className="flex items-center gap-2">
-                                    <Checkbox
-                                        id={`floor-${floor}`}
-                                        checked={filters.floors.includes(floor)}
-                                        onCheckedChange={() => toggleFloor(floor)}
-                                    />
-                                    <Label
-                                        htmlFor={`floor-${floor}`}
-                                        className="cursor-pointer text-sm font-normal"
-                                    >
-                                        Floor {floor}
-                                    </Label>
-                                </div>
-                            ))}
-                        </div>
+                <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-4 pb-4">
+                    <div className="flex flex-col gap-2">
+                        <span className="text-xs font-medium text-muted-foreground">Building</span>
+                        {buildings.map((b) => (
+                            <div key={b} className="flex items-center gap-2">
+                                <Checkbox
+                                    id={`building-${b}`}
+                                    checked={filters.buildings.includes(b)}
+                                    onCheckedChange={() => toggle('buildings', b)}
+                                />
+                                <Label htmlFor={`building-${b}`} className="cursor-pointer text-sm font-normal">
+                                    {b}
+                                </Label>
+                            </div>
+                        ))}
                     </div>
 
+                    <Separator />
+
                     <div className="flex flex-col gap-2">
-                        <span className="text-xs font-medium text-muted-foreground">
-                            Room Status
-                        </span>
-                        {Object.entries(STATUS_CONFIG).map(([value, cfg]) => (
+                        <span className="text-xs font-medium text-muted-foreground">Floor</span>
+                        {floors.map((f) => (
+                            <div key={f} className="flex items-center gap-2">
+                                <Checkbox
+                                    id={`floor-${f}`}
+                                    checked={filters.floors.includes(f)}
+                                    onCheckedChange={() => toggle('floors', f)}
+                                />
+                                <Label htmlFor={`floor-${f}`} className="cursor-pointer text-sm font-normal">
+                                    {f}
+                                </Label>
+                            </div>
+                        ))}
+                    </div>
+
+                    <Separator />
+
+                    <div className="flex flex-col gap-2">
+                        <span className="text-xs font-medium text-muted-foreground">Category</span>
+                        {categories.map((cat) => (
+                            <div key={cat} className="flex items-center gap-2">
+                                <Checkbox
+                                    id={`cat-${cat}`}
+                                    checked={filters.categories.includes(cat)}
+                                    onCheckedChange={() => toggle('categories', cat)}
+                                />
+                                <Label htmlFor={`cat-${cat}`} className="cursor-pointer text-sm font-normal">
+                                    {cat}
+                                </Label>
+                            </div>
+                        ))}
+                    </div>
+
+                    <Separator />
+
+                    <div className="flex flex-col gap-2">
+                        <span className="text-xs font-medium text-muted-foreground">Room Status</span>
+                        {Object.entries(ROOM_STATUS_CONFIG).map(([value, cfg]) => (
                             <div key={value} className="flex items-center gap-2">
                                 <Checkbox
                                     id={`status-${value}`}
                                     checked={filters.statuses.includes(Number(value))}
-                                    onCheckedChange={() => toggleStatus(Number(value))}
+                                    onCheckedChange={() => toggle('statuses', Number(value))}
                                 />
-                                <Label
-                                    htmlFor={`status-${value}`}
-                                    className="flex cursor-pointer items-center gap-1.5 text-sm font-normal"
-                                >
-                                    <span
-                                        className="inline-block size-2.5 rounded-sm"
-                                        style={{ backgroundColor: cfg.text }}
-                                    />
+                                <Label htmlFor={`status-${value}`} className="cursor-pointer text-sm font-normal">
                                     {cfg.label}
                                 </Label>
                             </div>

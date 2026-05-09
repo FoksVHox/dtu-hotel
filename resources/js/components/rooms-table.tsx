@@ -4,17 +4,25 @@ import { RoomStatusBadge } from '@/components/room-status-badge';
 
 export type Room = {
     id: number;
-    code: string;
-    category: string;
-    floor: number;
+    code: string | null;
     status: number;
-    booking_status: number | null;
     manual_status: number | null;
+    scheduled_cleaning_at: string | null;
     room_category_id: number;
     floor_id: number;
+    room_category: { id: number; name: string; description: string };
+    floor: { id: number; name: string; building: { name: string } };
 };
 
-type SortKey = 'code' | 'category' | 'status';
+type SortKey = 'building' | 'floor' | 'code' | 'category' | 'status';
+
+function getSortValue(room: Room, key: SortKey): string | number {
+    if (key === 'building') return room.floor.building.name;
+    if (key === 'floor') return room.floor.name;
+    if (key === 'category') return room.room_category.name;
+    if (key === 'code') return room.code ?? '';
+    return room.status;
+}
 
 type SortHeaderProps = {
     label: string;
@@ -55,8 +63,8 @@ export function RoomsTable({
         const copy = [...rooms];
 
         copy.sort((a, b) => {
-            const aVal = a[sortKey];
-            const bVal = b[sortKey];
+            const aVal = getSortValue(a, sortKey);
+            const bVal = getSortValue(b, sortKey);
 
             if (typeof aVal === 'number' && typeof bVal === 'number') {
                 return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
@@ -89,35 +97,42 @@ export function RoomsTable({
 
     return (
         <div className="overflow-hidden rounded-xl border border-white/10">
-            <table className="w-full text-sm">
+            <table className="w-full table-fixed text-sm">
                 <thead className="bg-muted/50 text-muted-foreground">
                     <tr>
-                        <th className="px-4 py-3 text-left">
+                        <th className="px-3 py-2 text-left">
+                            <SortHeader label="Building" sortKey="building" activeKey={sortKey} direction={sortDir} onToggle={toggleSort} />
+                        </th>
+                        <th className="px-3 py-2 text-left">
+                            <SortHeader label="Floor" sortKey="floor" activeKey={sortKey} direction={sortDir} onToggle={toggleSort} />
+                        </th>
+                        <th className="px-3 py-2 text-left">
                             <SortHeader label="Room Code" sortKey="code" activeKey={sortKey} direction={sortDir} onToggle={toggleSort} />
                         </th>
-                        <th className="px-4 py-3 text-left">
+                        <th className="px-3 py-2 text-left">
                             <SortHeader label="Category" sortKey="category" activeKey={sortKey} direction={sortDir} onToggle={toggleSort} />
                         </th>
-                        <th className="px-4 py-3 text-left">
+                        <th className="px-3 py-2 text-left">
                             <SortHeader label="Status" sortKey="status" activeKey={sortKey} direction={sortDir} onToggle={toggleSort} />
                         </th>
-                        <th className="px-4 py-3 text-right">Actions</th>
+                        <th className="px-3 py-2 text-right">Actions</th>
                     </tr>
                 </thead>
 
                 <tbody className="divide-y divide-white/10">
                     {sortedRooms.map((room) => (
                         <tr key={room.id} className="hover:bg-white/5">
-                            <td className="px-4 py-3 font-medium">{room.code}</td>
-                            <td className="px-4 py-3">{room.category}</td>
-                            <td className="px-4 py-3">
+                            <td className="px-3 py-2">{room.floor.building.name}</td>
+                            <td className="px-3 py-2">{room.floor.name}</td>
+                            <td className="px-3 py-2 font-medium">{room.code ?? '—'}</td>
+                            <td className="px-3 py-2">{room.room_category.name}</td>
+                            <td className="px-3 py-2">
                                 <RoomStatusBadge
-                                    status={room.booking_status}
-                                    manualStatus={room.manual_status}
+                                    status={null}
                                     fallbackStatus={room.status}
                                 />
                             </td>
-                            <td className="px-4 py-3">
+                            <td className="px-3 py-2">
                                 <div className="flex justify-end gap-2">
                                     <button
                                         className="rounded-md border border-white/10 p-2 hover:bg-white/5"
