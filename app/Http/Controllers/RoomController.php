@@ -56,9 +56,9 @@ class RoomController extends Controller
         return to_route('rooms.index');
     }
 
-    public function show(string $id): void {}
+    public function show(): void {}
 
-    public function edit(string $id): void {}
+    public function edit(): void {}
 
     public function update(UpdateRoomRequest $request, Room $room): RedirectResponse
     {
@@ -105,5 +105,10 @@ class RoomController extends Controller
         return to_route('rooms.index');
     }
 
-    public function destroy(string $id): void {}
+    public function destroy(Room $room): RedirectResponse
+    {
+        $room->delete();
+
+        return to_route('rooms.index');
+    }
 }

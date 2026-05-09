@@ -1,7 +1,7 @@
 import { Head, router } from '@inertiajs/react';
 import { Plus, Search } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { store as storeRoom, update as updateRoom } from '@/actions/App/Http/Controllers/RoomController';
+import { destroy as destroyRoom, store as storeRoom, update as updateRoom } from '@/actions/App/Http/Controllers/RoomController';
 import { ROOM_STATUS_CONFIG, STATUS_CONFIG } from '@/components/room-status-badge';
 import { RoomsTable, type Room } from '@/components/rooms-table';
 import { RoomFilterBar } from '@/components/rooms/room-filter-bar';
@@ -192,7 +192,7 @@ export default function RoomsIndex({
     }
 
     function handleDeleteRoom(roomId: number): void {
-        setLocalRooms((prev) => prev.filter((room) => room.id !== roomId));
+        router.delete(destroyRoom({ room: roomId }).url);
     }
 
     function resetForm(): void {
