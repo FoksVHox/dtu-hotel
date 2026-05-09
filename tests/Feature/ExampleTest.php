@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+
 it('serves the landing page to unauthenticated visitors', function () {
     $response = $this->get('/');
 
@@ -13,7 +15,7 @@ it('redirects authenticated users from / to the dashboard', function () {
 });
 
 it('redirects authenticated but un-onboarded users from / to onboarding via the dashboard middleware', function () {
-    $user = App\Models\User::factory()->create([
+    $user = User::factory()->create([
         'hotel_id' => null,
         'onboarded_at' => null,
     ]);
