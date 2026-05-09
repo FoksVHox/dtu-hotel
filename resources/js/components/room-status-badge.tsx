@@ -24,7 +24,7 @@ export function RoomStatusBadge({
     manualStatus,
     fallbackStatus,
 }: {
-    status: number | null | undefined;
+    status?: number | null | undefined;
     manualStatus?: number | null;
     fallbackStatus?: number;
 }) {

@@ -3,6 +3,7 @@
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MaintenanceController;
+use App\Http\Controllers\MaintenanceLogController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SearchGuestsController;
@@ -38,6 +39,7 @@ Route::middleware(['auth', 'ensure.hotel.onboarded'])->group(function () {
     Route::get('guests/search', SearchGuestsController::class)->name('guests.search');
 
     Route::get('maintenance', MaintenanceController::class)->name('maintenance.index');
+    Route::post('maintenance/logs', [MaintenanceLogController::class, 'store'])->name('maintenance.logs.store');
 });
 
 require __DIR__.'/settings.php';
