@@ -38,8 +38,14 @@ class BookingController extends Controller
                 'rooms' => $booking->rooms->map(fn (Room $room) => [
                     'id' => $room->id,
                     'code' => $room->building->code.'-'.$room->floor->name.'-'.$room->id,
-                    'room_category' => ['name' => $room->roomCategory?->name ?? ''],
-                    'floor' => ['code' => $room->floor->code],
+                    'room_category' => [
+                        'id' => $room->roomCategory?->id,
+                        'name' => $room->roomCategory?->name ?? '',
+                    ],
+                    'floor' => [
+                        'id' => $room->floor->id,
+                        'code' => $room->floor->code,
+                    ],
                 ]),
             ]);
 

@@ -46,6 +46,7 @@ import {
     SheetTrigger,
 } from '@/components/ui/sheet';
 import AppLayout from '@/layouts/app-layout';
+import bookingsRoute from '@/routes/bookings';
 import type { BreadcrumbItem } from '@/types';
 import type { Booking } from '@/types/booking';
 import {
@@ -56,7 +57,6 @@ import {
     type CalendarRoom,
     type CalendarRoomCategory,
 } from '@/types/calendar';
-import bookingsRoute from '@/routes/bookings';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Booking Management', href: bookingsRoute.index().url },
@@ -543,22 +543,8 @@ export default function BookingsIndex({
     }
 
     const filteredBookings = useMemo(() => {
-        const categoryNameMap = new Map(
-            categories.map((category) => [category.id, category.name]),
-        );
-        const floorCodeMap = new Map(
-            floors.map((floor) => [floor.id, floor.code]),
-        );
-        const selectedCategoryNames = new Set(
-            filters.categoryIds
-                .map((id) => categoryNameMap.get(id))
-                .filter((name): name is string => name !== undefined),
-        );
-        const selectedFloorCodes = new Set(
-            filters.floorIds
-                .map((id) => floorCodeMap.get(id))
-                .filter((code): code is string => code !== undefined),
-        );
+        const selectedCategoryIds = new Set(filters.categoryIds);
+        const selectedFloorIds = new Set(filters.floorIds);
         const query = searchQuery.trim().toLowerCase();
 
         return bookings.filter((booking) => {
@@ -570,18 +556,18 @@ export default function BookingsIndex({
             }
 
             if (
-                selectedCategoryNames.size > 0 &&
+                selectedCategoryIds.size > 0 &&
                 !booking.rooms.some((room) =>
-                    selectedCategoryNames.has(room.room_category.name),
+                    selectedCategoryIds.has(room.room_category.id ?? -1),
                 )
             ) {
                 return false;
             }
 
             if (
-                selectedFloorCodes.size > 0 &&
+                selectedFloorIds.size > 0 &&
                 !booking.rooms.some((room) =>
-                    selectedFloorCodes.has(room.floor.code),
+                    selectedFloorIds.has(room.floor.id),
                 )
             ) {
                 return false;
@@ -614,7 +600,7 @@ export default function BookingsIndex({
 
             return searchableText.includes(query);
         });
-    }, [bookings, categories, filters, floors, searchQuery]);
+    }, [bookings, filters, searchQuery]);
 
     const sortedBookings = useMemo(() => {
         const copy = [...filteredBookings];

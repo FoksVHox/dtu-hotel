@@ -33,8 +33,8 @@ export interface BookingGuest {
 export interface BookingRoom {
     id: number;
     code: string;
-    room_category: { name: string };
-    floor: { code: string };
+    room_category: { id: number | null; name: string };
+    floor: { id: number; code: string };
 }
 
 export interface Booking {
