@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\BookingStatus;
 use App\Enums\RoomStatus;
 use App\Http\Requests\StoreRoomRequest;
 use App\Http\Requests\UpdateRoomRequest;
+use App\Models\Booking;
 use App\Models\Floor;
 use App\Models\MaintenanceLog;
 use App\Models\Room;
@@ -17,9 +19,11 @@ class RoomController extends Controller
 {
     public function index(): Response
     {
-        $rooms = Room::with(['floor.building', 'roomCategory'])
-            ->orderBy('id')
-            ->get();
+        $rooms = Room::with([
+            'floor.building',
+            'roomCategory',
+            'bookings' => fn ($q) => $q->with('guests')->latest('start')->limit(5),
+        ])->orderBy('id')->get();
 
         $categories = RoomCategory::orderBy('name')->get(['id', 'name']);
 
@@ -30,10 +34,26 @@ class RoomController extends Controller
                 'building_name' => $floor->building->name,
             ]);
 
+        $totalBookings = Booking::count();
+
+        $roomStats = [
+            'checked_in' => Booking::where('status', BookingStatus::CheckedIn)->count(),
+            'confirmed' => Booking::where('status', BookingStatus::Confirmed)->count(),
+            'pending' => Booking::where('status', BookingStatus::Pending)->count(),
+            'cancelled' => Booking::where('status', BookingStatus::Cancelled)->count(),
+            'total_bookings' => $totalBookings,
+            'avg_bookings_per_room' => $rooms->count() > 0 ? round($totalBookings / $rooms->count(), 1) : 0,
+            'checkins_today' => Booking::whereDate('start', today())->count(),
+            'checkouts_today' => Booking::whereDate('end', today())->count(),
+            'checkins_this_week' => Booking::whereBetween('start', [now(), now()->addDays(7)])->count(),
+            'rooms_with_accessories' => Room::has('roomAccessories')->count(),
+        ];
+
         return Inertia::render('rooms/index', [
             'rooms' => $rooms,
             'categories' => $categories,
             'floors' => $floors,
+            'roomStats' => $roomStats,
         ]);
     }
 

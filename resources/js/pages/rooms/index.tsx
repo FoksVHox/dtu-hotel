@@ -1,9 +1,10 @@
 import { Head, router } from '@inertiajs/react';
-import { Plus, Search } from 'lucide-react';
+import { AlertTriangle, Building2, CalendarDays, CheckCircle, DoorOpen, Layers, Plus, Search, Sparkles, Wrench } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { destroy as destroyRoom, store as storeRoom, update as updateRoom } from '@/actions/App/Http/Controllers/RoomController';
 import { ROOM_STATUS_CONFIG, STATUS_CONFIG } from '@/components/room-status-badge';
 import { RoomsTable, type Room } from '@/components/rooms-table';
+import { RoomDetailDialog } from '@/components/rooms/room-detail-dialog';
 import { RoomFilterBar } from '@/components/rooms/room-filter-bar';
 import {
     RoomFilterSheet,
@@ -12,6 +13,8 @@ import {
 } from '@/components/rooms/room-filter-sheet';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
 import {
     Dialog,
     DialogContent,
@@ -57,14 +60,36 @@ type EditForm = {
 const initialForm: RoomForm = { code: '', room_category_id: '', floor_id: '', status: '' };
 const initialEditForm: EditForm = { code: '', room_category_id: '', floor_id: '', status: '' };
 
+type RoomStats = {
+    checked_in: number;
+    confirmed: number;
+    pending: number;
+    cancelled: number;
+    total_bookings: number;
+    avg_bookings_per_room: number;
+    checkins_today: number;
+    checkouts_today: number;
+    checkins_this_week: number;
+    rooms_with_accessories: number;
+};
+
+const defaultRoomStats: RoomStats = {
+    checked_in: 0, confirmed: 0, pending: 0, cancelled: 0,
+    total_bookings: 0, avg_bookings_per_room: 0,
+    checkins_today: 0, checkouts_today: 0, checkins_this_week: 0,
+    rooms_with_accessories: 0,
+};
+
 export default function RoomsIndex({
     rooms,
     categories = [],
     floors = [],
+    roomStats = defaultRoomStats,
 }: {
     rooms?: Room[];
     categories?: CategoryOption[];
     floors?: FloorOption[];
+    roomStats?: RoomStats;
 }) {
     const safeRooms = rooms ?? [];
 
@@ -193,6 +218,45 @@ export default function RoomsIndex({
 
     function handleDeleteRoom(roomId: number): void {
         router.delete(destroyRoom({ room: roomId }).url);
+    }
+
+    const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+    const [detailOpen, setDetailOpen] = useState(false);
+
+    const counts = useMemo(() => {
+        const total = localRooms.length;
+        const available = localRooms.filter((r) => r.status === 0).length;
+        const occupied = localRooms.filter((r) => r.status === 1).length;
+        const cleaning = localRooms.filter((r) => r.status === 2).length;
+        const outOfOrder = localRooms.filter((r) => r.status === 3).length;
+        const withBookings = localRooms.filter((r) => r.bookings.length > 0).length;
+        const totalBookings = localRooms.reduce((sum, r) => sum + r.bookings.length, 0);
+        const scheduledCleaning = localRooms.filter((r) => r.scheduled_cleaning_at != null).length;
+        const occupancyPct = total > 0 ? Math.round((occupied / total) * 100) : 0;
+        const availablePct = total > 0 ? Math.round((available / total) * 100) : 0;
+        const bookingCoveragePct = total > 0 ? Math.round((withBookings / total) * 100) : 0;
+        const uniqueBuildings = new Set(localRooms.map((r) => r.floor.building.name)).size;
+        const uniqueFloors = new Set(localRooms.map((r) => r.floor_id)).size;
+        const uniqueCategories = new Set(localRooms.map((r) => r.room_category.name)).size;
+        return {
+            total, available, occupied, cleaning, outOfOrder,
+            withBookings, totalBookings, scheduledCleaning,
+            occupancyPct, availablePct, bookingCoveragePct,
+            uniqueBuildings, uniqueFloors, uniqueCategories,
+        };
+    }, [localRooms]);
+
+    function handleRowClick(room: Room): void {
+        setSelectedRoom(room);
+        setDetailOpen(true);
+    }
+
+    function handleToggleMaintenance(room: Room): void {
+        const nextStatus = room.status === 3 ? 0 : 3;
+        router.patch(
+            updateRoom({ room: room.id }).url,
+            { status: nextStatus, manual_status: null },
+        );
     }
 
     function resetForm(): void {
@@ -466,43 +530,227 @@ export default function RoomsIndex({
                 </Dialog>
 
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                    <Card>
-                        <CardHeader className="pb-1">
-                            <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground">—</CardTitle>
+                    {/* Card 1: Room Status Overview */}
+                    <Card className="gap-4 py-5">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-lg">
+                                <Building2 className="size-4 text-muted-foreground" />
+                                Room Status
+                            </CardTitle>
                         </CardHeader>
-                        <CardContent>
-                            <p className="text-3xl font-bold">—</p>
-                            <p className="mt-1 text-xs text-muted-foreground">Coming soon</p>
+                        <CardContent className="flex flex-col gap-3">
+                            <div className="flex items-center justify-between">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Building2 className="size-3.5" />
+                                    Total rooms
+                                </span>
+                                <span className="text-sm font-semibold">{counts.total}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <DoorOpen className="size-3.5" />
+                                    Available
+                                </span>
+                                <span className="text-sm font-semibold">
+                                    {counts.available}
+                                    <span className="ml-1 text-xs font-normal text-muted-foreground">({counts.availablePct}%)</span>
+                                </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <CheckCircle className="size-3.5" />
+                                    Occupied
+                                </span>
+                                <span className="text-sm font-semibold">
+                                    {counts.occupied}
+                                    <span className="ml-1 text-xs font-normal text-muted-foreground">({counts.occupancyPct}%)</span>
+                                </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Sparkles className="size-3.5" />
+                                    Cleaning
+                                </span>
+                                <span className="text-sm font-semibold">{counts.cleaning}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Wrench className="size-3.5" />
+                                    Out of Order
+                                </span>
+                                <span className="text-sm font-semibold">{counts.outOfOrder}</span>
+                            </div>
+                            <Separator />
+                            <div className="flex flex-col gap-1.5">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-xs text-muted-foreground">Occupancy</span>
+                                    <span className="text-xs font-medium">{counts.occupancyPct}%</span>
+                                </div>
+                                <Progress value={counts.occupancyPct} />
+                            </div>
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader className="pb-1">
-                            <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground">—</CardTitle>
+                    {/* Card 2: Booking Activity */}
+                    <Card className="gap-4 py-5">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-lg">
+                                <CalendarDays className="size-4 text-muted-foreground" />
+                                Booking Activity
+                            </CardTitle>
                         </CardHeader>
-                        <CardContent>
-                            <p className="text-3xl font-bold">—</p>
-                            <p className="mt-1 text-xs text-muted-foreground">Coming soon</p>
+                        <CardContent className="flex flex-col gap-3">
+                            <div className="flex items-center justify-between">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <CalendarDays className="size-3.5" />
+                                    Total bookings
+                                </span>
+                                <span className="text-sm font-semibold">{roomStats.total_bookings}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <CheckCircle className="size-3.5" />
+                                    Checked in
+                                </span>
+                                <span className="text-sm font-semibold">{roomStats.checked_in}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <CheckCircle className="size-3.5" />
+                                    Confirmed
+                                </span>
+                                <span className="text-sm font-semibold">{roomStats.confirmed}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <AlertTriangle className="size-3.5" />
+                                    Pending
+                                </span>
+                                <span className="text-sm font-semibold">{roomStats.pending}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <DoorOpen className="size-3.5" />
+                                    Cancelled
+                                </span>
+                                <span className="text-sm font-semibold">{roomStats.cancelled}</span>
+                            </div>
+                            <Separator />
+                            <div className="flex items-center justify-between">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <CalendarDays className="size-3.5" />
+                                    Avg per room
+                                </span>
+                                <span className="text-sm font-semibold">{roomStats.avg_bookings_per_room}</span>
+                            </div>
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader className="pb-1">
-                            <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground">—</CardTitle>
+                    {/* Card 3: Today's Activity */}
+                    <Card className="gap-4 py-5">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-lg">
+                                <Sparkles className="size-4 text-muted-foreground" />
+                                Today &amp; Cleaning
+                            </CardTitle>
                         </CardHeader>
-                        <CardContent>
-                            <p className="text-3xl font-bold">—</p>
-                            <p className="mt-1 text-xs text-muted-foreground">Coming soon</p>
+                        <CardContent className="flex flex-col gap-3">
+                            <div className="flex items-center justify-between">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <CalendarDays className="size-3.5" />
+                                    Check-ins today
+                                </span>
+                                <span className="text-sm font-semibold">{roomStats.checkins_today}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <DoorOpen className="size-3.5" />
+                                    Check-outs today
+                                </span>
+                                <span className="text-sm font-semibold">{roomStats.checkouts_today}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <CalendarDays className="size-3.5" />
+                                    Check-ins this week
+                                </span>
+                                <span className="text-sm font-semibold">{roomStats.checkins_this_week}</span>
+                            </div>
+                            <Separator />
+                            <div className="flex items-center justify-between">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Sparkles className="size-3.5" />
+                                    Being cleaned
+                                </span>
+                                <span className="text-sm font-semibold">{counts.cleaning}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Sparkles className="size-3.5" />
+                                    Scheduled cleaning
+                                </span>
+                                <span className="text-sm font-semibold">{counts.scheduledCleaning}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Wrench className="size-3.5" />
+                                    Needs attention
+                                </span>
+                                <span className="text-sm font-semibold">{counts.cleaning + counts.outOfOrder}</span>
+                            </div>
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader className="pb-1">
-                            <CardTitle className="text-xs uppercase tracking-wide text-muted-foreground">—</CardTitle>
+                    {/* Card 4: Hotel Structure */}
+                    <Card className="gap-4 py-5">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-lg">
+                                <Layers className="size-4 text-muted-foreground" />
+                                Hotel Structure
+                            </CardTitle>
                         </CardHeader>
-                        <CardContent>
-                            <p className="text-3xl font-bold">—</p>
-                            <p className="mt-1 text-xs text-muted-foreground">Coming soon</p>
+                        <CardContent className="flex flex-col gap-3">
+                            <div className="flex items-center justify-between">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Building2 className="size-3.5" />
+                                    Buildings
+                                </span>
+                                <span className="text-sm font-semibold">{counts.uniqueBuildings}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Layers className="size-3.5" />
+                                    Floors
+                                </span>
+                                <span className="text-sm font-semibold">{counts.uniqueFloors}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <DoorOpen className="size-3.5" />
+                                    Total rooms
+                                </span>
+                                <span className="text-sm font-semibold">{counts.total}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <CheckCircle className="size-3.5" />
+                                    Categories
+                                </span>
+                                <span className="text-sm font-semibold">{counts.uniqueCategories}</span>
+                            </div>
+                            <Separator />
+                            <div className="flex items-center justify-between">
+                                <span className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Sparkles className="size-3.5" />
+                                    With accessories
+                                </span>
+                                <span className="text-sm font-semibold">
+                                    {roomStats.rooms_with_accessories}
+                                    <span className="ml-1 text-xs font-normal text-muted-foreground">
+                                        ({counts.total > 0 ? Math.round((roomStats.rooms_with_accessories / counts.total) * 100) : 0}%)
+                                    </span>
+                                </span>
+                            </div>
                         </CardContent>
                     </Card>
                 </div>
@@ -536,6 +784,15 @@ export default function RoomsIndex({
                     rooms={filteredRooms}
                     onEdit={handleOpenEdit}
                     onDelete={handleDeleteRoom}
+                    onRowClick={handleRowClick}
+                    onToggleMaintenance={handleToggleMaintenance}
+                />
+
+                <RoomDetailDialog
+                    room={selectedRoom}
+                    open={detailOpen}
+                    onOpenChange={setDetailOpen}
+                    onEdit={handleOpenEdit}
                 />
             </div>
         </AppLayout>

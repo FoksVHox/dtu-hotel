@@ -2,6 +2,14 @@ import { Pencil, Trash2, Wrench } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { RoomStatusBadge } from '@/components/room-status-badge';
 
+export type RoomBooking = {
+    id: number;
+    start: string;
+    end: string;
+    status: number;
+    guests: { id: number; first_name: string; last_name: string }[];
+};
+
 export type Room = {
     id: number;
     code: string | null;
@@ -12,6 +20,7 @@ export type Room = {
     floor_id: number;
     room_category: { id: number; name: string; description: string };
     floor: { id: number; name: string; building: { name: string } };
+    bookings: RoomBooking[];
 };
 
 type SortKey = 'building' | 'floor' | 'code' | 'category' | 'status';
@@ -51,10 +60,14 @@ export function RoomsTable({
     rooms,
     onEdit,
     onDelete,
+    onRowClick,
+    onToggleMaintenance,
 }: {
     rooms: Room[];
     onEdit?: (room: Room) => void;
     onDelete?: (id: number) => void;
+    onRowClick?: (room: Room) => void;
+    onToggleMaintenance?: (room: Room) => void;
 }) {
     const [sortKey, setSortKey] = useState<SortKey>('code');
     const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
@@ -121,7 +134,11 @@ export function RoomsTable({
 
                 <tbody className="divide-y divide-white/10">
                     {sortedRooms.map((room) => (
-                        <tr key={room.id} className="hover:bg-white/5">
+                        <tr
+                            key={room.id}
+                            className="cursor-pointer hover:bg-white/5"
+                            onClick={() => onRowClick?.(room)}
+                        >
                             <td className="px-3 py-2">{room.floor.building.name}</td>
                             <td className="px-3 py-2">{room.floor.name}</td>
                             <td className="px-3 py-2 font-medium">{room.code ?? '—'}</td>
@@ -132,7 +149,7 @@ export function RoomsTable({
                                     fallbackStatus={room.status}
                                 />
                             </td>
-                            <td className="px-3 py-2">
+                            <td className="px-3 py-2" onClick={(e) => e.stopPropagation()}>
                                 <div className="flex justify-end gap-2">
                                     <button
                                         className="rounded-md border border-white/10 p-2 hover:bg-white/5"
@@ -143,9 +160,9 @@ export function RoomsTable({
                                     </button>
 
                                     <button
-                                        className="rounded-md border border-white/10 p-2 hover:bg-white/5"
-                                        title="Maintenance"
-                                        onClick={() => console.log('maintenance', room.id)}
+                                        className={`rounded-md border p-2 hover:bg-white/5 ${room.status === 3 ? 'border-amber-500/40 text-amber-400' : 'border-white/10'}`}
+                                        title={room.status === 3 ? 'Mark as Available' : 'Mark as Out of Order'}
+                                        onClick={() => onToggleMaintenance?.(room)}
                                     >
                                         <Wrench className="h-4 w-4" />
                                     </button>
