@@ -52,19 +52,9 @@ export default function Hero({ canRegister }: { canRegister: boolean }) {
 
             <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-6 py-20 md:grid-cols-5 md:py-28">
                 <div className="md:col-span-3">
-                    <div
-                        className={[
-                            'inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs font-medium text-neutral-700 transition-all duration-700 ease-out',
-                            mounted ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0',
-                        ].join(' ')}
-                    >
-                        <span className="size-1.5 animate-pulse rounded-full bg-black" />
-                        Built at DTU · For small & medium hotels
-                    </div>
-
                     <h1
                         className={[
-                            'mt-6 text-5xl font-semibold leading-[1.02] tracking-tight transition-all duration-700 ease-out md:text-7xl',
+                            'text-5xl font-semibold leading-[1.02] tracking-tight transition-all duration-700 ease-out md:text-7xl',
                             mounted ? 'translate-y-0 opacity-100 delay-100' : 'translate-y-4 opacity-0',
                         ].join(' ')}
                     >
@@ -79,7 +69,7 @@ export default function Hero({ canRegister }: { canRegister: boolean }) {
                             mounted ? 'translate-y-0 opacity-100 delay-200' : 'translate-y-4 opacity-0',
                         ].join(' ')}
                     >
-                        DTU Hotel brings your bookings, rooms, guests, and maintenance into one place — fast to set up, calm to use.
+                        DTU Hotel brings your bookings, rooms, guests, and maintenance into one place — fast to set up, easy to use.
                     </p>
 
                     <div
