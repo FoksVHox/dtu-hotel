@@ -4,7 +4,6 @@ use App\Enums\BookingStatus;
 use App\Models\Booking;
 use App\Models\Guest;
 use App\Models\Room;
-use App\Models\User;
 
 // ── Index: Authentication ─────────────────────────────────────────────────────
 
@@ -16,18 +15,18 @@ test('unauthenticated user cannot access bookings index', function () {
 // ── Index: Access & Props ─────────────────────────────────────────────────────
 
 test('authenticated user can access bookings index', function () {
-    $this->actingAs(User::factory()->create());
+    $this->actingAsHotelUser();
 
     $this->get(route('bookings.index'))
         ->assertSuccessful();
 });
 
 test('index returns bookings with rooms and guests', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $room = Room::factory()->create();
-    $guest = Guest::factory()->create();
-    $booking = Booking::factory()->create();
+    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
+    $booking = Booking::factory()->create(['hotel_id' => $user->hotel_id]);
     $booking->rooms()->attach($room);
     $booking->guests()->attach($guest);
 
@@ -43,11 +42,11 @@ test('index returns bookings with rooms and guests', function () {
 });
 
 test('response includes code key on rooms and first_name on guests', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $room = Room::factory()->create();
-    $guest = Guest::factory()->create();
-    $booking = Booking::factory()->create();
+    $room = Room::factory()->create(['hotel_id' => $user->hotel_id]);
+    $guest = Guest::factory()->create(['hotel_id' => $user->hotel_id]);
+    $booking = Booking::factory()->create(['hotel_id' => $user->hotel_id]);
     $booking->rooms()->attach($room);
     $booking->guests()->attach($guest);
 
@@ -71,9 +70,9 @@ test('unauthenticated user cannot delete a booking', function () {
 // ── Destroy: Deletable statuses ───────────────────────────────────────────────
 
 test('a Pending booking can be deleted', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $booking = Booking::factory()->create(['status' => BookingStatus::Pending]);
+    $booking = Booking::factory()->create(['hotel_id' => $user->hotel_id, 'status' => BookingStatus::Pending]);
 
     $this->delete(route('bookings.destroy', $booking))
         ->assertRedirect();
@@ -82,9 +81,9 @@ test('a Pending booking can be deleted', function () {
 });
 
 test('a Confirmed booking can be deleted', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $booking = Booking::factory()->create(['status' => BookingStatus::Confirmed]);
+    $booking = Booking::factory()->create(['hotel_id' => $user->hotel_id, 'status' => BookingStatus::Confirmed]);
 
     $this->delete(route('bookings.destroy', $booking))
         ->assertRedirect();
@@ -93,9 +92,9 @@ test('a Confirmed booking can be deleted', function () {
 });
 
 test('a Cancelled booking can be deleted', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $booking = Booking::factory()->create(['status' => BookingStatus::Cancelled]);
+    $booking = Booking::factory()->create(['hotel_id' => $user->hotel_id, 'status' => BookingStatus::Cancelled]);
 
     $this->delete(route('bookings.destroy', $booking))
         ->assertRedirect();
@@ -106,9 +105,9 @@ test('a Cancelled booking can be deleted', function () {
 // ── Destroy: Non-deletable statuses ──────────────────────────────────────────
 
 test('a CheckedIn booking cannot be deleted', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $booking = Booking::factory()->create(['status' => BookingStatus::CheckedIn]);
+    $booking = Booking::factory()->create(['hotel_id' => $user->hotel_id, 'status' => BookingStatus::CheckedIn]);
 
     $this->delete(route('bookings.destroy', $booking))
         ->assertRedirect()
@@ -118,9 +117,9 @@ test('a CheckedIn booking cannot be deleted', function () {
 });
 
 test('a CheckedOut booking cannot be deleted', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $booking = Booking::factory()->create(['status' => BookingStatus::CheckedOut]);
+    $booking = Booking::factory()->create(['hotel_id' => $user->hotel_id, 'status' => BookingStatus::CheckedOut]);
 
     $this->delete(route('bookings.destroy', $booking))
         ->assertRedirect()
@@ -130,9 +129,9 @@ test('a CheckedOut booking cannot be deleted', function () {
 });
 
 test('a Maintenance booking cannot be deleted', function () {
-    $this->actingAs(User::factory()->create());
+    $user = $this->actingAsHotelUser();
 
-    $booking = Booking::factory()->create(['status' => BookingStatus::Maintenance]);
+    $booking = Booking::factory()->create(['hotel_id' => $user->hotel_id, 'status' => BookingStatus::Maintenance]);
 
     $this->delete(route('bookings.destroy', $booking))
         ->assertRedirect()
