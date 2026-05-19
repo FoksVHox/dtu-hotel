@@ -94,6 +94,7 @@ class MaintenanceController extends Controller
 
         return Inertia::render('maintenance/index', [
             'rooms' => $rooms,
+            'cleaningRooms' => $rooms->filter(fn ($room) => $room['status'] === RoomStatus::Cleaning->value)->values(),
             'allRooms' => $allRooms,
             'floors' => $floors,
             'stats' => $stats,
