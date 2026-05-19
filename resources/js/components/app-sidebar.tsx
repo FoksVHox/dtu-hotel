@@ -49,12 +49,7 @@ const mainNavItems: NavItem[] = [
         title: 'Maintenance',
         href: maintenance.index(),
         icon: Wrench,
-    },
-    {
-        title: 'Settings',
-        href: profile.edit(),
-        icon: Settings,
-    },
+    }
 ];
 
 const footerNavItems: NavItem[] = [
